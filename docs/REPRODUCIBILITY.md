@@ -48,13 +48,30 @@ python scripts/quick_start.py
 - `e4_exact/`：Exact Oracle 求解器与正式协议（N-grid、timeout、预算）；
 - `r6/frozen_method_configs/`：六个 Baseline 的 frozen 配置。
 
-## 6. 参考结果
+## 7. 复现层级
 
-`reference_results/` 提供各正式实验的轻量机器可读聚合摘要（数值全部来自既有正式结果，不重新计算 Claim、不重跑实验）。完整逐实例结果不随本公开仓库分发。
+复现分为三个层级：
 
-## 7. 复现范围与限制
+- **Level A — Fully self-contained（无需任何外部数据）**：Quick Start（`python scripts/quick_start.py`）、合成场景、CARS（AADA→RCLA）、六个 Baseline、Schema V4 验证、微型 Exact Oracle——全部可直接复现；
+- **Level B — Public-code reproducible**：代表性实验管线（`scripts/reproduce/` 中各 run/aggregate/check 脚本）可直接运行，不依赖外部数据；
+- **Level C — External-data dependent**：Trace 增强实验（`scripts/reproduce/e4_v2/`）需要第三方 Trace 数据（见 docs/DATA.md），数据缺失时入口返回 `DATA_NOT_AVAILABLE`。
 
-- 无 GNN、无 Repair、无 deadline 模型；
-- Exact Oracle 仅适用于极小规模（正式包络 N∈{4,5,6}、M=4、LOW/TRANSITION、固定 formal seeds），不声称对大规模实例可计算；
+## 8. 测试套件
+
+```bash
+pytest -q
+```
+
+干净公开环境（fresh clone + fresh venv）实测：**217 passed / 152 skipped / 0 failed**。152 个 skip 为已解释的外部资产依赖（第三方 Trace 数据、全量正式结果归档、内部正文/合同完整性资产不随本公开仓库分发）；核心 CARS / Baseline / Schema / Quick Start / Oracle 测试均实际运行通过。
+
+## 9. 参考结果
+
+`reference_results/` 提供各正式实验的轻量机器可读聚合摘要（数值全部来自既有正式结果，不重新计算 Claim、不重跑实验），**不是全量 raw formal archive**。完整逐实例结果不随本公开仓库分发；不建议把 reference_results 作为实验输入数据。
+
+## 10. 复现范围与限制
+
+- 无 GNN、无独立 Repair 层、无 deadline 模型；
+- Exact Oracle 仅适用于极小规模（正式包络 N∈{4,5,6}、M=4、LOW/TRANSITION、固定 formal seeds），不声称对大规模实例可计算，不是在线 CARS 或可扩展通用求解器；
 - Trace 增强实验为 semi-synthetic / trace-enhanced 证据，非真实 MEC 生产部署验证；
-- 硬件/环境差异可能影响运行时间，但不影响确定性决策与规范化结果（浮点按契约容差比较）。
+- 负载诱导服务退化（LISC）为可能出现的经验形态；当前评估范围内观察到的是 ordinary degradation；
+- 硬件/环境差异可能影响运行时间，但不影响确定性决策与规范化结果（浮点按契约容差比较）；同 seed 的 `fingerprint`（决策 (X,A,F) 的确定性 SHA-256 摘要）应完全一致。
