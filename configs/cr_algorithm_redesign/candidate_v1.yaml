@@ -9,7 +9,7 @@
 #   - scenario_config 指向参考场景（仅记录；正式 validation 由阶段 runner
 #     用 E1_ENVIRONMENT_V1 生成器构造 paired 场景）。
 
-method_id: cars_aada_rcla_candidate
+method_id: cars
 config_label: cr_algorithm_redesign_candidate_v1
 scenario_config: configs/cr_algorithm_redesign/candidate_v1.yaml
 
