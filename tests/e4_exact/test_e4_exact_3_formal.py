@@ -26,7 +26,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _TESTS = os.path.dirname(_HERE)
 ROOT = os.path.dirname(_TESTS)
 CONFIGS = os.path.join(ROOT, "configs", "e4_exact")
-SCRIPTS = os.path.join(ROOT, "scripts", "experiments", "e4_exact")
+SCRIPTS = os.path.join(ROOT, "scripts", "reproduce", "e4_exact")
 
 sys.path.insert(0, SCRIPTS)
 sys.path.insert(0, os.path.join(ROOT, "src"))

@@ -26,7 +26,7 @@ import sys
 import pytest
 
 _PROJECT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-_SCRIPTS_E2 = os.path.join(_PROJECT, "scripts", "experiments", "e2_v2")
+_SCRIPTS_E2 = os.path.join(_PROJECT, "scripts", "reproduce", "e2_v2")
 if _SCRIPTS_E2 not in sys.path:
     sys.path.insert(0, _SCRIPTS_E2)
 

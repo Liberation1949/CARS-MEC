@@ -29,7 +29,7 @@ import pytest
 import yaml
 
 _PROJECT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(_PROJECT, "scripts", "experiments", "e1_v2"))
+sys.path.insert(0, os.path.join(_PROJECT, "scripts", "reproduce", "e1_v2"))
 sys.path.insert(0, os.path.join(_PROJECT, "src"))
 
 from build_e1_v2_environment import (  # noqa: E402

@@ -17,7 +17,7 @@ import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_ROOT = PROJECT_ROOT / "configs" / "e4_v2"
-SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "experiments" / "e4_v2"
+SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "reproduce" / "e4_v2"
 TRACE_ROOT = PROJECT_ROOT / "data" / "processed" / "e4_trace_enhanced"
 OUT_DIR = PROJECT_ROOT / "results" / "e4_v2" / "e4_v2_2_formal"
 

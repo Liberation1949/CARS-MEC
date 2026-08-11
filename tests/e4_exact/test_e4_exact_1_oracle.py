@@ -595,7 +595,7 @@ def test_t41_no_write_to_iii_vii_by_oracle_code():
     # 其 open("experiment_docs/III_VII.md") 为只读 hash 校验，非写入正文）
     src_files = (
         _glob.glob(os.path.join(ROOT, "src", "cars", "exact_oracle", "*.py"))
-        + [os.path.join(ROOT, "scripts", "experiments", "e4_exact",
+        + [os.path.join(ROOT, "scripts", "reproduce", "e4_exact",
                         "run_e4_exact_1_validation.py")]
     )
     for f in src_files:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""E0-V2 环境生成器测试（scripts/experiments/e0_v2/build_e0_v2_environment.py；E0-V2-0 冻结）。
+"""E0-V2 环境生成器测试（scripts/reproduce/e0_v2/build_e0_v2_environment.py；E0-V2-0 冻结）。
 
 覆盖（AC-3）：
 - 确定性：同 seed 两次生成逐字节一致；
@@ -20,8 +20,8 @@ import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _TESTS = os.path.dirname(_HERE)
 _PROJECT = os.path.dirname(_TESTS)
-_E0_GEN_DIR = os.path.join(_PROJECT, "scripts", "experiments", "e0_v2")
-_E3_GEN_DIR = os.path.join(_PROJECT, "scripts", "experiments", "e3_v2")
+_E0_GEN_DIR = os.path.join(_PROJECT, "scripts", "reproduce", "e0_v2")
+_E3_GEN_DIR = os.path.join(_PROJECT, "scripts", "reproduce", "e3_v2")
 for _p in (_TESTS, _E0_GEN_DIR, _E3_GEN_DIR):
     if _p not in sys.path:
         sys.path.insert(0, _p)

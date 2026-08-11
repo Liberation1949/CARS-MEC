@@ -23,13 +23,13 @@ from pathlib import Path
 import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "experiments" / "e4_v2"
+SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "reproduce" / "e4_v2"
 FORMAL_DIR = PROJECT_ROOT / "results" / "e4_v2" / "e4_v2_2_formal"
 REANA_DIR = PROJECT_ROOT / "results" / "e4_v2" / "e4_v2_statistical_reanalysis"
 MANUSCRIPT = PROJECT_ROOT / "experiment_docs" / "III_VII.md"
 TRACE_ROOT = PROJECT_ROOT / "data" / "processed" / "e4_trace_enhanced"
 
-# 重分析脚本位于 scripts/experiments/e4_v2/ 子目录（conftest 仅加入 scripts/），
+# 重分析脚本位于 scripts/reproduce/e4_v2/ 子目录（conftest 仅加入 scripts/），
 # 此处显式加入以支持核心纯函数导入。
 sys.path.insert(0, str(SCRIPT_ROOT))
 

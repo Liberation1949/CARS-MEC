@@ -17,7 +17,7 @@ import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _TESTS = os.path.dirname(_HERE)
 _PROJECT = os.path.dirname(_TESTS)
-_GEN_DIR = os.path.join(_PROJECT, "scripts", "experiments", "e3_v2")
+_GEN_DIR = os.path.join(_PROJECT, "scripts", "reproduce", "e3_v2")
 for _p in (_TESTS, _GEN_DIR):
     if _p not in sys.path:
         sys.path.insert(0, _p)

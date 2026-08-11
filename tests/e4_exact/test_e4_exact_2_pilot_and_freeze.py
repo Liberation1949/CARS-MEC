@@ -27,7 +27,7 @@ _TESTS = os.path.dirname(_HERE)
 ROOT = os.path.dirname(_TESTS)
 CONFIGS = os.path.join(ROOT, "configs", "e4_exact")
 RESULTS = os.path.join(ROOT, "results", "e4_exact", "e4_exact_2_pilot")
-SCRIPTS = os.path.join(ROOT, "scripts", "experiments", "e4_exact")
+SCRIPTS = os.path.join(ROOT, "scripts", "reproduce", "e4_exact")
 
 PILOT_PROTOCOL = os.path.join(CONFIGS, "e4_exact_2_pilot_protocol.yaml")
 FORMAL_PROTOCOL = os.path.join(CONFIGS, "e4_exact_formal_protocol.yaml")

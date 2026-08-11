@@ -21,7 +21,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TRACE_ROOT = PROJECT_ROOT / "data" / "processed" / "e4_trace_enhanced"
 CONFIG_ROOT = PROJECT_ROOT / "configs" / "e4_v2"
-SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "experiments" / "e4_v2"
+SCRIPT_ROOT = PROJECT_ROOT / "scripts" / "reproduce" / "e4_v2"
 PILOT_DIR = PROJECT_ROOT / "results" / "e4_v2" / "e4_v2_1_pilot"
 
 DATASETS = ["azure", "nep", "shanghai"]
