@@ -126,3 +126,86 @@ def schema_errors_v4():
         return vas.validate_instance(payload, target, registry, docs)
 
     return _check
+
+
+# ---------------------------------------------------------------------------
+# OS2: external-artifact dependent tests
+#
+# The public repo does NOT bundle formal results / trace data / contracts /
+# manuscript. Tests that validate those artifacts are skipped in a clean clone
+# (they become active once the corresponding reproduce script under
+# scripts/reproduce/ has been executed and produced the artifact in results/).
+# This is a test-packaging decision (OS2 contract §6); no algorithm or metric
+# semantics are changed.
+# ---------------------------------------------------------------------------
+
+_PROJECT_ROOT = os.path.dirname(_HERE)
+
+
+def _artifact(rel: str) -> str:
+    return os.path.join(_PROJECT_ROOT, rel.replace("/", os.sep))
+
+
+EXTERNAL_MODULE_DEPS = {
+    "tests/e0_v2/test_e0_v2_2_formal.py": ["results/e0_v2/e0_v2_2_formal/formal_summary.json"],
+    "tests/e3_v2/test_e3_v2_2_formal.py": ["results/e3_v2/e3_v2_2_formal/formal_meta.json"],
+    "tests/e4_v2/test_e4_v2_2_formal.py": ["results/e4_v2/e4_v2_2_formal/formal_window_manifest.json"],
+    "tests/e4_v2/test_e4_v2_statistical_reanalysis.py": ["results/e4_v2/e4_v2_statistical_reanalysis/window_level_paired_effects.csv"],
+    "tests/e4_exact/test_e4_exact_2_pilot_and_freeze.py": ["results/e4_exact/e4_exact_2_pilot/formal_scale_selection.json"],
+    "tests/e4_exact/test_e4_exact_0_contract.py": ["reports/contracts/E4_EXACT_ORACLE_CONTRACT_V1.md"],
+}
+
+_DATA = "data/processed/e4_trace_enhanced/"
+_RES_E4V2_PILOT = "results/e4_v2/e4_v2_1_pilot/trace_regime_diagnostics.csv"
+_SENTINEL_CONTRACT = "reports/contracts/CARS_EXECUTABLE_THEORY_CONTRACT_V4.md"
+
+EXTERNAL_TEST_DEPS = {
+    # e1_v2: artifacts produced by reproduce scripts
+    "tests/e1_v2/test_e1_v2_contract.py::test_promotion_equivalence_artifact_exists": ["results/e1_v2/promotion_equivalence.json"],
+    "tests/e1_v2/test_e1_v2_environment_calibration.py::test_protected_objects_unchanged": ["results/e1_v2/e1_v2_0_calibration/pre_state_hashes.json"],
+    # e4_exact oracle: source-repo integrity guards (not applicable to the public copy)
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t37_cars_methods_unchanged": [_SENTINEL_CONTRACT],
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t38_evaluator_unchanged": [_SENTINEL_CONTRACT],
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t39_contract_v4_unchanged": [_SENTINEL_CONTRACT],
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t40_schema_v4_unchanged": [_SENTINEL_CONTRACT],
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t42_e4_v2_assets_unchanged": [_SENTINEL_CONTRACT],
+    "tests/e4_exact/test_e4_exact_1_oracle.py::test_t43_data_unchanged": [_SENTINEL_CONTRACT],
+    # e4_v2_0_contract: trace data not bundled
+    "tests/e4_v2/test_e4_v2_0_contract.py::test_t01_trace_root_read_only": [_DATA],
+    "tests/e4_v2/test_e4_v2_0_contract.py::test_t10_partitions_disjoint": [_DATA],
+    "tests/e4_v2/test_e4_v2_0_contract.py::test_t10b_time_order_cal_pilot_formal": [_DATA],
+    "tests/e4_v2/test_e4_v2_0_contract.py::test_t20_e4_v2_0_tests_collect": [_DATA],
+    "tests/e4_v2/test_e4_v2_0_contract.py::test_manual_micro_case_mapping_smoke": [_DATA],
+    # e4_v2_1_pilot: trace data / pilot results not bundled
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t01b_formal_access_guard_behavior": [_DATA],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t02_partitions_disjoint": [_DATA],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t03_no_data_write": [_DATA],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t11_layer_a_no_method_result": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t12_no_method_dependent_diagnostics": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t13_candidates_preserved": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t14_selected_windows_reproducible": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t16_same_scenario_across_methods": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t17_timeout_30s": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t18_errors_not_deleted": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t19_not_formal": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t20_formal_not_executed": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_t22_e4_v2_targeted": [_RES_E4V2_PILOT],
+    "tests/e4_v2/test_e4_v2_1_pilot.py::test_manual_micro_case_window_scenario_schema": [_RES_E4V2_PILOT],
+}
+
+
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        nodeid = item.nodeid.replace("\\", "/")
+        deps = EXTERNAL_TEST_DEPS.get(nodeid.split("[")[0])
+        if deps is None:
+            deps = EXTERNAL_MODULE_DEPS.get(nodeid.split("::")[0])
+        if not deps:
+            continue
+        missing = [d for d in deps if not os.path.exists(_artifact(d))]
+        if missing:
+            item.add_marker(pytest.mark.skip(
+                reason="requires non-bundled artifact(s): %s (formal results / trace data / "
+                       "contracts / manuscript are not distributed with this public repo; "
+                       "run the corresponding reproduce script under scripts/reproduce/ to "
+                       "generate results/, or supply the artifact)" % ", ".join(missing)))

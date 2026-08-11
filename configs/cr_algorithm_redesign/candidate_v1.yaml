@@ -1,0 +1,25 @@
+# CR-ALG-REDESIGN-1：CARS 新算法候选（AADA + RCLA）方法配置
+# 版本: CR_ALGORITHM_REDESIGN_CANDIDATE_V1
+# 日期: 2026-08-08
+# 阶段: CR-ALG-REDESIGN-1（独立候选；非 current executable theory）
+# 说明:
+#   - 候选方法 id = cars_aada_rcla_candidate（不覆盖 Registry 中正式 cars）；
+#   - 本阶段 Repair=OFF（BLR 已于 CR-ALG-REDESIGN-S1R 由用户决定删除）；
+#   - 确定性求解器固定容差/迭代上界（非调参旋钮，默认值即冻结）；
+#   - scenario_config 指向参考场景（仅记录；正式 validation 由阶段 runner
+#     用 E1_ENVIRONMENT_V1 生成器构造 paired 场景）。
+
+method_id: cars_aada_rcla_candidate
+config_label: cr_algorithm_redesign_candidate_v1
+scenario_config: configs/cr_algorithm_redesign/candidate_v1.yaml
+
+eps_cmp: 1.0e-09          # R2 冻结判定容差（与正式方法一致）
+method_seed: 1
+hard_timeout_seconds: 30.0
+
+# RCLA 确定性求解参数（冻结默认；同一数值用于测试与 validation）
+rcla_mu_tol: 1.0e-09
+rcla_max_iters: 200
+rcla_mu_lo: 1.0e-12
+rcla_mu_hi: 1.0e+12
+rcla_numeric_epsilon: 1.0e-12
