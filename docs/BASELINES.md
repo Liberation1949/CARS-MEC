@@ -62,7 +62,7 @@ The three strong baselines are all **independent reimplementations** (source-ali
   - 位置移动后逐维 clamp 到 position_bounds。 / positions are clamped per dimension to position_bounds after movement.
 - **Omitted**：FTA 具体内部算法、原文预算/私有云资源约束、移动随机化参数 α（原文 IV-D 同，仅登记）。 / FTA's specific internal algorithm, the paper's budget/private-cloud resource constraints, and the movement randomization parameter α (same as the paper's IV-D, recorded only).
 - **Parameter / search budget**（仅测试/复现用）：`population_size`（tiny 4 / small 8）、`max_generations`（3/10）、`beta_0`（1）、`gamma`（2）、`position_bounds`（[-2,2]）、`objective_evaluation_cap`（128/2048）、`soft_deadline_margin`、`hard_timeout_seconds`。
-- **Fairness boundary**：共享全部执行边界；不使用 CARS 私有状态；无隐藏 Gate/Repair；不加额外可行性信息；最终结果由统一 Evaluator 产生。 / shares all execution boundaries; does not use CARS-private state; no hidden Gate/Repair; no extra feasibility information; final results are produced by the unified Evaluator.
+- **Fairness boundary**：共享全部执行边界；不使用 CARS 私有状态；不使用 CARS 内部辅助机制；不加额外可行性信息；最终结果由统一 Evaluator 产生。 / shares all execution boundaries; does not use CARS-private state; no hidden internal CARS mechanisms; no extra feasibility information; final results are produced by the unified Evaluator.
 
 ## 4. 弱 Baseline 与边界诊断 Weak Baselines and Boundary Diagnostics
 

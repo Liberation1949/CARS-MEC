@@ -54,7 +54,7 @@ Formal experiment scripts live under `scripts/reproduce/<experiment>/`. Each exp
 
 Formal protocols and environment freezes live under `configs/`:
 
-- `cars_v4/`：正式 CARS 方法配置（AADA→RCLA，无 Repair）； / formal CARS method config (AADA→RCLA, no Repair);
+- `cars_v4/`：正式 CARS 方法配置（AADA→RCLA）； / formal CARS method config (AADA→RCLA);
 - `e0_v2/`、`e1_v2/`、`e2_v2/`、`e3_v2/`、`e3_formal/`：E0–E2 与消融环境/协议； / E0–E2 and ablation environments/protocols;
 - `e4_v2/`：Trace 增强协议、字段映射、环境选择（含 `${CARS_DATA_ROOT}` 占位）； / Trace-enhanced protocol, field mapping, environment selection (with the `${CARS_DATA_ROOT}` placeholder);
 - `e4_exact/`：Exact Oracle 求解器与正式协议（N-grid、timeout、预算）； / Exact Oracle solver and formal protocol (N-grid, timeout, budget);
@@ -88,7 +88,7 @@ Measured in a clean public environment (fresh clone + fresh venv): **217 passed 
 
 ## 10. 复现范围与限制 Reproduction Scope and Limitations
 
-- 无 GNN、无独立 Repair 层、无 deadline 模型； / No GNN, no independent Repair layer, no deadline model;
+- CARS 由 AADA（离散指派）与 RCLA（连续资源分配）两个模块组成，任务成功仅取决于可靠性、不引入 deadline 模型； / CARS consists of two modules, AADA (discrete assignment) and RCLA (continuous resource allocation); task success depends only on reliability, with no deadline model;
 - Exact Oracle 仅适用于极小规模（论文正式评估实例 N∈{4,5,6}、M=4），不声称对大规模实例可计算，不是在线 CARS 或可扩展通用求解器； / The Exact Oracle applies only to very small instances (the paper's formal evaluation N∈{4,5,6}, M=4), makes no claim of computability at large scale, and is not the online CARS nor a scalable general-purpose solver;
 - Trace 增强实验为 semi-synthetic / trace-enhanced 证据，非真实 MEC 生产部署验证； / Trace-enhanced experiments are semi-synthetic / trace-enhanced evidence, not real MEC production-deployment validation;
 - 负载通过有限资源竞争影响任务可获得资源、时延与可靠性，不直接改变服务器物理故障率；本文结论仅对评估的场景范围有效； / Load affects a task's available resources, latency, and reliability through competition for finite computational resources, without directly changing server physical failure rates; the paper's conclusions hold only within the evaluated scenario scope;
