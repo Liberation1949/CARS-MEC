@@ -18,7 +18,7 @@ import time
 
 
 def _ensure_paths() -> None:
-    """确保 src 在 sys.path（PYTHONPATH 已由 Runner 注入，此处双保险）。"""
+    """把 src 放进 sys.path（PYTHONPATH 已由 Runner 注入，这里是双保险）。"""
     here = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     src = os.path.join(os.path.dirname(here), "src")
     for p in (src,):

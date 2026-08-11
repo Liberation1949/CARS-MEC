@@ -83,8 +83,8 @@ def e0_prefix_scenario(super_cfg: dict, n: int) -> dict:
 def build_e0_v2_environment(seed: int, n: int, n_max: int = E0_N_MAX) -> dict:
     """便捷函数：返回 N=n 的 E0 场景（内部从 N_max 前缀切分，保证嵌套链）。
 
-    注意：多次调用同一 (seed, n) 结果一致（确定性）；对同一 seed 不同 n 的调用
-    各自生成 N_max 超场景（runner 可先持有一个 super 复用，避免重复生成）。
+    同一 (seed, n) 多次调用结果一致（确定性）；同一 seed 的不同 n 各自生成
+    N_max 超场景，runner 可复用已生成的 super，避免重复生成。
     """
     super_cfg = build_e0_v2_super_scenario(seed=seed, n_max=n_max)
     return e0_prefix_scenario(super_cfg, n)

@@ -1,27 +1,30 @@
 # CITATION.cff.template
 #
-# OS3（2026-08-11）：软件版本冻结为 1.0.0；论文标题已从正文确认。
+# OS3（2026-08-11）：软件版本冻结为 1.0.0；论文标题已从正文确认。v1.0.1 仅含文档双语化与注释措辞调整，无逻辑变更。
+# OS3 (2026-08-11): software version frozen at 1.0.0; paper title confirmed from the manuscript. v1.0.1 contains only bilingual documentation and comment rephrasing, no logic changes.
 # 仓库内尚无直接作者/DOI/期刊证据，OS3 不得伪造作者信息。
+# No direct author/DOI/journal evidence exists in the repository; OS3 must not fabricate author information.
 # 请论文作者确认以下字段后，将本文件重命名为 CITATION.cff。
+# Please rename this file to CITATION.cff after the paper authors confirm the fields below.
 #
-# 参考格式（CITATION.cff 1.2.0）：
+# 参考格式（CITATION.cff 1.2.0）/ Reference format (CITATION.cff 1.2.0):
 # cff-version: 1.2.0
 # message: "If you use this software, please cite it as below."
 # title: "CARS: Capacity-Aware Reliability Stabilization via Assignment-Allocation Coordination in Multi-User Mobile Edge Computing"
-# abstract: <可选>
+# abstract: <可选 / optional>
 # authors:
-#   - family-names: <姓>
-#     given-names: <名>
-#     orcid: <可选>
+#   - family-names: <姓 / family name>
+#     given-names: <名 / given name>
+#     orcid: <可选 / optional>
 # date-released: 2026-08-11
-# version: 1.0.0
+# version: 1.0.1
 # license: MIT
 # preferred-citation:
 #   type: article
-#   authors: <作者>
+#   authors: <作者 / authors>
 #   title: "CARS: Capacity-Aware Reliability Stabilization via Assignment-Allocation Coordination in Multi-User Mobile Edge Computing"
-#   journal: <期刊/会议>
-#   year: <年份>
-#   doi: <若已有 DOI；无 DOI 时省略>
+#   journal: <期刊/会议 / journal or conference>
+#   year: <年份 / year>
+#   doi: <若已有 DOI；无 DOI 时省略 / if a DOI exists; omit if none>
 #
-# CITATION_METADATA_PENDING = authors / doi / journal / year（正文与仓库中无直接证据）
+# CITATION_METADATA_PENDING = authors / doi / journal / year（正文与仓库中无直接证据 / no direct evidence in manuscript or repository）

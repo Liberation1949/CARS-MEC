@@ -121,7 +121,7 @@ def test_t5_changing_cars_tssr_does_not_change_selection():
 
 
 def _rebuild_selection():
-    # 从已冻结 selection.json 读取原始参数（确保确定性重建使用相同输入）
+    # 从已冻结 selection.json 读取原始参数，保证重建输入与冻结时一致
     import yaml
     sel0 = _load_json(SELECTION_JSON)
     per_budget = sel0["per_instance_acceptance_budget_s"]

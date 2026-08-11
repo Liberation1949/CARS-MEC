@@ -149,8 +149,8 @@ def build_e2_v2_environment(
     返回 dict：
       - "scenario_cfg": 显式场景配置（mode=explicit；servers 容量已覆盖；ΣF=F_total）
       - "metadata":     容量结构元数据（theta/cv_realized/HHI/F_list/rank 等）
-    注意：servers 只含 Schema V4 允许字段（server_id/capacity_cycles_per_sec/
-    nominal_failure_rate）；λ_j 来自基础环境抽样（跨 CV_F 不变）。
+    servers 只含 Schema V4 允许字段（server_id/capacity_cycles_per_sec/
+    nominal_failure_rate）；λ_j 由基础环境抽样给出（跨 CV_F 不变）。
     """
     if cv_f_target not in ALLOWED_CV_F_PRIMARY and cv_f_target not in ALLOWED_CV_F_EXTENSION:
         raise ValueError(
