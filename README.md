@@ -53,7 +53,7 @@ CARS/
 ├── src/cars/
 │   ├── common/          # 确定性工具 / deterministic utilities
 │   ├── evaluator/       # 统一 Evaluator（TSSR / Rbar_eff / Ubar_eff / V_R 等）/ unified evaluator
-│   ├── simulator/       # 物理模型、场景 materializer、T0 派生状态 / physical models, scenario materializer, T0 derived state
+│   ├── simulator/       # 物理模型、场景 materializer、派生状态 / physical models, scenario materializer, derived state
 │   ├── runner/          # MethodRunner / worker（统一执行边界与超时）/ unified execution boundary and timeout
 │   ├── results/         # Canonical Result
 │   ├── exact_oracle/    # Small-Scale Exact Oracle（评估支持工具 / evaluation support）
@@ -161,21 +161,25 @@ Measured result in a clean public environment (fresh clone + fresh venv):
 0 failed
 ```
 
-**152 skipped 是已解释的、预期的**：公开仓库有意不重新分发第三方 Trace 数据、全量正式结果归档、以及内部正文/合同完整性资产；对应测试在缺少这些资产时明确跳过（见 `tests/conftest.py` 中的说明）。核心 CARS / Baseline / Schema / Quick Start / Oracle 测试均已实际运行通过。禁止将结果表述为 "all 369 tests passed"。
+**152 skipped 是已解释的、预期的**：公开仓库有意不重新分发第三方 Trace 数据、全量正式结果归档、以及仅在研究仓库内部使用的完整性校验资产；对应测试在缺少这些资产时会明确跳过（见 `tests/conftest.py` 中的说明）。核心 CARS / Baseline / Schema / Quick Start / Oracle 测试均已实际运行通过，请勿将结果描述为 "all 369 tests passed"（跳过项是预期的）。
 
-**The 152 skipped are explained and expected**: the public repository intentionally does not redistribute third-party Trace data, full formal-result archives, or internal manuscript/contract integrity assets; the corresponding tests explicitly skip when these assets are absent (see notes in `tests/conftest.py`). All core CARS / Baseline / Schema / Quick Start / Oracle tests have actually run and passed. It is prohibited to report the result as "all 369 tests passed".
+**The 152 skipped are explained and expected**: the public repository intentionally does not redistribute third-party Trace data, full formal-result archives, or integrity-check assets used only inside the research repository; the corresponding tests explicitly skip when these assets are absent (see notes in `tests/conftest.py`). All core CARS / Baseline / Schema / Quick Start / Oracle tests have actually run and passed. Please do not describe the result as "all 369 tests passed" — the skips are expected.
 
 ## Reference Results 参考结果
 
-`reference_results/` 提供各正式实验的**轻量机器可读聚合摘要**（来源与内容见 [reference_results/README.md](reference_results/README.md)），**不是全量 raw formal archive**，也不应作为实验输入数据。
+`reference_results/` 存放论文各正式实验的**聚合结果摘要**（JSON/CSV），方便读者快速查看论文中引用的实验数值；各实验的详细内容与来源见 [reference_results/README.md](reference_results/README.md)。这里只包含聚合摘要，不含逐实例的完整原始输出。
 
-`reference_results/` provides **lightweight machine-readable aggregate summaries** of each formal experiment (source and content in [reference_results/README.md](reference_results/README.md)); it is **not a full raw formal archive** and should not be used as experiment input data.
+`reference_results/` holds **aggregated result summaries** (JSON/CSV) of the paper's formal experiments, so readers can quickly look up the numbers cited in the paper; see [reference_results/README.md](reference_results/README.md) for per-experiment details. Only aggregated summaries are included — not the full per-instance raw outputs.
 
 ## Citation 引用
 
-作者与论文引用信息待作者确认后填入 [CITATION.cff.template](CITATION.cff.template)。
+正式引用元数据（作者、DOI、期刊/会议）待论文作者确认后补充；当前请按论文标题引用，并参照 [CITATION.cff.template](CITATION.cff.template) 中的模板：
 
-Author and citation information will be filled into [CITATION.cff.template](CITATION.cff.template) once confirmed by the authors.
+**CARS: Capacity-Aware Reliability Stabilization via Assignment–Allocation Coordination in Multi-User Mobile Edge Computing**
+
+Formal citation metadata (authors, DOI, journal/conference) will be added once confirmed by the paper authors. For now, please cite the paper by its title and follow the template in [CITATION.cff.template](CITATION.cff.template):
+
+**CARS: Capacity-Aware Reliability Stabilization via Assignment–Allocation Coordination in Multi-User Mobile Edge Computing**
 
 ## License 许可证
 

@@ -17,9 +17,9 @@ Lightweight machine-readable reference-result summaries, extracted from the pape
 
 ## 说明 Notes
 
-- 数值全部来自既有正式结果；不重新计算 Claim、不重跑实验； / all values come from existing formal results; claims are not recomputed and experiments are not rerun;
-- **本目录不是全量 raw formal archive**，仅含聚合摘要； / **this directory is not a full raw formal archive**; it contains aggregate summaries only;
-- **smoke / pilot 结果不在此目录**； / **smoke / pilot results are not in this directory**;
-- **不建议把 `reference_results/` 作为实验输入数据**——它只用于查阅论文引用数值； / **`reference_results/` should not be used as experiment input data** — it exists only to look up values cited in the paper;
-- 完整逐实例结果与阶段内部报告不随本公开仓库分发； / full per-instance results and internal stage reports are not distributed with this public repository;
+- 数值来自论文既有正式实验，未重新计算或重跑； / values come from the paper's existing formal experiments and are not recomputed or rerun;
+- 仅含聚合摘要，不含逐实例的完整原始输出； / aggregate summaries only — full per-instance raw outputs are not included;
+- smoke / pilot 结果不在此目录； / smoke / pilot results are not in this directory;
+- 本目录用于查阅论文引用的数值，不作为实验输入； / this directory exists to look up values cited in the paper, not as experiment input;
+- 完整逐实例结果与内部报告不随本公开仓库分发； / full per-instance results and internal reports are not distributed with this public repository;
 - 复现与范围说明见 [docs/REPRODUCIBILITY.md](../docs/REPRODUCIBILITY.md)。 / see [docs/REPRODUCIBILITY.md](../docs/REPRODUCIBILITY.md) for reproduction and scope notes.
