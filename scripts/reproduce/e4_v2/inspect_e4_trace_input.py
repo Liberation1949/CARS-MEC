@@ -295,6 +295,14 @@ def main() -> int:
 
     results: Dict[str, Any] = {"checks": {}}
 
+    # OS2: clear DATA_NOT_AVAILABLE message instead of a raw FileNotFoundError crash
+    if not os.path.isdir(TRACE_ROOT) or not any(os.scandir(TRACE_ROOT)):
+        print("DATA_NOT_AVAILABLE: third-party Trace data is not bundled with this public repo.")
+        print("  Expected directory: %s" % TRACE_ROOT)
+        print("  Required datasets: azure / nep / shanghai (raw + processed splits).")
+        print("  See docs/DATA.md for data acquisition and the expected directory layout.")
+        return 2
+
     print("== [1] manifest hash verification ==")
     r1 = check_manifest_hashes()
     results["checks"]["manifest_hashes"] = r1

@@ -19,7 +19,7 @@ read_only_policy: >
 # 1. 根路径与总体
 # ---------------------------------------------------------------------------
 trace_root: data/processed/e4_trace_enhanced
-absolute_root: ${CARS_DATA_ROOT}/Desktop/my_study/论文资料/我的论文/论文3/CARS_Project/data/processed/e4_trace_enhanced
+absolute_root: ${CARS_DATA_ROOT}
 file_count: 19
 total_size_bytes: 101738196
 total_size_human: "~97.0 MiB"

@@ -1,6 +1,6 @@
 # Baselines
 
-本文档说明公开仓库中六个对比 Baseline 的来源、重实现性质、忠实组件、项目适配、省略部分、参数/搜索预算与公平边界。所有信息基于 CARS_Project 中冻结的 adaptation contracts（`reports/experiments/R3_*_adaptation_contract.yaml`）与正式代码。
+本文档说明公开仓库中六个对比 Baseline 的来源、重实现性质、忠实组件、项目适配、省略部分、参数/搜索预算与公平边界。所有信息基于研究阶段冻结的 adaptation contracts（原始记录于内部报告）与正式代码。
 
 三个强 Baseline 均为**独立重实现**（source-aligned, project-adapted），不是第三方源码的直接复制；三个强 Baseline 的原始论文 PDF（`references/*.pdf`）受版权保护，**不随本公开仓库分发**（仅保留书目引用）。
 
