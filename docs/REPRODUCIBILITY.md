@@ -89,7 +89,7 @@ Measured in a clean public environment (fresh clone + fresh venv): **217 passed 
 ## 10. 复现范围与限制 Reproduction Scope and Limitations
 
 - 无 GNN、无独立 Repair 层、无 deadline 模型； / No GNN, no independent Repair layer, no deadline model;
-- Exact Oracle 仅适用于极小规模（正式包络 N∈{4,5,6}、M=4、LOW/TRANSITION、固定 formal seeds），不声称对大规模实例可计算，不是在线 CARS 或可扩展通用求解器； / The Exact Oracle applies only to very small scales (formal envelope N∈{4,5,6}, M=4, LOW/TRANSITION, fixed formal seeds), makes no claim of computability at large scale, and is not the online CARS nor a scalable general-purpose solver;
+- Exact Oracle 仅适用于极小规模（论文正式评估实例 N∈{4,5,6}、M=4），不声称对大规模实例可计算，不是在线 CARS 或可扩展通用求解器； / The Exact Oracle applies only to very small instances (the paper's formal evaluation N∈{4,5,6}, M=4), makes no claim of computability at large scale, and is not the online CARS nor a scalable general-purpose solver;
 - Trace 增强实验为 semi-synthetic / trace-enhanced 证据，非真实 MEC 生产部署验证； / Trace-enhanced experiments are semi-synthetic / trace-enhanced evidence, not real MEC production-deployment validation;
-- 负载诱导服务退化（LISC）为可能出现的经验形态；当前评估范围内观察到的是 ordinary degradation； / Load-induced service collapse (LISC) is a possible empirical form; ordinary degradation is what is observed in the current evaluation scope;
+- 负载通过有限资源竞争影响任务可获得资源、时延与可靠性，不直接改变服务器物理故障率；本文结论仅对评估的场景范围有效； / Load affects a task's available resources, latency, and reliability through competition for finite computational resources, without directly changing server physical failure rates; the paper's conclusions hold only within the evaluated scenario scope;
 - 硬件/环境差异可能影响运行时间，但不影响确定性决策与规范化结果（浮点按契约容差比较）；同 seed 的 `fingerprint`（决策 (X,A,F) 的确定性 SHA-256 摘要）应完全一致。 / Hardware/environment differences may affect runtime but not deterministic decisions and normalized results (floating point is compared at contract tolerance); the `fingerprint` for the same seed (deterministic SHA-256 digest of decision (X,A,F)) must be identical.

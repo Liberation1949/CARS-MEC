@@ -1,8 +1,8 @@
 # reference_results 参考结果
 
-轻量机器可读参考结果摘要，从既有冻结正式实验提取（OS1），数值不随本仓库重新计算。
+轻量机器可读参考结果摘要，从论文既有正式实验提取，数值不随本仓库重新计算。
 
-Lightweight machine-readable reference-result summaries, extracted from existing frozen formal experiments (OS1); values are not recomputed in this repository.
+Lightweight machine-readable reference-result summaries, extracted from the paper's existing formal experiments; values are not recomputed in this repository.
 
 ## 内容 Contents
 

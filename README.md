@@ -186,7 +186,7 @@ MIT License, see [LICENSE](LICENSE).
 ## Reproducibility Scope and Limitations 复现范围与限制
 
 - 无 GNN、无独立 Repair 层、无 deadline 模型； / No GNN, no independent Repair layer, no deadline model;
-- Exact Oracle 仅覆盖论文正式包络（N∈{4,5,6}、M=4、LOW/TRANSITION、固定 formal seeds），不外推更大规模； / The Exact Oracle covers only the paper's formal envelope (N∈{4,5,6}, M=4, LOW/TRANSITION, fixed formal seeds) and does not extrapolate to larger scales;
+- Exact Oracle 仅用于论文正式评估中的极小规模实例（N∈{4,5,6}、M=4），不适用于更大规模的问题； / The Exact Oracle is used only for the very small instances in the paper's formal evaluation (N∈{4,5,6}, M=4) and does not apply to larger problems;
 - Trace 数据不随仓库分发；Trace 增强实验为 semi-synthetic / trace-enhanced 证据，非真实 MEC 生产部署验证； / Trace data is not distributed with the repository; Trace-enhanced experiments are semi-synthetic / trace-enhanced evidence, not real MEC production-deployment validation;
-- 负载诱导服务退化（LISC）为可能出现的经验形态，非本文问题的理论前提；当前评估范围内观察到的是 ordinary degradation； / Load-induced service collapse (LISC) is a possible empirical form, not a theoretical premise of this problem; ordinary degradation is what is observed in the current evaluation scope;
+- 负载通过有限资源竞争影响任务的可用资源、时延与可靠性，不直接改变服务器的物理故障率；本文结论仅对评估的场景范围有效； / Load affects a task's available resources, latency, and reliability through competition for finite computational resources, but does not directly change server physical failure rates; the paper's conclusions hold only within the evaluated scenario scope;
 - 全量正式结果与阶段内部报告不随本公开仓库分发；`reference_results/` 仅含轻量摘要。 / Full formal results and internal stage reports are not distributed with this public repository; `reference_results/` contains only lightweight summaries.
