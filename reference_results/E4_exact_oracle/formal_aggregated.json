@@ -1,0 +1,75 @@
+{
+  "experiment": "e4_exact_3_formal",
+  "aggregation_version": "E4_EXACT_3_AGGREGATE_V1",
+  "records_total": 30,
+  "bootstrap": {
+    "method": "paired bootstrap 95% CI (fixed seed)",
+    "seed": 20260810,
+    "n_resamples": 10000
+  },
+  "groups": {
+    "4": {
+      "instances": 10,
+      "computable": 10,
+      "failures": {
+        "timeout": 0,
+        "error": 0
+      },
+      "oracle_tier1_mean": 1.0,
+      "cars_tier1_mean": 1.0,
+      "tier1_gap_mean": 0.0,
+      "tier1_gap_ci95": [
+        0.0,
+        0.0
+      ],
+      "first_tier_match_rate": 1,
+      "conditional_tier2_gap_mean": 0.000791,
+      "conditional_tier3_gap_mean": 4.3e-05,
+      "full_lex_match_rate": 0.4,
+      "oracle_runtime_ms_mean": 156256.2375,
+      "cars_runtime_ms_mean": 1.6
+    },
+    "5": {
+      "instances": 10,
+      "computable": 10,
+      "failures": {
+        "timeout": 0,
+        "error": 0
+      },
+      "oracle_tier1_mean": 1.0,
+      "cars_tier1_mean": 1.0,
+      "tier1_gap_mean": 0.0,
+      "tier1_gap_ci95": [
+        0.0,
+        0.0
+      ],
+      "first_tier_match_rate": 1,
+      "conditional_tier2_gap_mean": 0.000638,
+      "conditional_tier3_gap_mean": 4.3e-05,
+      "full_lex_match_rate": 0.3,
+      "oracle_runtime_ms_mean": 1348965.5559,
+      "cars_runtime_ms_mean": 0.0
+    },
+    "6": {
+      "instances": 10,
+      "computable": 10,
+      "failures": {
+        "timeout": 0,
+        "error": 0
+      },
+      "oracle_tier1_mean": 1.0,
+      "cars_tier1_mean": 1.0,
+      "tier1_gap_mean": 0.0,
+      "tier1_gap_ci95": [
+        0.0,
+        0.0
+      ],
+      "first_tier_match_rate": 1,
+      "conditional_tier2_gap_mean": 0.000594,
+      "conditional_tier3_gap_mean": 0.0,
+      "full_lex_match_rate": 0.2,
+      "oracle_runtime_ms_mean": 11945424.5353,
+      "cars_runtime_ms_mean": 1.6
+    }
+  }
+}

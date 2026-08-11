@@ -1,0 +1,51 @@
+# E1-V2 正式实验环境（E1_V2_ENVIRONMENT_V1）
+# 版本: E1_V2_ENVIRONMENT_V1
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1 + E1 Freeze/Pilot
+# 状态: FROZEN（E1-V2 正式环境；用户 2026-08-09 冻结：E1_ENVIRONMENT_V1 语义 +
+#       任务规模扩展至 N=200）
+# 生成器: scripts/experiments/e1_v2/build_e1_v2_environment.py
+# 依据: 用户 2026-08-09 决策；E1_ENVIRONMENT_V1（configs/e1/e1_environment_v1.yaml）；
+#       E3-V2 生成器（scripts/experiments/e3_v2/build_e3_v2_environment.py）；
+#       Contract V4；Schema V4。
+
+environment:
+  id: E1_V2_ENVIRONMENT_V1
+  m: 8
+  topology: "fully connected"
+  compute_scale: 1.0
+  task_compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_distribution: {0: 0.4, 8: 0.3, 16: 0.3}
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  local_failure_rate: 0.002
+  server_capacity_rule: "F_j = 10000 * (1 + 0.3 * (j mod 3))  # 10000/13000/16000"
+  server_lambda: "U[0.001, 0.003]（固定名义故障率；不随 N/负载改变）"
+  min_reliability: "U[0.85, 0.95]"
+  delay_weight: "U[0.5, 0.8]"
+  data_bits: 1000
+  deadline: "无 deadline 模型（deadline_seconds 占位 1000.0，字段兼容，逻辑不使用）"
+  system_params: >
+    Schema V4（rcla_solver: rcla_mu_tol=1e-9/rcla_max_iters=200/rcla_mu_lo=1e-12/
+    rcla_mu_hi=1e12/rcla_numeric_epsilon=1e-12；numeric_epsilon=1e-12；
+    无 cala_weights/repair_budget/repair_tolerances/kappa_R/kappa_D）
+  nested_generation: >
+    seed 一次性生成 Gamma_200（确定性 RNG(seed)；服务器参数在任务后抽取一次，
+    对全部 N 前缀固定）；任意 N<=200 用 prefix_scenario（deterministic nested
+    prefix：Gamma_20 ⊂ Gamma_50 ⊂ ... ⊂ Gamma_200）。增加 N 表示增加任务。
+
+# 结构继承说明（E1_ENVIRONMENT_V1 已验证；无 deadline 模型）
+design_rationale: |
+  1. 环境结构与 E1_ENVIRONMENT_V1 / E3-V2 完全一致（M=8 全连接、ν={0:0.4,8:0.3,
+     16:0.3}、λ_j∈U[0.001,0.003]、λ_loc=0.002、F_j=10000·(1+0.3(j mod 3))、
+     R_min∈U[0.85,0.95]）——保证 E0/E1/E3 三实验环境可比；
+  2. N 上限 200（用户冻结）：与 E0-V2 对齐，展示 CARS 在高负载下相对优势；
+  3. 负载通过有限容量竞争影响 f_ij、执行时延与任务可靠性，不改变服务器
+     物理故障率（正文 III 章机制链）。
+
+formal_grid: [20, 50, 80, 110, 140, 170, 200]
+pressure_intervals:
+  LOW: [20, 50]
+  TRANSITION: [80, 110, 140]
+  HIGH: [170, 200]
+formal_seeds: [1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110]
+pilot_seeds: [201, 202, 203]

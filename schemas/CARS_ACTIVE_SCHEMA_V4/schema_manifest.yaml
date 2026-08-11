@@ -1,0 +1,242 @@
+# CARS Active Schema - Schema Manifest
+# 版本: CARS_ACTIVE_SCHEMA_V4
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1 (Active Schema V4 同步；正文 CARS=AADA→RCLA)
+# 说明: 列出全部 Active Schema 文件、$id、版本、直接依据、对象职责、生产/消费模块、状态时点、
+#       相关不变量、相关测试。
+#       V4 相对 V3 的受控变化（CR-CARS-PROMOTION-E1）：方法链改为 AADA→RCLA（无 Repair）；
+#       SystemParams 移除 cala_weights/repair_budget/repair_tolerances，新增 rcla_solver
+#       （rcla_mu_tol/rcla_max_iters/rcla_mu_lo/rcla_mu_hi/rcla_numeric_epsilon）；
+#       ruad_io/cala_io/repair_io 由 aada_io/rcla_io 取代；schedule_decision {X,A,F} 结构
+#       不变（仅版本号）；ModuleStatus enum = [aada, rcla]。
+#       V1/V2/V3 保留为历史，可独立验证。
+#       直接依据层级: experiment_docs/III_VI.md 数学语义（d1350de4…，2026-08-09）
+#                     > Contract V4 > 本 Schema。
+
+schema_version: CARS_ACTIVE_SCHEMA_V4
+base_dir: schemas/CARS_ACTIVE_SCHEMA_V4
+id_base: https://cars.example.org/schema/v4
+
+schemas:
+  - schema_name: common
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/common.schema.json
+    id: https://cars.example.org/schema/v4/common.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - Contract V4 Part 1 (实体/变量/类型/单位/数学域)
+      - Contract V4 Part 7 (数值边界、+inf 统一表示)
+      - Contract V4 Part 7 (失败原因分类)
+    object_responsibility: 共享数值域、枚举与 sentinel 定义（nonnegative/positive/probability/binary/method_status/failure_reason/inf sentinel）
+    producing_module: null
+    consuming_module: 全部其余 Schema
+    state_timepoint: 全部
+    related_invariants: []
+    related_tests:
+      - T-schema-meta
+      - T-ref-resolvable
+      - T-id-unique
+      - T-field-units
+    pending_r2_fields:
+      - 完整错误代码枚举（仅冻结 method_status/failure_reason 语义级枚举）
+
+  - schema_name: core_entities
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/core_entities.schema.json
+    id: https://cars.example.org/schema/v4/core_entities.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 III-B.1 (Task Model, T-01..T-09)
+      - 正文 III-B.2 (Mobile Device Model, D-01..D-04)
+      - 正文 III-B.3 (Edge Server Model, S-01..S-02)
+      - 正文 III-C.2 / III-D.1 (链路参数, L-01..L-04)
+      - Contract V4 Part 7 (rcla_solver 冻结默认)
+    object_responsibility: 定义 Task / Device / Server / WirelessLink / SystemParams 五类核心实体的字段、类型、单位与数值域；SystemParams = rcla_solver + numeric_epsilon（V4 无 cala/repair 参数）
+    producing_module: Scenario Generator (R2)
+    consuming_module: Scenario / 各模块 I/O / MethodResult / EvaluatorIO
+    state_timepoint: T0
+    related_invariants:
+      - alpha_i + beta_i = 1
+      - SystemParams 不含 ruad_gamma / cala_weights / repair_budget / repair_tolerances / kappa_R / kappa_D（V4：CARS=AADA→RCLA，无 CALA/Repair 层）
+      - lambda_j 固定名义故障率不被动态改写
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-06b, INV-11, INV-12, INV-RUAD-GAMMA)
+    pending_r2_fields:
+      - 无（结构完整；数值在调参阶段冻结）
+
+  - schema_name: scenario
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/scenario.schema.json
+    id: https://cars.example.org/schema/v4/scenario.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 III-A (E-01..E-04 系统级实体与集合)
+      - Contract V4 Part 2 (系统状态 S_t)
+    object_responsibility: 时隙级系统状态 S_t = {Gamma_t, D_t, M_t, B_t, R_t^req} 的完整场景载体（T0）
+    producing_module: Scenario Generator (R2)
+    consuming_module: PredecisionState / AADA / Evaluator
+    state_timepoint: T0
+    related_invariants:
+      - task/device/server/link ID 唯一
+      - len(tasks) == len(devices) == N
+      - 每个 task.device_id 引用存在
+      - 每个 link.source_device_id / target_server_id 引用存在
+      - alpha_i + beta_i = 1
+      - SystemParams 不含 ruad_gamma / cala_weights / repair_budget / repair_tolerances / kappa_R / kappa_D（V4）
+      - additionalProperties:false 禁止未来信息字段
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-06b, INV-11, INV-12, INV-RUAD-GAMMA)
+    pending_r2_fields:
+      - 无
+
+  - schema_name: predecision_state
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/predecision_state.schema.json
+    id: https://cars.example.org/schema/v4/predecision_state.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - Contract V4 Part 2 (输入与预处理)
+      - Contract V4 Part 3 (评价语义)
+    object_responsibility: T0 决策前状态 = Scenario（AADA 合法输入；additionalProperties:false 拒绝 T2-T4 未来信息）
+    producing_module: Scenario Generator (R2)
+    consuming_module: AADA (R2)
+    state_timepoint: T0
+    related_invariants:
+      - 同 scenario
+      - 不含任何 T2-T4 未来信息字段（resource_allocation 等）
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-09)
+    pending_r2_fields:
+      - 无
+
+  - schema_name: schedule_decision
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/schedule_decision.schema.json
+    id: https://cars.example.org/schema/v4/schedule_decision.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 IV-A.1/IV-A.2/IV-A.4 (决策变量 X/A/F)
+      - 正文 IV-B (C1-C6, Omega_phy)
+      - Contract V4 Part 3 (物理可行域)
+    object_responsibility: 完整调度方案 Pi = {X, A, F} 的载体（T1/T2 共用；V4 无 T3 Repair）
+    producing_module: AADA (X/A, T1) / RCLA (F, T2)
+    consuming_module: RCLA / MethodResult / EvaluatorIO
+    state_timepoint: T1/T2
+    related_invariants:
+      - len(X) == N
+      - len(A) == N 且每行 len == M
+      - len(F) == N 且每行 len == M
+      - sum_j A[i][j] == X[i] (C3)
+      - X[i]==0 => A[i][j]==0 且 F[i][j]==0
+      - A[i][j]==0 => F[i][j]==0 (C5)
+      - 0 <= F[i][j] <= A[i][j]*F_j (C5)
+      - sum_i F[i][j] <= F_j (C6)
+      - A[i][j]==1 => (i,j) 存在对应 WirelessLink（结构层 C4；e_phy 公式计算留待 R2）
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-01..INV-06a)
+    pending_r2_fields:
+      - e_phy 公式计算（C4 完全判定）
+
+  - schema_name: aada_io
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/aada_io.schema.json
+    id: https://cars.example.org/schema/v4/aada_io.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 V-B (V-B.1/V-B.3/V-B.5/V-B.6/V-B.7)
+      - Contract V4 Part 4 (AADA 语义)
+    object_responsibility: AADA (Algorithm V-1) 输入输出契约：X^(0), A^(0), Q_j, G_j + 诊断
+    producing_module: AADA (R2)
+    consuming_module: RCLA (R2)
+    state_timepoint: T0 (input) / T1 (output)
+    related_invariants:
+      - 输出 X/A 满足 C1-C4
+      - 输入仅 T0 决策前状态（无未来信息）
+      - 动态状态 Q_j/G_j 维度 M 且非负
+      - AADA 不产生 F（禁止职责；F 由 RCLA 产生）
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-09)
+    pending_r2_fields:
+      - 无
+
+  - schema_name: rcla_io
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/rcla_io.schema.json
+    id: https://cars.example.org/schema/v4/rcla_io.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 V-C (V-C.1/V-C.2/V-C.3/V-C.5)
+      - Contract V4 Part 5 (RCLA 语义)
+    object_responsibility: RCLA (Algorithm V-2) 输入输出契约：固定指派 + rcla_solver -> F^(0) + 诊断
+    producing_module: RCLA (R2)
+    consuming_module: MethodResult (R2)
+    state_timepoint: T1 (input) / T2 (output)
+    related_invariants:
+      - 输出 F 使 Pi^(0) 满足 C5-C6（容量精确饱和）
+      - 不改变 X/A（无修复层，V-C.4）
+      - ALLOCATION_INFEASIBLE 语义（sum ell_R > F_j + eps；回退普通 LA 并记录诊断）
+    related_tests:
+      - T-valid-case
+    pending_r2_fields:
+      - 无
+
+  - schema_name: method_result
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/method_result.schema.json
+    id: https://cars.example.org/schema/v4/method_result.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - Contract V4 Part 7 (方法返回)
+    object_responsibility: 方法运行结果容器（method_id/scenario_id/seed/X-A-F/模块状态/runtime/timeout/物理可行性/QoS 成功/诊断）
+    producing_module: Method Runner (R2)
+    consuming_module: EvaluatorIO (R2) / 结果聚合 (R2)
+    state_timepoint: T2
+    related_invariants:
+      - method_id 白名单（AGENTS.md §10）
+      - 无 legacy_forbidden_fields
+      - ModuleStatus enum = [aada, rcla]（V4 无 Repair）
+    related_tests:
+      - T-valid-case
+      - T-invalid-cases (INV-08)
+    pending_r2_fields:
+      - 完整错误代码枚举
+      - 正式实验指标白名单
+      - 指标计算公式
+      - 失败计分规则
+
+  - schema_name: evaluator_io
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/evaluator_io.schema.json
+    id: https://cars.example.org/schema/v4/evaluator_io.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - 正文 III-E (F-19..F-25)
+      - 正文 IV-C (F-38..F-43)
+      - Contract V4 Part 3 (评价语义)
+    object_responsibility: External Evaluator 输入输出容器（T4 独立重算全部指标；正式口径）
+    producing_module: External Evaluator (R2)
+    consuming_module: 结果聚合 / 审计 (R2)
+    state_timepoint: T4
+    related_invariants:
+      - 指标为结构承载（计算公式/白名单/计分规则留待 R2）
+    related_tests:
+      - T-valid-case
+    pending_r2_fields:
+      - 指标计算公式（F-19..F-45 全部）
+      - 正式指标白名单
+      - 失败计分规则
+      - 浮点比较容差 (CFG-11)
+
+  - schema_name: experiment_protocol
+    file_path: schemas/CARS_ACTIVE_SCHEMA_V4/experiment_protocol.schema.json
+    id: https://cars.example.org/schema/v4/experiment_protocol.schema.json
+    version: CARS_ACTIVE_SCHEMA_V4
+    direct_basis:
+      - AGENTS.md §11 (数据划分)
+      - Contract V4 Part 3 (评价语义)
+    object_responsibility: 实验协议结构载体（seed/数据划分/timeout/负载水平；只登记结构不冻结数值）
+    producing_module: 实验协议 (E1 阶段)
+    consuming_module: Runner / 审计 (R2+)
+    state_timepoint: 实验前
+    related_invariants:
+      - 无跨字段不变量（结构层）
+    related_tests:
+      - T-valid-case（结构示例）
+    pending_r2_fields:
+      - 全部具体数值（seed 值、timeout、负载水平等）—— 在对应实验协议冻结

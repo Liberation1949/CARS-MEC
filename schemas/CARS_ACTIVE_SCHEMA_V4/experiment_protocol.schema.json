@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/experiment_protocol.schema.json",
+  "title": "CARS Active Schema - Experiment Protocol",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "实验协议结构载体（只登记结构，不冻结具体数值）。直接依据：AGENTS.md §11（数据划分 training/validation_or_pilot/formal_test）、Contract Part 13（CFG-07..CFG-12 为 EXPERIMENT_PROTOCOL_GAP 项，数值在各阶段协议事前冻结）、正文 III-F.3（F-30 负载水平、F-33 LISC 判据参数）。所有数值（seed 值、timeout、负载水平、delta_S、h 等）必须在对应实验协议中冻结，本 Schema 仅表达结构。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol_id",
+    "seed",
+    "data_split",
+    "timeout_seconds",
+    "load_levels",
+    "lisc_parameters"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "CARS_ACTIVE_SCHEMA_V4",
+      "x-unit": "version",
+      "description": "Active Schema 版本标识"
+    },
+    "protocol_id": {
+      "$ref": "common.schema.json#/$defs/unique_id",
+      "description": "协议唯一标识"
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "x-unit": "dimensionless",
+      "description": "随机 seed（CFG-09；复现性要求，AGENTS.md §13）"
+    },
+    "data_split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["training", "validation_or_pilot", "formal_test"],
+      "properties": {
+        "training": {
+          "type": "string",
+          "minLength": 1,
+          "x-unit": "split",
+          "description": "training 划分（AGENTS.md §11；CARS 无训练模块，结构保留以对齐协议）"
+        },
+        "validation_or_pilot": {
+          "type": "string",
+          "minLength": 1,
+          "x-unit": "split",
+          "description": "validation_or_pilot 划分（AGENTS.md §11）"
+        },
+        "formal_test": {
+          "type": "string",
+          "minLength": 1,
+          "x-unit": "split",
+          "description": "formal_test 划分；formal-test 禁止选参（AGENTS.md §11）"
+        }
+      }
+    },
+    "timeout_seconds": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "x-unit": "s",
+      "description": "方法超时预算（CFG-10；Contract Part 9.1）"
+    },
+    "load_levels": {
+      "type": "array",
+      "items": { "type": "number", "exclusiveMinimum": 0 },
+      "x-unit": "load",
+      "description": "预排序负载水平 ell_1 < ... < ell_K（F-30, CFG-08；E0 外生场景控制变量）"
+    },
+    "lisc_parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "delta_S",
+        "persistence_intervals",
+        "reference_interval_start",
+        "reference_interval_end"
+      ],
+      "properties": {
+        "delta_S": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "ratio",
+          "description": "LISC 显著下降阈值 delta_S（F-33, CFG-07）"
+        },
+        "persistence_intervals": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "x-unit": "intervals",
+          "description": "持续性连续区间数 h（F-33, CFG-07）"
+        },
+        "reference_interval_start": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "index",
+          "description": "参考区间起点（CFG-07）"
+        },
+        "reference_interval_end": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "index",
+          "description": "参考区间终点（CFG-07）"
+        }
+      }
+    }
+  }
+}

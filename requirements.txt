@@ -1,0 +1,7 @@
+# runtime dependencies (direct)
+PyYAML>=6.0
+jsonschema>=4.0
+
+# test / reproduction (dev)
+# pytest>=7.0
+# matplotlib>=3.5

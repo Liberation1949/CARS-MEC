@@ -1,0 +1,186 @@
+# E2 正式实验协议（E2-V2-1：Robustness under Heterogeneous Computing Resources）
+# 版本: E2_V2_FORMAL_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E2-V2-1（E2 正式主实验——算力异构扫描 Confirmatory Evaluation）
+# 状态: FROZEN_ONLY / NOT_EXECUTED（formal seeds 2101-2110 只登记；
+#       AUTHORIZED_TO_START_E2_V2_1_FORMAL = NO，须用户授权后方可运行）
+# 直接依据: 用户 2026-08-09 E2 设计（resource-side heterogeneity robustness；
+#       基线池与 E1 一致；N=170 主环境；CV_F{0..1.2}；2 图 1 表；lower performance
+#       sensitivity Claim）；E2-V2-0 冻结环境（E2_V2_ENVIRONMENT_SELECTED_V1）；
+#       正文 III_VI.md（CARS=AADA→RCLA、无 deadline、固定名义 λ_j）；
+#       Contract V4；Schema V4；E1_V2_PROTOCOL_V1（统计/图表/Claim 口径模板）。
+
+protocol_id: e2_v2_formal_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+
+# ---------------------------------------------------------------------------
+# 1. E2 定位与研究问题（用户冻结）
+# ---------------------------------------------------------------------------
+positioning: >
+  E2 = resource-side heterogeneity robustness（服务器计算资源异构与动态容量压力下的
+  鲁棒性）。E1 已证明 task-side scaling（N 20→200）；E2 固定任务侧（N=170），只扫描
+  服务器容量分布 CV_F（ΣF_j = F_total 恒定）。核心问题：总算力不变、算力越来越集中
+  到少数服务器时，CARS 是否仍能稳定利用有限边缘资源？
+  E1：任务越来越多怎么办？E2：服务器越来越不均衡怎么办？（正交）
+
+research_questions:
+  Q1: >
+    固定总算力下，随着服务器容量分布越来越不均衡（CV_F↑），CARS 是否比代表性
+    Baseline 维持更高的有效服务水平（TSSR / Rbar_eff / Ubar_eff），并表现出更缓的
+    退化（lower performance sensitivity to computational heterogeneity）？
+  Q2: >
+    CARS 的相对优势是否在高异构/资源竞争区显现（CV_F 增大后优势扩大）？不预设 CV_F0；
+    由数据决定优势是否出现、出现在哪个 CV_F 区间。
+  Q3: >
+    CARS 的鲁棒性付出多少计算代价？——算法执行时间 method_runtime_ms（主口径，
+    与 E1-V2-1 一致）+ total_wall_time_ms（端到端补充参考）+ TIMEOUT/ERROR/completion。
+
+outcome_neutral: >
+  E2 检验 CARS 在资源异构下的服务质量、可靠性、效用与计算开销，不预设
+  "CARS 必须所有指标第一"。正式结果只允许 supported / conditionally supported /
+  not supported；不得事后移动验收终点。最佳 Claim 表述：
+  "CARS exhibits lower performance sensitivity to computational heterogeneity"
+  （不是"极端点绝对值最高"）。
+
+# ---------------------------------------------------------------------------
+# 2. 方法集合（用户冻结；与 E1 同一 baseline pool，不换不删不新增）
+# ---------------------------------------------------------------------------
+methods:
+  main: [cars, bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+  diagnostic: [foa]        # boundary diagnostic；不参与"综合最佳方法"排名
+  cars_config: configs/cars_v4/cars_frozen_v4.yaml    # 正式 CARS（AADA→RCLA，Contract V4）
+  baseline_configs:
+    bpso_rata_la: configs/r6/frozen_method_configs/bpso_frozen.yaml
+    jtora_adapted: configs/r6/frozen_method_configs/jtora_frozen.yaml
+    nfa_adapted: configs/r6/frozen_method_configs/nfa_frozen.yaml
+    reliability_only: configs/r6/frozen_method_configs/reliability_only_frozen.yaml
+    local_only: configs/r6/frozen_method_configs/local_only_frozen.yaml
+    foa: configs/r6/frozen_method_configs/foa_frozen.yaml
+  forbidden:
+    - "禁止只调优 CARS / 给 CARS 单独预处理"
+    - "禁止隐藏 timeout/异常/不可行"
+    - "禁止因 E1 某方法表现强/弱而在 E2 删除它（基线池与 E1 一致）"
+    - "禁止新增第四个强基线"
+  fairness:
+    shared: [scenario, seed, derived-data rules, hard constraints, Evaluator,
+             timeout policy, hardware budget, failure accounting]
+    timeout_seconds: 30.0    # R6 冻结 shared timeout
+
+# ---------------------------------------------------------------------------
+# 3. 环境（E2-V2-0 冻结：E2_V2_ENVIRONMENT_SELECTED_V1）
+# ---------------------------------------------------------------------------
+environment:
+  id: E2_V2_ENVIRONMENT_SELECTED_V1
+  n: 170                    # 冻结主环境（E2-V2-0 选择；E1 HIGH 区）
+  m: 8
+  topology: "fully connected"
+  deadline: "无 deadline 模型（deadline_seconds 占位 1000.0，逻辑不使用）"
+  compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_profile: MEDIUM          # ν = {0, 8, 16} (0.4/0.3/0.3)
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  s_f: 1.0
+  total_capacity: 101000.0           # F_total^E2 = F_total^E1（E2-V2-0 冻结）
+  server_lambda: "U[0.001, 0.003]（固定名义故障率；不随 CV_F 改变）"
+  local_failure_rate: 0.002
+  min_reliability: "U[0.85, 0.95]"
+  system_params: "Schema V4（rcla_solver + numeric_epsilon；无 cala/repair 参数）"
+  capacity_generation: >
+    F_j(theta) = F_total * exp(theta*z_j) / sum_k exp(theta*z_k)；z = 固定对称模板
+    [-1.5,-1.0,-0.5,-0.15,0.15,0.5,1.0,1.5]（每 seed 独立 substream 置换）；
+    theta deterministic bisection 命中 CV_F^target；ΣF 恒定、F_j>0、同 seed 跨 CV_F
+    任务/设备/信道/λ_j/R_min 全不变（仅 F_j 改变）。
+
+# ---------------------------------------------------------------------------
+# 4. Formal 网格与 seeds（E2-V2-0 冻结；只登记，本阶段不运行）
+# ---------------------------------------------------------------------------
+cv_f_grid: [0.0, 0.3, 0.6, 0.9, 1.2]
+cv_f_labels: {0.0: homogeneous, 0.3: mild, 0.6: moderate, 0.9: high, 1.2: extreme}
+cv_f_extension_1_5: NOT_USED      # E2-V2-0 预注册条件未满足
+formal_seeds: [2101, 2102, 2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110]
+paired_comparison: true
+seed_isolation: "{2101..2110}(E2) ∩ {1101..1110}(E1) = ∅；∩ {601..620}(E0-V2) = ∅；∩ {401..410}(E3-V2) = ∅；∩ {201..203}(pilot) = ∅；∩ {1201..1205}(E2 calib) = ∅"
+same_scenario_across_methods: true   # 每 (seed, CV_F) 场景只生成一次，全部方法共享
+seed_policy: "禁止因正式结果不好增加/删除/筛选 seed；formal seeds 未经用户授权禁止访问"
+
+# ---------------------------------------------------------------------------
+# 5. 正式运行量
+# ---------------------------------------------------------------------------
+formal_runs: 350    # 5 CV_F × 7 方法 × 10 seeds
+total_runs: "5 CV_F x 7 方法 x 10 seeds = 350 runs（统一跑 7 方法含 FOA 诊断）"
+
+# ---------------------------------------------------------------------------
+# 6. 正式指标（统一 Evaluator；无 V_D 族）
+# ---------------------------------------------------------------------------
+metrics:
+  primary: TSSR
+  secondary: [Rbar_eff, Ubar_eff]
+  diagnostic: [V_R]
+  efficiency: method_runtime_ms          # 主口径=算法执行时间（与 E1-V2-1 一致）
+  efficiency_supplementary: total_wall_time_ms
+  robustness: [completion_rate, timeout_count, method_error_count]
+  mechanism: [LI_dem, max_rho_dem, max_G_over_F, edge_offload_ratio]
+  forbidden_metrics: [V_D, V_D_only, V_D_and_R, deadline_violation_rate,
+                      deadline_only_rate, joint_violation_rate, lambda_eff,
+                      ruad_gamma, gamma, kappa_R, kappa_D]
+  evaluator: "统一 External Evaluator（Runner 唯一调用者）；方法不得自行定义成功/指标"
+
+# ---------------------------------------------------------------------------
+# 7. 统计协议（与 E1-V2-1 一致）
+# ---------------------------------------------------------------------------
+statistics:
+  plot_table_style: "mean ± std"
+  completion: "每点记录 n_completed"
+  completion_definition: >
+    SUCCESS / BUDGET_EXHAUSTED / NO_IMPROVEMENT = 完成（有 Evaluator 输出）；
+    TIMEOUT / METHOD_ERROR = 未完成
+  timeout_policy: >
+    TIMEOUT/ERROR 不删除、不重跑、不换 seed、不伪造 TSSR=0；完整进入结果；
+    单独记录 Completion Rate + Timeout Count
+  paired_bootstrap:
+    delta: "ΔX_s = X_CARS,s − X_baseline,s（X ∈ {TSSR, Rbar_eff, Ubar_eff}；按 CV_F 点配对）"
+    baselines: [bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+    resamples: 10000
+    rng_seed: 20260809
+    paired_only: true
+    insufficient: "有效 paired seeds < 8 -> INSUFFICIENT_PAIRED_COMPLETION"
+  degradation:
+    definition: "degradation(Y) = (Y(CV_F^high) − Y(0)) / Y(0)"
+    note: "Table E2-1 核心量；Claim = CARS 对资源结构变化表现出较低性能敏感性"
+
+# ---------------------------------------------------------------------------
+# 8. 图表合同（用户冻结：2 图 1 表）
+# ---------------------------------------------------------------------------
+figure_table_contract:
+  Fig_E2_1: "三 panel：x=CV_F，y=(a) TSSR / (b) Rbar_eff / (c) Ubar_eff；7 方法 mean±std"
+  Fig_E2_2: "三 panel：x=CV_F，y=(a) LI_dem / (b) max_j rho_j^dem / (c) edge/offloading ratio（必要时 max G/F 替换其一）"
+  Table_E2_1: "极端异构端点比较 CV_F=0 vs CV_F=1.2：Method | TSSR | Rbar_eff | Ubar_eff | LI | max pressure | Runtime | degradation"
+  no_module_runtime: "E2 不做模块级 runtime 拆解（属 E3）"
+
+# ---------------------------------------------------------------------------
+# 9. Claim 判定规则（outcome-neutral，冻结；与 E1-V2-1 一致）
+# ---------------------------------------------------------------------------
+claim_rules:
+  allowed: [supported, conditionally_supported, not_supported]
+  supported: >
+    CV_F 增大过程中 CARS 相对某 Baseline 稳定更优或退化更缓（paired CI 支持）+ CARS
+    runtime 在可接受在线范围——只对实际显著领先的 Baseline 写对应结论
+  conditionally_supported: "仅特定 CV_F 区间（如 high/extreme）明显优于 -> 限定该区间"
+  not_supported: >
+    未稳定优于 -> 缩小 Claim（不是 P1）
+  best_claim: >
+    "CARS exhibits lower performance sensitivity to computational heterogeneity"
+    ——degradation 相对更小/更缓；优先于"绝对值最高"
+
+# ---------------------------------------------------------------------------
+# 10. 阶段边界
+# ---------------------------------------------------------------------------
+stage_boundary:
+  this_stage: "E2-V2-1 Formal 主实验（350 runs；2 图 1 表；正式报告）"
+  not_in_scope: ["E2-B capacity-reliability conflict 小表（后续 E2-V2-2 或 E2-3）",
+                 "snapshot capacity shock（附录候选）", "组件消融（属 E3，E2 不做）"]
+  forbidden:
+    - "访问 pilot seeds 混入正式统计"
+    - "调参 / 改环境 / 改算法 / 改 Evaluator"
+    - "因正式结果移动 CV_F 网格或 seed"
+    - "未经用户授权运行 formal seeds 2101-2110"

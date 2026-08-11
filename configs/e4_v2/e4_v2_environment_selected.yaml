@@ -1,0 +1,127 @@
+# E4-V2 环境选择冻结（E4-V2-1：Trace 动态区域识别与 Pilot 校准）
+# 版本: E4_V2_ENVIRONMENT_SELECTED_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-1（Pilot 校准完成；E4-V2-2 Formal 结构冻结）
+# 状态: FROZEN（环境选择依据 Layer A algorithm-neutral 诊断；Layer B 仅 sanity）
+# 说明: 本文件冻结每个 dataset 的可用区域/判定规则/阈值/选中 Pilot 窗口/Formal 确定性
+#       选择规则/所用 Trace 字段/所用场景诊断/排除诊断及理由。
+# 直接依据: 用户 E4-V2-1 指示；E4_V2_PROTOCOL_V1；E4_V2_1_PILOT_PROTOCOL_V1；
+#       E4_V2_TRACE_FIELD_MAPPING_V1；Layer A 实测（results/e4_v2/e4_v2_1_pilot/）。
+
+environment_selected_version: E4_V2_ENVIRONMENT_SELECTED_V1
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+schema_version: CARS_ACTIVE_SCHEMA_V4
+selection_basis: "Layer A algorithm-neutral Trace/Scenario 诊断（禁 CARS 排名/方法结果）"
+layer_b_role: "仅 sanity（可运行性/可辨识性）；不参与窗口排名与环境选择"
+window_construction:
+  window_len_slots: 24
+  stride_slots: 24
+  rule: "时间连续、非重叠、不跨 partition、不重排、不抽取未来信息、不删除异常高压窗口"
+
+# ---------------------------------------------------------------------------
+# Trace→Scenario 构造规则（E4-V2-1 冻结；E4-V2-0 mapping 允许字段）
+# ---------------------------------------------------------------------------
+trace_to_scenario:
+  base_environment: "E1-V2 基础环境（M=8 全连接；c 三带{2000,5000,12000}；ν{MEDIUM 0/8/16}；f_loc{800,1200}；λ_j U[0.001,0.003] 固定名义；R_min U[0.85,0.95]；无 deadline）"
+  dataset_seeds: {azure: 2401, nep: 2402, shanghai: 2403}
+  workload_size_rule:
+    azure: "N_t = 50 + round(150 * p_win)，p_win = 窗口内归一化 workload_intensity 均值"
+    shanghai: "N_t = 50 + round(150 * p_win)，p_win = 窗口内归一化 workload_intensity 均值"
+    nep: "N_t = 100（固定；NEP 无 workload 信号，不得使用 workload_intensity/request_count/user_count）"
+  server_capacity_rule:
+    azure: "F_j = F_j^base（trace 不缩放容量）"
+    shanghai: "F_j = F_j^base（trace 不缩放容量）"
+    nep: "F_j = F_j^base * max(0.40, 1 - 0.50 * min(1, p_win/0.12))，p_win = 窗口内 cpu_pressure 中位数（容量侧；λ_j 不变）"
+  forbidden_trace_effects:
+    - "Trace 不得改写 λ_j（固定名义故障率）"
+    - "Trace 不得改写 R_min"
+    - "Trace 不得改写任何算法/Baseline 参数"
+    - "Trace workload 只驱动 Scenario workload/state，不直接改变算法参数"
+
+# ---------------------------------------------------------------------------
+# 各 Dataset 冻结结果
+# ---------------------------------------------------------------------------
+datasets:
+  azure:
+    available_regimes: [LOW, TRANSITION, HIGH]
+    regime_definition: "dataset-relative P33/P66（窗口 p_win = 归一化 workload_intensity 均值）"
+    layer_a_thresholds: {p33: 0.330148, p66: 0.618275}
+    regime_meaning:
+      LOW: "p_win<=0.330；d/c≈0.27-0.29；服务充裕"
+      TRANSITION: "0.330<p_win<=0.618；d/c≈0.54-0.59；资源竞争显现"
+      HIGH: "p_win>0.618；d/c≈0.72-0.76；明显高压但可服务"
+    selected_pilot_windows:
+      - {window_id: azure_win_0032, regime: HIGH, p_win: 0.7678, n: 165, d_c: 0.7567}
+      - {window_id: azure_win_0104, regime: HIGH, p_win: 0.6975, n: 155, d_c: 0.7191}
+      - {window_id: azure_win_0069, regime: LOW, p_win: 0.1964, n: 79, d_c: 0.2923}
+      - {window_id: azure_win_0132, regime: LOW, p_win: 0.1225, n: 68, d_c: 0.2734}
+      - {window_id: azure_win_0064, regime: TRANSITION, p_win: 0.4874, n: 123, d_c: 0.5872}
+      - {window_id: azure_win_0130, regime: TRANSITION, p_win: 0.4140, n: 112, d_c: 0.5399}
+    formal_selection_rule:
+      rule: "formal 分区→连续非重叠 24-slot 窗口→p_win（同上）→按 FROZEN 阈值(P33/P66)分类→每档按时间顺序取前 5 个窗口"
+      thresholds: {p33: 0.330148, p66: 0.618275}
+      windows_per_regime: 5
+
+  nep:
+    available_regimes: [LOW, TRANSITION, HIGH]
+    regime_definition: "dataset-relative P33/P66（窗口 p_win = cpu_pressure 中位数；经容量缩放产生场景级压力梯度）"
+    layer_a_thresholds: {p33: 0.076213, p66: 0.087299}
+    regime_meaning:
+      LOW: "p_win<=0.076；容量缩放小，d/c≈0.70-0.71"
+      TRANSITION: "0.076<p_win<=0.087；d/c≈0.78-0.79"
+      HIGH: "p_win>0.087；容量缩放大，d/c≈0.84-0.87"
+    trace_level_note: "NEP cpu_pressure 绝对范围窄(0.056-0.111)，场景级 d/c 经容量缩放形成可辨识梯度（Warning W-E4-2 相关）"
+    selected_pilot_windows:
+      - {window_id: nep_win_0079, regime: HIGH, p_win: 0.0967, n: 100, d_c: 0.8704}
+      - {window_id: nep_win_0254, regime: HIGH, p_win: 0.0907, n: 100, d_c: 0.8355}
+      - {window_id: nep_win_0003, regime: LOW, p_win: 0.0646, n: 100, d_c: 0.7112}
+      - {window_id: nep_win_0183, regime: LOW, p_win: 0.0610, n: 100, d_c: 0.6968}
+      - {window_id: nep_win_0174, regime: TRANSITION, p_win: 0.0806, n: 100, d_c: 0.7822}
+      - {window_id: nep_win_0188, regime: TRANSITION, p_win: 0.0824, n: 100, d_c: 0.7912}
+    formal_selection_rule:
+      rule: "formal 分区→连续非重叠 24-slot 窗口→p_win（cpu_pressure 中位数）→按 FROZEN 阈值(P33/P66)分类→每档按时间顺序取前 5 个窗口"
+      thresholds: {p33: 0.076213, p66: 0.087299}
+      windows_per_regime: 5
+
+  shanghai:
+    available_regimes: [LOW, HIGH]
+    regime_definition: "dataset-relative P33 两档（窗口 p_win = 归一化 workload_intensity 均值）"
+    layer_a_thresholds: {p33: 0.584594}
+    regime_meaning:
+      LOW: "p_win<=0.585（低尾；d/c≈0.66-0.69）"
+      HIGH: "p_win>0.585（高压平台；d/c≈0.73；workload 与 request_count 相关性 0.984）"
+    transition_note: "shanghai workload 呈低尾+高压平台结构，TRANSITION 与 HIGH 场景级 d/c 几乎重叠(0.729 vs 0.743)——按用户规则不强造第三档，如实冻结两档（Warning）"
+    selected_pilot_windows:
+      - {window_id: shanghai_win_0103, regime: HIGH, p_win: 0.6350, n: 145, d_c: 0.7288}
+      - {window_id: shanghai_win_0108, regime: HIGH, p_win: 0.6072, n: 141, d_c: 0.7288}
+      - {window_id: shanghai_win_0099, regime: LOW, p_win: 0.4961, n: 124, d_c: 0.6569}
+      - {window_id: shanghai_win_0148, regime: LOW, p_win: 0.5253, n: 129, d_c: 0.6937}
+    formal_selection_rule:
+      rule: "formal 分区→连续非重叠 24-slot 窗口→p_win→按 FROZEN 阈值(P33)分类→每档按时间顺序取前 5 个窗口"
+      thresholds: {p33: 0.584594}
+      windows_per_regime: 5
+
+# ---------------------------------------------------------------------------
+# 使用与排除的字段/诊断
+# ---------------------------------------------------------------------------
+trace_fields_used:
+  azure: [workload_intensity（归一化，TRACE_DERIVED）, timestamp, slot_id]
+  nep: [cpu_pressure（TRACE_OBSERVED）, region_id/hotspot（诊断参考）, timestamp, slot_id]
+  shanghai: [workload_intensity（归一化，TRACE_DERIVED）, request_count（交叉校验）, timestamp, slot_id]
+scenario_diagnostics_used:
+  - n
+  - local_feasible_ratio
+  - edge_feasible_ratio（=recoverable_edge_ratio）
+  - aggregate_min_floor_demand
+  - total_capacity
+  - demand_capacity_ratio
+  - per_server_pressure_max
+  - per_server_pressure_mean
+  - pressure_dispersion
+  - predecision_infeasible_ratio
+excluded_diagnostics:
+  - {name: li_dem, reason: "assignment/method-dependent（用户 §6.2 明确禁止作为 Layer A 评分）"}
+  - {name: rho_dem, reason: "assignment/method-dependent"}
+  - {name: burst_level, reason: "burst_score 全 0 占位；burstiness=NOT_AVAILABLE"}
+  - {name: tssr/rbar_eff/ubar_eff/v_r, reason: "方法结果；禁用于环境选择（Layer B 仅 sanity）"}
+  - {name: method_runtime_ms, reason: "方法结果；禁用于环境选择"}

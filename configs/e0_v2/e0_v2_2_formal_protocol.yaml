@@ -1,0 +1,121 @@
+# E0-V2-2 阶段合同：Formal Confirmatory Evaluation
+# 版本: E0_V2_2_FORMAL_PROTOCOL_V1
+# 日期: 2026-08-09
+# 状态: FROZEN（本阶段执行 Formal；分析/图表/正文属 E0-V2-MANUSCRIPT）
+# 依据: E0-V2-1 Formal 网格冻结（configs/e0_v2/e0_v2_formal_grid.yaml，V1）；
+#       E0-V2-0 协议与字段定义；用户 2026-08-09 E0 设计；正文 III-F/VI-E.2/VI-F.1。
+
+# ---------------------------------------------------------------------------
+# 0. 阶段定义
+# ---------------------------------------------------------------------------
+stage_id: E0_V2_2
+stage_name: "E0 Formal：Confirmatory Evaluation（正式现象识别数据）"
+stage_goal: >
+  在 E0-V2-1 冻结的 Formal 网格与 seeds 上执行 Confirmatory Evaluation：
+  7 N × 20 paired seeds × 3 主方法 = 420 runs（主运行量）+ local_only 诊断控制
+  140 runs（随跑，不入主图）。统一 Evaluator 唯一评价；paired 共享场景；
+  输出正式 raw_records + summary + 完整性证据。本阶段不出图/表/正文
+  （属 E0-V2-MANUSCRIPT），但须验证基础统计可复现。
+workflow: "Freeze -> Confirm -> Execute -> Test -> Review -> Return -> Stop"
+authorized: true            # 用户 2026-08-09 授权 E0-V2-2
+next_stage: E0_V2_MANUSCRIPT  # 分析与正文（不自动进入）
+
+# ---------------------------------------------------------------------------
+# 1. 正式规格（冻结；不得再调）
+# ---------------------------------------------------------------------------
+formal_spec:
+  grid: [20, 50, 80, 110, 140, 170, 200]     # E0_V2_FORMAL_GRID_V1 候选 A
+  seeds: [601, 602, 603, 604, 605, 606, 607, 608, 609, 610,
+          611, 612, 613, 614, 615, 616, 617, 618, 619, 620]
+  seeds_status: NEW_PAIRED_UNSEEN
+  methods_main: [reliability_only, bpso_rata_la, cars_aada_rcla_candidate]
+  methods_diagnostic: [local_only]            # 诊断控制；不入主图；可选附录/表一行
+  main_runs: 420                              # 3 x 7 x 20
+  diagnostic_runs: 140                        # 1 x 7 x 20
+  total_runs: 560
+  paired_invariant: "所有方法对每个 (seed, N) 使用完全相同的 (tasks, servers, links)"
+  timeout_seconds: 30.0                       # R6 冻结 shared timeout
+  nested_tasks: "每 seed 生成一次 N_max=260 超场景，prefix 到各 N"
+  output_dir: results/e0_v2/e0_v2_2_formal
+
+# ---------------------------------------------------------------------------
+# 2. 指标（E0-V2-0 字段定义；本阶段只记录，分析在 MANUSCRIPT）
+# ---------------------------------------------------------------------------
+metrics:
+  core: [TSSR, Rbar_eff, Ubar_eff, V_R]
+  mechanism: [V_F, median_f_over_ellR, max_G_over_F, LI_dem, edge_ratio]
+  primary_outcome: TSSR
+  forbidden: [V_D, deadline_violation_rate, lambda_eff, Q_j, Z_j, ruad_gamma, gamma,
+              collapse_threshold]
+
+# ---------------------------------------------------------------------------
+# 3. 本阶段产物
+# ---------------------------------------------------------------------------
+deliverables:
+  - scripts/experiments/e0_v2/run_e0_v2_2_formal.py   # Formal runner
+  - results/e0_v2/e0_v2_2_formal/{scenarios/, formal_raw.jsonl, formal_summary.json}
+  - results/e0_v2/e0_v2_2_integrity.json
+  - reports/experiments/E0_V2_2_formal.md
+  - tests/e0_v2/test_e0_v2_2_formal.py               # 正式数据完整性冻结测试
+
+# ---------------------------------------------------------------------------
+# 4. 允许修改范围 / 禁止
+# ---------------------------------------------------------------------------
+allowed_modify:
+  - results/e0_v2/e0_v2_2_formal/**     # Formal 结果
+  - scripts/experiments/e0_v2/**        # Formal runner（新文件）
+  - tests/e0_v2/**                      # 正式数据完整性测试
+  - reports/experiments/**              # 本阶段报告
+  - configs/e0_v2/**                    # 阶段合同（本文件）
+forbidden:
+  - "调整算法参数 / 修改任务分布"
+  - "使用 pilot seeds 201-205 进入正式统计"
+  - "在正式结果出来后调整网格/指标"
+  - "修改保护对象（experiment_docs/references/data/src/schemas/既有 configs）"
+  - "把 local_only 放入主图（仅诊断）"
+  - "隐藏 timeout / METHOD_ERROR / 不可行"
+  - "根据结果事后改变指标定义"
+  - "因无坍缩/无差异重调环境（结论只能是如实报告）"
+
+# ---------------------------------------------------------------------------
+# 5. AC（本阶段验收）
+# ---------------------------------------------------------------------------
+acceptance_criteria:
+  AC-1: "Formal 560 runs 全部完成；TIMEOUT/METHOD_ERROR 如实计数"
+  AC-2: "paired 共享：同 (seed,N) 各方法使用同一 scenario（scenario_hash 断言）"
+  AC-3: "pilot seeds 201-205 未进入正式统计（互斥断言）"
+  AC-4: "正式指标（TSSR/Rbar/Ubar/V_R）与机制指标（V_F/median/maxG-F/LI_dem/edge_ratio）记录完整"
+  AC-5: "summary（per-cell mean/std over 20 seeds）可复现；primary=TSSR"
+  AC-6: "formal_seed_used 标记正确；local_only 标记 diagnostic"
+  AC-7: "保护对象零修改；全量 pytest 无新增失败"
+  AC-8: "报告 + integrity 完整；P0=0；P1=0"
+
+# ---------------------------------------------------------------------------
+# 6. P0 / P1 / 停止条件
+# ---------------------------------------------------------------------------
+p0:
+  - "核心工具无法运行"
+  - "正式结果实际损坏"
+p1:
+  - "paired 场景不一致（同 seed 同 N 不同方法）"
+  - "pilot seeds 混入正式统计"
+  - "指标口径与字段定义冲突"
+  - "统一 Evaluator 未被唯一使用"
+  - "保护对象被未经授权修改"
+  - "正式结果不可复现（同配置重算不一致）"
+stop_conditions:
+  - "发现 MANUSCRIPT_HARD_CONFLICT"
+  - "需要修改保护对象但无批准"
+  - "出现真实 P0/P1 且无法在合同内修复"
+  - "用户撤回授权"
+completion_definition: "AC-1..AC-8 满足；P0=0；P1=0；PASS/PASS_WITH_WARNINGS/FAIL_AND_REDESIGN"
+max_rounds: 2
+
+# ---------------------------------------------------------------------------
+# 7. 分析边界（本阶段不做；E0-V2-MANUSCRIPT 执行）
+# ---------------------------------------------------------------------------
+analysis_deferred:
+  - "坍缩判断（前后斜率 + segmented regression + bootstrap CI）"
+  - "Fig E0-1（TSSR/Rbar/Ubar vs N 三 panel）与 Fig E0-2（V_R/V_F/max G-F）"
+  - "Table E0-1（退化/坍缩总结）"
+  - "E0 正文 section（experiment_docs/E0_manuscript_section.md 新版）"

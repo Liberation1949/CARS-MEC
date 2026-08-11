@@ -1,0 +1,131 @@
+# E3-V2-2 正式消融协议（E3-V2-1 后冻结；Confirmatory Evaluation）
+# 版本: E3_V2_FORMAL_PROTOCOL_V1
+# 日期: 2026-08-09
+# 依据: E3-V2-1 环境选择（configs/e3_v2/e3_v2_environment_selected.yaml）；
+#       E3-V2-0 variant/字段冻结；正文 V-B/V-C/VI-F。
+
+formal_protocol_version: E3_V2_FORMAL_PROTOCOL_V1
+
+# 1. 正式环境（唯一允许；不得再调）
+environments:
+  LOW:        {N: 20}
+  TRANSITION: {N: 80}
+  HIGH:       {N: 150}
+PRIMARY_E3_ENVIRONMENT: TRANSITION
+primary_N: 80
+note: >
+  LOW/HIGH 为机制边界与压力一致性证据，不得取代 Transition 成为事后选择的
+  "最佳结果环境"。
+
+# 2. 正式 seeds（全新 paired；pilot seeds 201-203 禁止进入正式统计）
+formal_seeds: [401, 402, 403, 404, 405, 406, 407, 408, 409, 410]
+pilot_seeds: [201, 202, 203]
+pilot_seeds_in_formal: false
+
+# 3. 正式执行单元（7 个；不得新增第 8 个）
+units:
+  - {id: full,              aada_variant: full,          allocation_mode: rcla}
+  - {id: no_rescue,         aada_variant: no_rescue,     allocation_mode: rcla}
+  - {id: rescue_only,       aada_variant: rescue_only,   allocation_mode: rcla}
+  - {id: no_alloc_aware,    aada_variant: no_alloc_aware, allocation_mode: rcla}
+  - {id: no_utility_gate,   aada_variant: no_utility_gate, allocation_mode: rcla}
+  - {id: fixed_rcla,        aada_variant: full,          allocation_mode: rcla}
+  - {id: fixed_ordinary_la, aada_variant: full,          allocation_mode: ordinary_la}
+
+total_runs: 210   # 10 seeds x 3 pressures x 7 units
+
+# 4. Scenario 生成（canonical；同 (pressure, seed) 全部 variant 共享）
+scenario_rule:
+  generator: scripts/experiments/e3_v2/build_e3_v2_environment.py
+  canonical: "每个 (pressure, seed) 只生成一个 S_{p,s}；全部 variant 复用"
+  no_resampling: "不得针对 variant 重采样任务/server/link"
+  prefix_consistency: "同 seed 同 N 实例与 pressure 无关（服务器先行）"
+  record: scenario_hash
+
+# 5. Fixed-assignment（因果隔离；RCLA vs ordinary LA 必须同一 X/A）
+fixed_assignment:
+  source: "Full AADA 输出 (X^(0), A^(0))"
+  freeze: [X_hash, A_hash, XA_hash]
+  assert: "hash(X_rcla)==hash(X_la) 且 hash(A_rcla)==hash(A_la)；不一致则对照无效并停止"
+  only_change: allocation method
+
+# 6. 正式指标
+primary_outcome: TSSR
+secondary_outcomes: [Rbar_eff, Ubar_eff, V_R, LI_dem]
+forbidden_metrics: [deadline 类指标（无 deadline 模型）]
+
+# 7. 机制诊断（必记录）
+aada_diagnostics:
+  - local_failure_count / rate
+  - recoverable_local_failure_count / rate
+  - rescued_count
+  - RescueRate
+  - phase2_candidate_count
+  - phase2_accepted_count
+  - Phase2AcceptRate
+  - reliability_gate_rejection_count
+  - utility_gate_rejection_count
+  - no_candidate_count
+rcla_diagnostics:
+  - N_active_floor
+  - active_floor_ratio
+  - max_j G_j/F_j
+  - capacity_residual
+  - kkt_residual
+  - EDGE_reliability_violation_count
+  - N_ALLOCATION_INFEASIBLE
+correctness_expected: "N_ALLOCATION_INFEASIBLE = 0；max_epsilon_dphi 仅浮点量级"
+
+# 8. 失败来源记录（不得隐藏）
+failure_sources:
+  - LOCAL_FAILURE_NO_RECOVERABLE_EDGE
+  - EDGE_RELIABILITY_VIOLATION
+  - ALLOCATION_INFEASIBLE
+  - STRUCTURAL_VIOLATION
+  - OTHER
+
+# 9. Runtime（五段；不得用于选择/删除结果）
+runtime_fields:
+  - preprocess_runtime_ms
+  - phase1_runtime_ms
+  - phase2_runtime_ms
+  - allocation_runtime_ms
+  - total_runtime_ms
+note: "重点检查 Phase-2 是否仍为主要计算开销（O(N^3 M) 语义）"
+
+# 10. 统计（正式 only seeds 401-410）
+statistics:
+  per_cell: "pressure x variant: mean ± std"
+  paired_differences:
+    - {id: delta_rescue,  expr: "Full - no_rescue"}
+    - {id: delta_phase2,  expr: "Full - rescue_only"}
+    - {id: delta_alloc,   expr: "Full - no_alloc_aware"}
+    - {id: delta_gate,    expr: "Full - no_utility_gate"}
+    - {id: delta_rcla_la, expr: "fixed_rcla - fixed_ordinary_la"}
+  report: [paired_mean_diff, paired_std, direction_consistent_seed_count]
+  bootstrap: "无已冻结 bootstrap 工具——不临时新增（不构成关闭条件）"
+
+# 11. Claim 判定（仅允许）
+claim_statuses: [SUPPORTED, CONDITIONALLY_SUPPORTED, NOT_SUPPORTED, NOT_IDENTIFIABLE]
+
+# 12. 图表（1 figure + 1 table）
+figure_table_budget: "1 figure (Fig E3-1, 三 Panel) + 1 table (Table E3-1, Transition 主环境)"
+table_e3_1:
+  environment: TRANSITION (N=80)
+  columns: [Variant, TSSR, Rbar_eff, Ubar_eff, V_R, LI_dem, RescueRate, Phase2Accept, ActiveFloor, max G/F, Runtime]
+  appendix_rows: [fixed_rcla, fixed_ordinary_la]
+fig_e3_1:
+  panel_a: "AADA variants: TSSR vs pressure (LOW/TRANSITION/HIGH)"
+  panel_b: "AADA variants: Ubar_eff vs pressure（观察 Phase-2）"
+  panel_c: "fixed-assignment: RCLA vs ordinary LA 的 V_R vs pressure"
+  note: "不得根据'哪张图差距更漂亮'选择指标"
+
+# 13. 禁止
+forbidden:
+  - 再调环境 / 再调算法参数
+  - 根据结果改变 variant / 指标 / 删除 seed
+  - 因某个消融无差异重新设计环境
+  - 使用 pilot seeds 201-203 进入正式统计
+  - 修改 III-VI 正文
+  - 自动进入 E4 / 自动撰写 E3 论文正文
+  - 因 no_utility_gate 无差异重调（结论只能是 NOT_IDENTIFIABLE）

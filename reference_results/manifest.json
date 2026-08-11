@@ -1,0 +1,35 @@
+{
+ "description": "Lightweight machine-readable reference results extracted from frozen formal results (OS1). All values come from existing formal results; no Claim recomputation, no re-runs.",
+ "experiments": {
+  "E0_load_induced_degradation": {
+   "source": "e0_v2/e0_v2_2_formal",
+   "files": 1,
+   "bytes": 14522
+  },
+  "E1_task_scale": {
+   "source": "e1_v2/e1_v2_1_formal",
+   "files": 5,
+   "bytes": 52712
+  },
+  "E1b_compute_heterogeneity": {
+   "source": "e2_v2/e2_v2_1_formal",
+   "files": 4,
+   "bytes": 33598
+  },
+  "E2_component_ablation": {
+   "source": "e3_v2/e3_v2_2_formal",
+   "files": 1,
+   "bytes": 3139
+  },
+  "E3_trace_enhanced": {
+   "source": "e4_v2/e4_v2_2_formal",
+   "files": 7,
+   "bytes": 128800
+  },
+  "E4_exact_oracle": {
+   "source": "e4_exact/e4_exact_3_formal",
+   "files": 3,
+   "bytes": 8608
+  }
+ }
+}

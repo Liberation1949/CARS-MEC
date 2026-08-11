@@ -1,0 +1,113 @@
+# E4-V2-1 Pilot 协议（Trace 动态窗口识别 Pilot）
+# 版本: E4_V2_1_PILOT_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-0（协议冻结；E4-V2-1 才允许运行）
+# 状态: FROZEN_ONLY / NOT_EXECUTED（E4-V2-1 Pilot 未运行；AUTHORIZED_TO_START_E4_V2_1_PILOT=NO）
+# 直接依据: 用户 E4-V2-0 指示；E4_V2_PROTOCOL_V1；既有 Trace split manifest；
+#       Contract V4；Schema V4。
+
+protocol_id: e4_v2_1_pilot_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+overall_protocol: configs/e4_v2/e4_v2_protocol.yaml
+status: FROZEN_ONLY
+execution_status: NOT_EXECUTED
+
+# ---------------------------------------------------------------------------
+# 1. Pilot 唯一目标（用户冻结）
+# ---------------------------------------------------------------------------
+pilot_goal: >
+  识别 Trace 时间轴上的压力区域（LOW / TRANSITION / HIGH 或其他直接由 Trace 支持的
+  压力区域），为 E4 正式窗口选择提供 algorithm-neutral 依据；同时检查 E4 场景构造
+  管线可运行（timeout/error/决策合法性）与动态覆盖。
+
+pilot_use_limits:
+  - "只用于环境可辨识性和动态覆盖"
+  - "NOT_FORMAL：禁止用于论文正式均值/正式结论"
+  - "禁止依据 CARS 排名选择窗口"
+  - "禁止调参 / 改环境 / 改算法 / 访问 formal 分区"
+
+# ---------------------------------------------------------------------------
+# 2. 允许访问的数据分区（冻结）
+# ---------------------------------------------------------------------------
+allowed_partitions:
+  azure: [splits/azure/azure_calibration.jsonl, splits/azure/azure_pilot.jsonl]
+  nep: [splits/nep/nep_calibration.jsonl, splits/nep/nep_pilot.jsonl]
+  shanghai: [splits/shanghai/shanghai_calibration.jsonl, splits/shanghai/shanghai_pilot.jsonl]
+forbidden_partitions:
+  azure: [splits/azure/azure_formal.jsonl]
+  nep: [splits/nep/nep_formal.jsonl]
+  shanghai: [splits/shanghai/shanghai_formal.jsonl]
+formal_access_note: >
+  formal 分区（azure_formal 606 / nep_formal 1150 / shanghai_formal 659 slots）在
+  Pilot 阶段禁止访问；E4-V2-2 正式阶段须用户授权后方可运行。
+
+# ---------------------------------------------------------------------------
+# 3. Candidate windows / candidate trace segments（只登记候选，不执行）
+# ---------------------------------------------------------------------------
+candidate_windows:
+  source_of_candidates: >
+    从 calibration + pilot 分区按时间顺序与 workload 分布确定候选窗口段
+    （覆盖 LOW/TRANSITION/HIGH 压力候选）；候选必须来自允许分区。
+  # E4-V2-1 执行时登记的具体数值（协议只冻结规则；数值在授权白名单内选择并冻结）
+  frozen_window_values:
+    window_len_slots: 24
+    stride_slots: 24
+    n_min: 50
+    n_max: 200
+    nep_capacity: {cap_ref: 0.12, cap_floor: 0.40, cap_alpha: 0.50}
+    dataset_seeds: {azure: 2401, nep: 2402, shanghai: 2403}
+    regime_rule: "dataset-relative P33/P66（azure/nep 三档）或 P33（shanghai 两档）"
+    layer_b_methods: [cars, bpso_rata_la, nfa_adapted, reliability_only]
+    candidates_per_regime: 2
+    formal_windows_per_regime: 5
+  selection_criteria_algorithm_neutral:
+    - workload_intensity（既有归一化值；azure/shanghai）
+    - demand_capacity_ratio（d/c：aggregate reliability-floor demand / total capacity）
+    - burst_level（NOT_AVAILABLE——burst_score 全 0，不得使用）
+    - edge_feasible_ratio
+    - local_feasible_ratio
+    - per_server_pressure / max_pressure
+    - temporal_variation（时间序列变化，直接由 trace 支持）
+  forbidden_selection_criteria:
+    - "CARS 赢多少"
+    - "CARS 排名第几"
+    - "哪个窗口最有利于 CARS"
+  datasets_note: >
+    三数据集均可作候选源（azure/shanghai 提供负载强度信号；NEP 提供 cpu_pressure
+    容量压力信号）；是否全部进入正式实验由 E4-V2-1 Pilot 按 algorithm-neutral 标准
+    确认（本阶段不决定、不运行）。
+
+# ---------------------------------------------------------------------------
+# 4. Pilot 运行设计（冻结合同；E4-V2-1 执行时按此）
+# ---------------------------------------------------------------------------
+pilot_design:
+  method_pool: "与 E1/E2 一致（6 主 + FOA 诊断）——本阶段不运行"
+  scenario_construction: >
+    每个候选窗口构造一次 Schema V4 Scenario（synthetic-fixed 参数 + trace 驱动的
+    workload 水平）；同窗口全部方法共享；确定性生成。
+  checks:
+    - "timeout=30s 不超"
+    - "无 METHOD_ERROR"
+    - "决策合法性（Ω_phy）"
+    - "压力区域可辨识（非全 ceiling / 非全 collapse / 梯度存在）"
+    - "动态覆盖（候选窗口覆盖 LOW/TRANSITION/HIGH）"
+  forbidden:
+    - "访问 formal seeds / formal 窗口"
+    - "依据方法性能选择窗口"
+    - "调参 / 改环境 / 改算法"
+    - "重新处理 Trace"
+  seeds: "Pilot seeds 须与既有 E0/E1/E2/E3 pilot 及 formal seeds 互斥（E4-V2-1 冻结时登记）"
+
+# ---------------------------------------------------------------------------
+# 5. Pilot 输出与门槛
+# ---------------------------------------------------------------------------
+pilot_outputs:
+  - "results/e4_v2/e4_v2_1_pilot/（pilot_raw + summary + integrity）"
+  - "reports/experiments/E4-V2-1_pilot_environment_identification.md（唯一正式报告）"
+  - "configs/e4_v2/e4_v2_environment_selected.yaml（E4-V2-1 冻结）"
+gate_to_formal:
+  - "Pilot 通过（动态覆盖 + 可辨识 + 管线可运行）"
+  - "formal 窗口在运行前冻结"
+  - "P0=0、P1=0"
+  - "候选条件 READY_FOR_E4_V2_2_FORMAL=YES / AUTHORIZED_TO_START_E4_V2_2_FORMAL=NO（须用户授权）"

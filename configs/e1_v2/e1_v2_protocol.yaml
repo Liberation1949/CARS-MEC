@@ -1,0 +1,207 @@
+# E1 正式实验协议（E1-V2：Performance under Increasing Workload Scale）
+# 版本: E1_V2_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1 + E1 Freeze/Pilot（用户 2026-08-09 授权 Freeze + Pilot；
+#       AUTHORIZED_TO_RUN_E1_FORMAL = NO，formal-test 待用户另行授权）
+# 状态: FREEZE + PILOT（本阶段运行 Pilot；formal-test 不运行）
+# 直接依据: 用户 2026-08-09 E1 设计（3 研究问题、方法集合、环境/网格、Q2/Q3
+#       操作化、统计、2 图 1 表、outcome-neutral Claim）；
+#       正文 III_VI.md（CARS=AADA→RCLA、无 deadline 模型、III-F 负载诱导服务退化）；
+#       Contract V4（CARS_EXECUTABLE_THEORY_CONTRACT_V4.md）；
+#       Schema V4（CARS_ACTIVE_SCHEMA_V4）；
+#       CR_CARS_PROMOTION_E1_V1.md（promotion + E1 合同）。
+
+protocol_id: e1_v2_protocol_v1
+phase: "E1: Performance under Increasing Workload Scale（任务规模增长下的性能与可扩展性）"
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+
+# ---------------------------------------------------------------------------
+# 1. E1 定位与研究问题（用户冻结）
+# ---------------------------------------------------------------------------
+positioning: >
+  E1 是论文第一主性能实验（非现象识别——那是 E0）。
+  E0 = What happens?（负载诱导服务退化现象与形态）；
+  E1 = How well does CARS handle it?（完整 CARS 面对规模增长比 Baseline 强多少）。
+  不再叫 Collapse Experiment；collapse 已降级为服务退化可能出现的一种特殊形态，
+  E1 不承担证明/推迟坍缩（E0 已定论 ordinary degradation，限定 N<=200）。
+
+research_questions:
+  Q1: >
+    任务规模增大（N↑）时，CARS 能否比代表性 Baseline 维持更高的有效服务水平
+    （TSSR / Rbar_eff / Ubar_eff），并表现出更缓的下降（scalability under
+    workload growth）？——不是"CARS 会不会下降"，而是"是否下降明显更慢"。
+  Q2: >
+    CARS 的优势是否主要出现在真正有资源竞争的压力区间？——轻载下方法差异小，
+    高载下容量竞争强、CARS 优势出现（Low Load -> little contention -> small
+    difference；High Load -> strong competition -> advantage emerges）。
+    不预设 N0；预固定压力区间，由数据决定优势是否出现、出现在哪个区间。
+  Q3: >
+    CARS 的性能优势付出多少计算代价？——算法执行时间 method_runtime_ms（主口径，
+    2026-08-09 用户批准：避免子进程隔离/状态构建等实验框架固定开销稀释算法差异）+
+    total_wall_time_ms（端到端补充参考，含实验框架固定开销，全部方法公平）+
+    TIMEOUT/ERROR/completion（在线可用性）；不做模块级 runtime 拆解
+    （模块拆解属 E3，E3 已做）。
+
+outcome_neutral: >
+  E1 检验 CARS 在负载增长下的服务质量、可靠性、效用与计算开销，不预设
+  "CARS 必须所有指标第一"。正式结果只允许 supported / conditionally
+  supported / not supported；不得事后移动验收终点。
+
+# ---------------------------------------------------------------------------
+# 2. 方法集合（用户冻结；与 Baseline 白名单一致）
+# ---------------------------------------------------------------------------
+methods:
+  main: [cars, bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+  diagnostic: [foa]        # boundary diagnostic：同 scenario/seed/Evaluator/timeout；
+                           # 不参与"综合最佳方法"排名
+  cars_config: configs/cars_v4/cars_frozen_v4.yaml    # 正式 CARS（AADA→RCLA，Contract V4）
+  baseline_configs:
+    bpso_rata_la: configs/r6/frozen_method_configs/bpso_frozen.yaml
+    jtora_adapted: configs/r6/frozen_method_configs/jtora_frozen.yaml
+    nfa_adapted: configs/r6/frozen_method_configs/nfa_frozen.yaml
+    reliability_only: configs/r6/frozen_method_configs/reliability_only_frozen.yaml
+    local_only: configs/r6/frozen_method_configs/local_only_frozen.yaml
+    foa: configs/r6/frozen_method_configs/foa_frozen.yaml
+  forbidden:
+    - "禁止只调优 CARS / 给 CARS 单独预处理"
+    - "禁止隐藏 timeout/异常/不可行"
+    - "禁止把 NFA 事后改称 offline baseline（除非其原始算法定义本就需要离线信息）"
+  fairness:
+    shared: [scenario, seed, derived-data rules, hard constraints, Evaluator,
+             timeout policy, hardware budget, failure accounting]
+    timeout_seconds: 30.0    # R6 冻结 shared timeout；禁止提高某方法 timeout
+
+# ---------------------------------------------------------------------------
+# 3. 环境（用户冻结：E1_ENVIRONMENT_V1 语义 + 任务规模扩展至 N=200）
+# ---------------------------------------------------------------------------
+environment:
+  id: E1_V2_ENVIRONMENT_V1（继承 E1_ENVIRONMENT_V1 语义；N_max=200）
+  m: 8
+  topology: "fully connected"
+  deadline: "无 deadline 模型（deadline_seconds 占位，逻辑不使用）"
+  compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_distribution: {0: 0.4, 8: 0.3, 16: 0.3}
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  server_base_capacity: 10000
+  server_capacity_rule: "F_j = 10000 * (1 + 0.3 * (j mod 3))"
+  server_lambda: "U[0.001, 0.003]（固定名义故障率；不随 N/负载改变）"
+  local_lambda: 0.002
+  min_reliability: "U[0.85, 0.95]"
+  compute_scale: 1.0
+  system_params: "Schema V4（rcla_solver + numeric_epsilon；无 cala/repair 参数）"
+  nested_generation: >
+    每个 seed 先生成 Γ_200（确定性 RNG(seed)；服务器参数在任务后抽取一次，
+    对全部 N 前缀固定）；任意 N<=200 用 deterministic nested prefix
+    （Gamma_20 ⊂ Gamma_50 ⊂ ... ⊂ Gamma_200）——增加 N 表示增加任务而非替换实例。
+
+# ---------------------------------------------------------------------------
+# 4. Formal 网格与 seeds（用户冻结；只登记，本阶段不运行）
+# ---------------------------------------------------------------------------
+formal_grid: [20, 50, 80, 110, 140, 170, 200]
+# E1-V2-0 环境校准后四区划分（决策前压力 + 所有方法整体响应；5-seed mean d/c 比：
+# 0.096/0.243/0.423/0.564/0.734/0.911/1.050 @ 20/50/80/110/140/170/200）
+pressure_intervals:
+  LOW: [20, 50]
+  TRANSITION: [80, 110, 140]
+  HIGH: [170]
+  NEAR_SATURATION: [200]
+formal_seeds: [1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110]
+paired_comparison: true
+seed_isolation: "{1101..1110} ∩ {401..410}(E3-V2) = ∅；∩ {601..620}(E0-V2) = ∅；∩ {201..203}(pilot) = ∅"
+same_scenario_across_methods: true   # 每 (N,s) 场景只生成一次，全部方法共享
+seed_policy: "禁止因正式结果不好增加/删除/筛选 seed"
+
+# ---------------------------------------------------------------------------
+# 5. Pilot（本阶段执行；NOT_FORMAL）
+# ---------------------------------------------------------------------------
+pilot:
+  seeds: [201, 202, 203]
+  n_points: [20, 80, 200]     # 代表点：LOW / TRANSITION / HIGH
+  methods: [cars, bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+  diagnostic_methods: [foa]
+  purpose:
+    - "预算/运行性检查（timeout=30s 不超、无 METHOD_ERROR、决策合法性）"
+    - "环境梯度 sanity check（多数方法 TSSR 随 N 下降、压力区间可辨识）"
+    - "6 方法 + FOA 均通过统一 MethodRunner（R5 公平边界）"
+  total_runs: "3 seeds x 3 N x 7 methods = 63 runs"
+  forbidden:
+    - "访问 formal seeds 1101-1110"
+    - "调参 / 改环境 / 改算法"
+    - "因 pilot 结果移动 formal 网格或代表点"
+
+# ---------------------------------------------------------------------------
+# 6. 正式指标（统一 Evaluator；无 V_D 族）
+# ---------------------------------------------------------------------------
+metrics:
+  primary: TSSR
+  secondary: [Rbar_eff, Ubar_eff]
+  diagnostic: [V_R]
+  efficiency: method_runtime_ms          # 主口径=算法执行时间（2026-08-09 用户批准；原 total_wall_time_ms 降为补充）
+  efficiency_supplementary: total_wall_time_ms   # 端到端参考（含实验框架固定开销，全部方法公平）
+  robustness: [completion_rate, timeout_count, method_error_count]
+  forbidden_metrics: [V_D, V_D_only, V_D_and_R, deadline_violation_rate, deadline_only_rate,
+                      joint_violation_rate, lambda_eff, ruad_gamma, gamma, kappa_R, kappa_D]
+  evaluator: "统一 External Evaluator（Runner 唯一调用者）；方法不得自行定义成功/指标"
+
+# ---------------------------------------------------------------------------
+# 7. 统计协议（用户冻结）
+# ---------------------------------------------------------------------------
+statistics:
+  plot_table_style: "mean ± std"
+  completion: "每点记录 n_completed"
+  completion_definition: >
+    SUCCESS / BUDGET_EXHAUSTED / NO_IMPROVEMENT = 完成（有 Evaluator 输出）；
+    TIMEOUT / METHOD_ERROR = 未完成
+  timeout_policy: >
+    TIMEOUT/ERROR 不删除、不重跑、不换 seed、不伪造 TSSR=0；完整进入结果；
+    单独记录 Completion Rate + Timeout Count
+  low_completion: >
+    8/10 completion 仅为"是否有足够 completed pairs 做推断统计"的门槛；
+    <8/10 仍完整报告 completion/timeout，只是不对其做强 superiority inference
+    （不得作为删除算法或把 timeout 当缺失值的依据）
+  paired_bootstrap:
+    delta: "ΔX_s = X_CARS,s − X_baseline,s（X ∈ {TSSR, Rbar_eff, Ubar_eff}）"
+    baselines: [bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+    resamples: 10000
+    rng_seed: 20260809
+    paired_only: true
+    insufficient: "有效 paired seeds < 8 -> INSUFFICIENT_PAIRED_COMPLETION"
+  p_value_policy: >
+    正文不以 p<0.05 为主要判据；核心证据 = effect size + paired consistency +
+    95% CI；如需显著性补 Wilcoxon signed-rank + Holm correction（正式报告）
+
+# ---------------------------------------------------------------------------
+# 8. 图表合同（用户冻结：2 图 1 表；不增加第 3/4 主图）
+# ---------------------------------------------------------------------------
+figure_table_contract:
+  Fig_E1_1: "三 panel：x=N，y=(a) TSSR / (b) Rbar_eff / (c) Ubar_eff；6 正式方法 mean±std"
+  Fig_E1_2: "x=N，y=method_runtime_ms（算法执行时间）；同时呈现 completion/timeout 信息"
+  Table_E1_1: "仅最高负载 N=200 汇总：Method | TSSR | Rbar_eff | Ubar_eff | V_R | method_runtime_ms | total_wall_time_ms | Completion | Timeout"
+  no_module_runtime: "E1 不做模块级 runtime 拆解（属 E3）"
+
+# ---------------------------------------------------------------------------
+# 9. Claim 判定规则（outcome-neutral，冻结）
+# ---------------------------------------------------------------------------
+claim_rules:
+  allowed: [supported, conditionally_supported, not_supported]
+  supported: >
+    中高负载下 CARS 相对某 Baseline 稳定更优（paired CI 支持正向差异）+ CARS
+    runtime 在可接受在线范围——只对实际显著领先的 Baseline 写对应结论
+  conditionally_supported: "仅特定区间（如 HIGH）明显优于 -> 限定该区间"
+  not_supported: >
+    未稳定优于 -> 缩小 Claim（不是 P1）；若 NFA 在服务质量与运行时间上都优于
+    CARS，"CARS 综合最优"判 not_supported（不换环境/改 timeout/降级 NFA）
+  quality_efficiency_tradeoff: >
+    NFA TSSR 更高但运行时间显著更长时，数据支持时表述 quality–efficiency
+    trade-off（NFA 以高开销换取高成功率/低退化，不可在线）
+
+# ---------------------------------------------------------------------------
+# 10. 阶段边界
+# ---------------------------------------------------------------------------
+boundary:
+  freeze_pilot: true          # 本阶段：冻结 + Pilot
+  formal_not_authorized: true # AUTHORIZED_TO_RUN_E1_FORMAL = NO（pilot 后返回等待授权）
+  run_in: "E1-FORMAL（需用户另行授权）"
+  aggregate_in: "E1-AGGREGATE（2 图 1 表）"
+  audit_in: "E1-AUDIT（结果决定 Claim；不预设）"

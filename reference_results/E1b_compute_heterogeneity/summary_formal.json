@@ -1,0 +1,800 @@
+{
+  "cv_grid": [
+    0.0,
+    0.3,
+    0.6,
+    0.9,
+    1.2
+  ],
+  "methods": [
+    "cars",
+    "bpso_rata_la",
+    "jtora_adapted",
+    "nfa_adapted",
+    "reliability_only",
+    "local_only",
+    "foa"
+  ],
+  "summary": {
+    "0": {
+      "cars": {
+        "tssr": {
+          "mean": 0.968824,
+          "std": 0.023829
+        },
+        "rbar_eff": {
+          "mean": 0.930553,
+          "std": 0.023233
+        },
+        "ubar_eff": {
+          "mean": 0.177836,
+          "std": 0.011423
+        },
+        "method_runtime_ms": {
+          "mean": 57.8
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "bpso_rata_la": {
+        "tssr": {
+          "mean": 0.77,
+          "std": 0.013783
+        },
+        "rbar_eff": {
+          "mean": 0.749835,
+          "std": 0.013233
+        },
+        "ubar_eff": {
+          "mean": 0.12333,
+          "std": 0.018747
+        },
+        "method_runtime_ms": {
+          "mean": 39.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "jtora_adapted": {
+        "tssr": {
+          "mean": 0.771765,
+          "std": 0.021501
+        },
+        "rbar_eff": {
+          "mean": 0.750771,
+          "std": 0.020849
+        },
+        "ubar_eff": {
+          "mean": 0.197379,
+          "std": 0.012386
+        },
+        "method_runtime_ms": {
+          "mean": 1371.9
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "nfa_adapted": {
+        "tssr": {
+          "mean": 0.953529,
+          "std": 0.027014
+        },
+        "rbar_eff": {
+          "mean": 0.912313,
+          "std": 0.025646
+        },
+        "ubar_eff": {
+          "mean": 0.171393,
+          "std": 0.013971
+        },
+        "method_runtime_ms": {
+          "mean": 4271.8
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "reliability_only": {
+        "tssr": {
+          "mean": 0.792941,
+          "std": 0.025478
+        },
+        "rbar_eff": {
+          "mean": 0.771163,
+          "std": 0.02413
+        },
+        "ubar_eff": {
+          "mean": 0.135389,
+          "std": 0.016498
+        },
+        "method_runtime_ms": {
+          "mean": 8.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "local_only": {
+        "tssr": {
+          "mean": 0.721765,
+          "std": 0.016855
+        },
+        "rbar_eff": {
+          "mean": 0.703519,
+          "std": 0.015195
+        },
+        "ubar_eff": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "foa": {
+        "tssr": {
+          "mean": 0.564118,
+          "std": 0.042536
+        },
+        "rbar_eff": {
+          "mean": 0.548064,
+          "std": 0.040657
+        },
+        "ubar_eff": {
+          "mean": -0.053772,
+          "std": 0.01246
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      }
+    },
+    "0.3": {
+      "cars": {
+        "tssr": {
+          "mean": 0.969412,
+          "std": 0.02927
+        },
+        "rbar_eff": {
+          "mean": 0.930901,
+          "std": 0.027795
+        },
+        "ubar_eff": {
+          "mean": 0.173225,
+          "std": 0.015021
+        },
+        "method_runtime_ms": {
+          "mean": 54.4
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "bpso_rata_la": {
+        "tssr": {
+          "mean": 0.760588,
+          "std": 0.020043
+        },
+        "rbar_eff": {
+          "mean": 0.74054,
+          "std": 0.019356
+        },
+        "ubar_eff": {
+          "mean": 0.135829,
+          "std": 0.012458
+        },
+        "method_runtime_ms": {
+          "mean": 43.7
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "jtora_adapted": {
+        "tssr": {
+          "mean": 0.78,
+          "std": 0.019721
+        },
+        "rbar_eff": {
+          "mean": 0.758285,
+          "std": 0.01905
+        },
+        "ubar_eff": {
+          "mean": 0.203779,
+          "std": 0.011313
+        },
+        "method_runtime_ms": {
+          "mean": 1397.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "nfa_adapted": {
+        "tssr": {
+          "mean": 0.951765,
+          "std": 0.032625
+        },
+        "rbar_eff": {
+          "mean": 0.910738,
+          "std": 0.030205
+        },
+        "ubar_eff": {
+          "mean": 0.168747,
+          "std": 0.018166
+        },
+        "method_runtime_ms": {
+          "mean": 4281.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "reliability_only": {
+        "tssr": {
+          "mean": 0.8,
+          "std": 0.026042
+        },
+        "rbar_eff": {
+          "mean": 0.777479,
+          "std": 0.025026
+        },
+        "ubar_eff": {
+          "mean": 0.138019,
+          "std": 0.014019
+        },
+        "method_runtime_ms": {
+          "mean": 3.2
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "local_only": {
+        "tssr": {
+          "mean": 0.721765,
+          "std": 0.016855
+        },
+        "rbar_eff": {
+          "mean": 0.703519,
+          "std": 0.015195
+        },
+        "ubar_eff": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "foa": {
+        "tssr": {
+          "mean": 0.555294,
+          "std": 0.043162
+        },
+        "rbar_eff": {
+          "mean": 0.540344,
+          "std": 0.041383
+        },
+        "ubar_eff": {
+          "mean": -0.077106,
+          "std": 0.025499
+        },
+        "method_runtime_ms": {
+          "mean": 1.5
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      }
+    },
+    "0.6": {
+      "cars": {
+        "tssr": {
+          "mean": 0.964706,
+          "std": 0.042743
+        },
+        "rbar_eff": {
+          "mean": 0.926509,
+          "std": 0.039974
+        },
+        "ubar_eff": {
+          "mean": 0.161908,
+          "std": 0.024592
+        },
+        "method_runtime_ms": {
+          "mean": 54.6
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "bpso_rata_la": {
+        "tssr": {
+          "mean": 0.739412,
+          "std": 0.01934
+        },
+        "rbar_eff": {
+          "mean": 0.720061,
+          "std": 0.019459
+        },
+        "ubar_eff": {
+          "mean": 0.135828,
+          "std": 0.013868
+        },
+        "method_runtime_ms": {
+          "mean": 42.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "jtora_adapted": {
+        "tssr": {
+          "mean": 0.778824,
+          "std": 0.025123
+        },
+        "rbar_eff": {
+          "mean": 0.757403,
+          "std": 0.02391
+        },
+        "ubar_eff": {
+          "mean": 0.202204,
+          "std": 0.015652
+        },
+        "method_runtime_ms": {
+          "mean": 1386.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "nfa_adapted": {
+        "tssr": {
+          "mean": 0.955882,
+          "std": 0.029086
+        },
+        "rbar_eff": {
+          "mean": 0.914465,
+          "std": 0.027384
+        },
+        "ubar_eff": {
+          "mean": 0.171392,
+          "std": 0.01526
+        },
+        "method_runtime_ms": {
+          "mean": 4287.5
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "reliability_only": {
+        "tssr": {
+          "mean": 0.800588,
+          "std": 0.021765
+        },
+        "rbar_eff": {
+          "mean": 0.778135,
+          "std": 0.021356
+        },
+        "ubar_eff": {
+          "mean": 0.136889,
+          "std": 0.01026
+        },
+        "method_runtime_ms": {
+          "mean": 3.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "local_only": {
+        "tssr": {
+          "mean": 0.721765,
+          "std": 0.016855
+        },
+        "rbar_eff": {
+          "mean": 0.703519,
+          "std": 0.015195
+        },
+        "ubar_eff": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "foa": {
+        "tssr": {
+          "mean": 0.553529,
+          "std": 0.042045
+        },
+        "rbar_eff": {
+          "mean": 0.539302,
+          "std": 0.040722
+        },
+        "ubar_eff": {
+          "mean": -0.198795,
+          "std": 0.04934
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      }
+    },
+    "0.9": {
+      "cars": {
+        "tssr": {
+          "mean": 0.961176,
+          "std": 0.051092
+        },
+        "rbar_eff": {
+          "mean": 0.923115,
+          "std": 0.047669
+        },
+        "ubar_eff": {
+          "mean": 0.161152,
+          "std": 0.022932
+        },
+        "method_runtime_ms": {
+          "mean": 53.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "bpso_rata_la": {
+        "tssr": {
+          "mean": 0.728235,
+          "std": 0.019826
+        },
+        "rbar_eff": {
+          "mean": 0.709068,
+          "std": 0.019533
+        },
+        "ubar_eff": {
+          "mean": 0.146132,
+          "std": 0.015773
+        },
+        "method_runtime_ms": {
+          "mean": 43.7
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "jtora_adapted": {
+        "tssr": {
+          "mean": 0.779412,
+          "std": 0.020756
+        },
+        "rbar_eff": {
+          "mean": 0.758182,
+          "std": 0.020131
+        },
+        "ubar_eff": {
+          "mean": 0.2036,
+          "std": 0.013591
+        },
+        "method_runtime_ms": {
+          "mean": 1415.5
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "nfa_adapted": {
+        "tssr": {
+          "mean": 0.956471,
+          "std": 0.032878
+        },
+        "rbar_eff": {
+          "mean": 0.914827,
+          "std": 0.030744
+        },
+        "ubar_eff": {
+          "mean": 0.171871,
+          "std": 0.014768
+        },
+        "method_runtime_ms": {
+          "mean": 4256.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "reliability_only": {
+        "tssr": {
+          "mean": 0.802941,
+          "std": 0.025809
+        },
+        "rbar_eff": {
+          "mean": 0.780406,
+          "std": 0.024632
+        },
+        "ubar_eff": {
+          "mean": 0.138598,
+          "std": 0.013733
+        },
+        "method_runtime_ms": {
+          "mean": 4.7
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "local_only": {
+        "tssr": {
+          "mean": 0.721765,
+          "std": 0.016855
+        },
+        "rbar_eff": {
+          "mean": 0.703519,
+          "std": 0.015195
+        },
+        "ubar_eff": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "foa": {
+        "tssr": {
+          "mean": 0.544706,
+          "std": 0.041942
+        },
+        "rbar_eff": {
+          "mean": 0.531823,
+          "std": 0.040683
+        },
+        "ubar_eff": {
+          "mean": -0.547994,
+          "std": 0.115814
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      }
+    },
+    "1.2": {
+      "cars": {
+        "tssr": {
+          "mean": 0.958824,
+          "std": 0.055369
+        },
+        "rbar_eff": {
+          "mean": 0.921315,
+          "std": 0.05145
+        },
+        "ubar_eff": {
+          "mean": 0.164023,
+          "std": 0.029191
+        },
+        "method_runtime_ms": {
+          "mean": 50.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "bpso_rata_la": {
+        "tssr": {
+          "mean": 0.722353,
+          "std": 0.016596
+        },
+        "rbar_eff": {
+          "mean": 0.703721,
+          "std": 0.01648
+        },
+        "ubar_eff": {
+          "mean": 0.112849,
+          "std": 0.025945
+        },
+        "method_runtime_ms": {
+          "mean": 40.6
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "jtora_adapted": {
+        "tssr": {
+          "mean": 0.779412,
+          "std": 0.02686
+        },
+        "rbar_eff": {
+          "mean": 0.758116,
+          "std": 0.02592
+        },
+        "ubar_eff": {
+          "mean": 0.203571,
+          "std": 0.016422
+        },
+        "method_runtime_ms": {
+          "mean": 1410.8
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "nfa_adapted": {
+        "tssr": {
+          "mean": 0.955882,
+          "std": 0.035998
+        },
+        "rbar_eff": {
+          "mean": 0.914564,
+          "std": 0.033528
+        },
+        "ubar_eff": {
+          "mean": 0.163872,
+          "std": 0.016282
+        },
+        "method_runtime_ms": {
+          "mean": 4192.1
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "reliability_only": {
+        "tssr": {
+          "mean": 0.799412,
+          "std": 0.030276
+        },
+        "rbar_eff": {
+          "mean": 0.777245,
+          "std": 0.029244
+        },
+        "ubar_eff": {
+          "mean": 0.135756,
+          "std": 0.015362
+        },
+        "method_runtime_ms": {
+          "mean": 4.7
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "local_only": {
+        "tssr": {
+          "mean": 0.721765,
+          "std": 0.016855
+        },
+        "rbar_eff": {
+          "mean": 0.703519,
+          "std": 0.015195
+        },
+        "ubar_eff": {
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      },
+      "foa": {
+        "tssr": {
+          "mean": 0.533529,
+          "std": 0.039727
+        },
+        "rbar_eff": {
+          "mean": 0.522079,
+          "std": 0.03849
+        },
+        "ubar_eff": {
+          "mean": -1.499058,
+          "std": 0.300616
+        },
+        "method_runtime_ms": {
+          "mean": 0.0
+        },
+        "completion": {
+          "n": 10,
+          "timeout": 0,
+          "error": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,210 @@
+# E2-V2-0 环境校准协议（Computational Heterogeneity Environment Calibration and Freeze）
+# 版本: E2_V2_0_ENVIRONMENT_CALIBRATION_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E2-V2-0（用户 2026-08-09 授权；result-neutral, algorithm-neutral）
+# 状态: FROZEN_ONLY（本阶段只校准/冻结 E2 环境；不跑 formal；不调算法参数）
+# 直接依据: 用户 2026-08-09 E2 设计（resource-side heterogeneity robustness）；
+#       正文 III_VI.md（CARS=AADA→RCLA、无 deadline、固定名义 λ_j、VI-F 映射
+#       Lemma 1/Prop 1/Prop 2 的 E2 角色）；
+#       Contract V4（CARS_EXECUTABLE_THEORY_CONTRACT_V4.md）；
+#       Schema V4（CARS_ACTIVE_SCHEMA_V4）；
+#       E1_V2_ENVIRONMENT_SELECTED_V1（sf1_vMEDIUM；F_total=101000）；
+#       E1-V2-0 校准报告（校准流程/选择规则模板）。
+
+protocol_id: e2_v2_0_environment_calibration_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+
+# ---------------------------------------------------------------------------
+# 1. 阶段定位（用户冻结）
+# ---------------------------------------------------------------------------
+positioning: >
+  E2 = resource-side heterogeneity robustness（服务器计算资源异构与动态容量压力下的
+  鲁棒性）。E1 已证明 task-side scaling（N 20→200）；E2 固定任务侧，只扫描服务器
+  容量分布 CV_F。唯一系统干预：F_j 分布（ΣF_j = F_total 恒定）。
+  本阶段唯一目标：在冻结语义下通过结果中立的 Pilot calibration 找到可辨识、
+  不过轻也不过重的 E2 实验环境，并在正式结果产生前冻结。
+  本阶段不产生论文性能 Claim、不比较最终方法排名、不运行 formal-test seeds。
+
+core_invariant: >
+  Σ_{j=1}^{M} F_j = F_total = 101000（= E1_V2_ENVIRONMENT_SELECTED_V1 的 F_total；
+  s_F=1.0 实测 [10000,13000,16000,10000,13000,16000,10000,13000]）。
+  同 seed 跨 CV_F：任务/设备/信道/local CPU/ν/R_min/λ_j 完全一致，仅 F_j 改变。
+
+selection_principle: >
+  workload coverage + heterogeneity gradient + identifiability + serviceability。
+  禁止使用 "CARS 相对某 Baseline 的最大提升幅度" 作为环境选择函数。
+
+# ---------------------------------------------------------------------------
+# 2. 基础环境（继承 E1_V2_ENVIRONMENT_SELECTED_V1 = sf1_vMEDIUM）
+# ---------------------------------------------------------------------------
+environment:
+  base: E1_V2_ENVIRONMENT_SELECTED_V1
+  m: 8
+  topology: "fully connected"
+  deadline: "无 deadline 模型（deadline_seconds 占位，逻辑不使用）"
+  compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_profile: MEDIUM          # ν = {0, 8, 16} (0.4/0.3/0.3)（V-MEDIUM 默认）
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  server_lambda: "U[0.001, 0.003]（固定名义故障率；禁止扫描/禁止 λ_j^eff）"
+  local_lambda: 0.002
+  min_reliability: "U[0.85, 0.95]"
+  total_capacity: 101000             # 继承 E1 正式环境（实测；E2-0 冻结写入）
+  system_params: "Schema V4（rcla_solver + numeric_epsilon；无 cala/repair 参数）"
+  nested_generation: >
+    每 seed 一次性生成 Gamma_200（确定性 RNG(seed)；服务器参数在任务后抽取一次，
+    对全部 N 前缀固定）；任意 N<=200 用 deterministic nested prefix。
+
+# ---------------------------------------------------------------------------
+# 3. 容量生成规则（用户冻结；softmax profile）
+# ---------------------------------------------------------------------------
+capacity_generation:
+  rule: "F_j(theta) = F_total * exp(theta*z_j) / sum_k exp(theta*z_k)"
+  rank_template: [-1.5, -1.0, -0.5, -0.15, 0.15, 0.5, 1.0, 1.5]   # 固定对称模板
+  rank_rng: "独立 RNG substream 'e2_capacity_rank'（每 seed 固定置换 rank 模板）"
+  theta_solve: "deterministic bisection 命中 CV_F^target（CV 随 theta 单调）"
+  tolerance_sumF: 1.0e-10            # |sum F_j - F_total| <= 1e-10*F_total（F_j 用浮点）
+  tolerance_cv: 1.0e-4               # |CV_realized - CV_target| <= 1e-4
+  properties:
+    - "sum F_j = F_total 严格固定"
+    - "F_j > 0 恒成立"
+    - "同 seed 跨 CV_F 是同一服务器结构逐渐被拉开（非每点重抽系统）"
+  forbidden:
+    - "不得因某个容量排列使 CARS 表现更好而重新排列服务器"
+
+# ---------------------------------------------------------------------------
+# 4. CV_F 扫描
+# ---------------------------------------------------------------------------
+cv_f_scan:
+  primary: [0.0, 0.3, 0.6, 0.9, 1.2]
+  labels:
+    0.0: "homogeneous"
+    0.3: "mild heterogeneity"
+    0.6: "moderate heterogeneity"
+    0.9: "high heterogeneity"
+    1.2: "extreme heterogeneity"
+  extension_probe: 1.5
+  extension_conditions:             # 预注册扩展条件（同时满足才允许测 1.5）
+    - "CV_F=1.2 时 predecision_infeasible 很低"
+    - "method sanity 仍全部接近 ceiling"
+    - "结构压力梯度明显未覆盖 HIGH 区"
+  extension_forbidden: "若 1.5 运行，其所有结果必须保留，不得只保留好看的点"
+
+# ---------------------------------------------------------------------------
+# 5. N 扫描与后备
+# ---------------------------------------------------------------------------
+n_scan: [140, 170, 200]
+preferred_n: 170                    # 预注册 tie-break（非预定结果）
+fallback:
+  rule: "仅当 N∈{140,170,200} 且 s_F=1.0 全部无法形成有效实验包络时，才启动 s_F∈{0.8,1.2}"
+  report_trigger_reason: true
+  stop_if_valid: "只要 s_F=1.0 存在合格环境，禁止继续搜索 0.8/1.2"
+
+# ---------------------------------------------------------------------------
+# 6. Seeds（冻结；formal 只登记禁止访问）
+# ---------------------------------------------------------------------------
+seeds:
+  calibration: [1201, 1202, 1203, 1204, 1205]   # 全新 calibration/pilot seeds
+  calibration_active: [1201, 1202, 1203]        # 本阶段 Layer A/B 使用
+  formal: [2101, 2102, 2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110]  # 只登记
+  formal_isolation: "{2101..2110} ∩ {1101..1110}(E1) = ∅；∩ {601..620}(E0-V2) = ∅；∩ {401..410}(E3-V2) = ∅；∩ {201..203}(pilot) = ∅；∩ {1201..1205}(E2 calib) = ∅"
+  formal_forbidden: "本阶段任何脚本检测到 formal seed 必须立即拒绝运行"
+
+# ---------------------------------------------------------------------------
+# 7. Layer A：方法无关环境诊断（决策前）
+# ---------------------------------------------------------------------------
+layer_a:
+  seeds: [1201, 1202, 1203]
+  n_grid: [140, 170, 200]
+  cv_f_grid: [0.0, 0.3, 0.6, 0.9, 1.2]
+  diagnostics:
+    capacity_structure:
+      - "N, M, F_total, mean(F_j), std(F_j), CV_F_target, CV_F_realized"
+      - "min_F, max_F, max/min capacity ratio"
+      - "capacity_HHI = sum_j (F_j/F_total)^2"
+      - "top2_capacity_share"
+    predecision:
+      - "local_feasible_ratio"
+      - "edge_feasible_edge_ratio（e_rec==1 的边占比）"
+      - "tasks_with_at_least_one_feasible_edge_ratio"
+      - "predecision_infeasible_ratio"
+    floor_pressure:
+      - "ell_R distribution（min/median/max/positive_ratio）"
+      - "per-server floor-to-capacity structural pressure（max/mean/dispersion）"
+      - "aggregate_min_floor_demand / demand_capacity_ratio"
+  ac:
+    AC-E2-ENV-1: "CV_F_realized 与 target 一致（<=1e-4）；capacity HHI 随 CV_F 单调上升"
+    AC-E2-ENV-2: "CV_F=0 不得已明显不可服务（low 端可服务）"
+    AC-E2-ENV-3: "高端形成实质结构压力（feasible-edge 结构可测变化、concentration 明显增加）"
+    AC-E2-ENV-4: "最高正式候选点 predecision_infeasible_ratio < 0.20（仅环境筛选参考，不写为论文理论阈值）"
+    AC-E2-ENV-5: "所有 CV_F 点 F_total 数值一致"
+
+# ---------------------------------------------------------------------------
+# 8. Layer B：方法 sanity check（Secondary；CARS 排名不入评分）
+# ---------------------------------------------------------------------------
+layer_b:
+  methods: [cars, bpso_rata_la, nfa_adapted, reliability_only]
+  seeds: [1201, 1202, 1203]
+  cv_f_grid: [0.0, 0.3, 0.6, 0.9, 1.2]
+  candidate_ns: "Layer A 筛选后最多 2 个 N 候选"
+  recorded: [TSSR, Rbar_eff, Ubar_eff, V_R, method_runtime_ms, TIMEOUT, METHOD_ERROR]
+  forbidden_scores:
+    - "cars_tssr - baseline_tssr"
+    - "cars_rank"
+    - "cars_win_count"
+    - "cars_relative_gain"
+  allowed_identifiability:
+    - "between_method_range(TSSR)"
+    - "between_method_variance(TSSR)"
+    - "all_ceiling"
+    - "all_collapse"
+    - "timeout_count"
+  elimination_rules:
+    - "所有方法在全部 CV_F 点几乎 ceiling"
+    - "高异构端所有方法同时接近不可服务"
+    - "大量 METHOD_ERROR/TIMEOUT"
+    - "CV_F 增大后系统完全没有可辨识变化"
+    - "环境主要测到 predecision infeasibility 而非异构资源竞争"
+    - "需要修改算法才能让环境正常"
+  forbidden_elimination: "禁止因 'CARS 优势不够大' 淘汰环境"
+
+# ---------------------------------------------------------------------------
+# 9. 最终环境选择规则（优先级严格固定）
+# ---------------------------------------------------------------------------
+selection:
+  priority:
+    1: "完整异构压力覆盖（homogeneous → mild/moderate → high）"
+    2: "高端仍可服务"
+    3: "method-independent structural identifiability"
+    4: "sanity 方法存在非零区分度"
+    5: "与 E1 公共尺度一致"
+    6: "若仍并列优先 N=170；再优先 s_F=1.0"
+  note: "N=170 是预注册 tie-break，不是预定结果；若 N=170 合格，不得因 N=140 或 N=200 让 CARS 优势更大而改变选择"
+
+# ---------------------------------------------------------------------------
+# 10. 阶段 AC（关闭必须同时满足）
+# ---------------------------------------------------------------------------
+ac:
+  AC-E2-1: "E2 唯一主变量确认为服务器容量异构度 CV_F"
+  AC-E2-2: "所有异构点 sum_j F_j = F_total"
+  AC-E2-3: "正式选中环境覆盖至少 homogeneous / mild-moderate / high 三个可辨识区域"
+  AC-E2-4: "最高正式异构点未进入大面积 method-independent unserviceable"
+  AC-E2-5: "环境选择没有使用 CARS rank/win/gain 作为评分依据"
+  AC-E2-6: "算法、Evaluator、Contract V4、Schema V4 均零功能修改"
+  AC-E2-7: "formal seeds 2101-2110 零访问"
+  AC-E2-8: "所有 calibration attempts 完整保留"
+  AC-E2-9: "冻结测试通过，本阶段新增 P0=0/P1=0"
+  AC-E2-10: "生成 e2_v2_environment_selected.yaml；READY_FOR_E2_V2_1_FORMAL=YES / AUTHORIZED_TO_START_E2_V2_1_FORMAL=NO"
+
+# ---------------------------------------------------------------------------
+# 11. 禁止事项
+# ---------------------------------------------------------------------------
+forbidden:
+  - "进入 E2 Formal"
+  - "访问 E2 formal seeds 2101-2110"
+  - "为 CARS 搜索新的 AADA 参数 / 为 RCLA 搜索新参数"
+  - "给 BPSO 增减搜索预算 / 给 NFA/JTORA 重新调参数"
+  - "因 Pilot 中某方法表现不好而修改其实现"
+  - "根据 E2 环境给 CARS 设置 experiment-specific 参数"
+  - "修改 experiment_docs/references/data/src/cars/schemas/Contract V4/Evaluator/MethodRunner/正式 CARS"
+  - "恢复 deadline / 引入 lambda_eff"

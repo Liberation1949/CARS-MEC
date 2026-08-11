@@ -1,0 +1,110 @@
+{
+  "E4_A_distinguishable_regimes": {
+    "verdict": "CONDITIONALLY_SUPPORTED",
+    "evidence": [
+      {
+        "dataset": "azure",
+        "regimes_pwin_mean": {
+          "HIGH": 0.7236216,
+          "TRANSITION": 0.4980154
+        },
+        "regimes": [
+          "HIGH",
+          "TRANSITION"
+        ]
+      },
+      {
+        "dataset": "nep",
+        "regimes_pwin_mean": {
+          "HIGH": 0.0946046,
+          "LOW": 0.0639912,
+          "TRANSITION": 0.0810376
+        },
+        "regimes": [
+          "HIGH",
+          "LOW",
+          "TRANSITION"
+        ]
+      },
+      {
+        "dataset": "shanghai",
+        "regimes_pwin_mean": {
+          "HIGH": 0.589009,
+          "LOW": 0.5343034
+        },
+        "regimes": [
+          "HIGH",
+          "LOW"
+        ]
+      }
+    ],
+    "boundary": "azure formal 无 LOW 档；shanghai 仅两档（undercoverage）"
+  },
+  "E4_B_cars_high_service": {
+    "verdict": "SUPPORTED",
+    "high_tssr_by_dataset": {
+      "azure": 0.982091,
+      "nep": 0.9544,
+      "shanghai": 0.98913
+    }
+  },
+  "E4_C_trend_persists": {
+    "verdict": "SUPPORTED",
+    "evidence": {
+      "azure": {
+        "cars_tssr": {
+          "TRANSITION": 0.992848,
+          "HIGH": 0.982091
+        },
+        "cars_degradation": 0.0108
+      },
+      "nep": {
+        "cars_tssr": {
+          "LOW": 0.9844,
+          "HIGH": 0.9544
+        },
+        "cars_degradation": 0.03
+      },
+      "shanghai": {
+        "cars_tssr": {
+          "LOW": 0.99216,
+          "HIGH": 0.98913
+        },
+        "cars_degradation": 0.003
+      }
+    }
+  },
+  "E4_D_quality_efficiency": {
+    "verdict": "SUPPORTED",
+    "evidence": {
+      "azure": {
+        "cars_runtime_ms": 55.86,
+        "nfa_runtime_ms": 4157.8,
+        "runtime_ratio_nfa_over_cars": 74.43,
+        "cars_tssr": 0.982091,
+        "nfa_tssr": 0.965137,
+        "delta_tssr_cars_nfa": 0.017
+      },
+      "nep": {
+        "cars_runtime_ms": 21.3,
+        "nfa_runtime_ms": 3270.28,
+        "runtime_ratio_nfa_over_cars": 153.53,
+        "cars_tssr": 0.9544,
+        "nfa_tssr": 0.9668,
+        "delta_tssr_cars_nfa": -0.0124
+      },
+      "shanghai": {
+        "cars_runtime_ms": 43.5,
+        "nfa_runtime_ms": 3904.4,
+        "runtime_ratio_nfa_over_cars": 89.76,
+        "cars_tssr": 0.98913,
+        "nfa_tssr": 0.983333,
+        "delta_tssr_cars_nfa": 0.0058
+      }
+    }
+  },
+  "E4_E_cross_dataset_consistency": {
+    "verdict": "CONDITIONALLY_SUPPORTED",
+    "note": "azure 无 LOW 档、shanghai 两档且 HIGH 仅 1 窗口——跨数据集结构天然不完全一致，按 dataset boundary 标注"
+  }
+}

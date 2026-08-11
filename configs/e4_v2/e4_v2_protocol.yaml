@@ -1,0 +1,197 @@
+# E4 总体实验协议（Trace-Enhanced Semi-Synthetic External-Validity Evaluation）
+# 版本: E4_V2_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-0（Trace 输入兼容性确认与实验协议冻结）
+# 状态: FROZEN（总体协议；Pilot/Formal 子协议分别冻结于 e4_v2_1_pilot_protocol.yaml 与
+#       e4_v2_2_formal_protocol.yaml；本阶段不运行任何实验）
+# 直接依据: 用户 E4-V2-0 指示（Trace 输入兼容性确认 + 协议冻结）；
+#       正文 III_VI.md（CARS=AADA→RCLA、无 deadline、固定名义 λ_j、III-F 负载诱导退化）；
+#       Contract V4；Schema V4；E1-V2/E2-V2 正式协议（方法池/统计/指标口径模板）。
+
+protocol_id: e4_v2_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+trace_input_manifest: configs/e4_v2/e4_v2_trace_input_manifest.yaml
+trace_field_mapping: configs/e4_v2/e4_v2_trace_field_mapping.yaml
+
+# ---------------------------------------------------------------------------
+# 1. E4 定位（用户冻结）
+# ---------------------------------------------------------------------------
+positioning: >
+  E4 是论文最后的外部有效性实验：Trace-enhanced / semi-synthetic external-validity
+  evaluation。在 E0–E3 用 controlled simulation 得到主要结论后，将 workload dynamics
+  改为由已有真实 Trace 派生的非平稳/时变输入，检验主要趋势是否仍然成立。
+  证据链：controlled simulation evidence -> trace-derived dynamic workload ->
+  trend preservation / degradation / boundary。
+  E4 不是：真实 MEC production deployment；真实在线运营系统验证；新算法/新调参/
+  新环境搜索/新数据处理实验。
+
+experiment_role: trace_enhanced_semi_synthetic_external_validity
+
+# ---------------------------------------------------------------------------
+# 2. 研究问题（用户冻结；研究问题不是预设结果）
+# ---------------------------------------------------------------------------
+research_questions:
+  Q1: >
+    真实 Trace 派生动态工作负载是否形成非平稳/高低压力变化，从而能够作为
+    controlled simulation 之外的独立动态输入？
+  Q2: >
+    在 Trace-enhanced 环境下，CARS 是否仍能维持较高服务成功率和有效可靠性？
+  Q3: >
+    E0/E1/E2 中观察到的主要趋势是否在 Trace-enhanced 环境中保持方向一致，
+    或其适用边界发生何种变化？
+  Q4: >
+    CARS 在 Trace-enhanced 环境下是否仍保持可接受的在线计算代价？
+
+# ---------------------------------------------------------------------------
+# 3. 方法集合（用户冻结：与 E1/E2 公平一致；本阶段不运行）
+# ---------------------------------------------------------------------------
+methods:
+  main: [cars, bpso_rata_la, jtora_adapted, nfa_adapted, reliability_only, local_only]
+  diagnostic: [foa]
+  cars_config: configs/cars_v4/cars_frozen_v4.yaml
+  baseline_configs:
+    bpso_rata_la: configs/r6/frozen_method_configs/bpso_frozen.yaml
+    jtora_adapted: configs/r6/frozen_method_configs/jtora_frozen.yaml
+    nfa_adapted: configs/r6/frozen_method_configs/nfa_frozen.yaml
+    reliability_only: configs/r6/frozen_method_configs/reliability_only_frozen.yaml
+    local_only: configs/r6/frozen_method_configs/local_only_frozen.yaml
+    foa: configs/r6/frozen_method_configs/foa_frozen.yaml
+  method_pool_rule: >
+    除非当前直接依据证明某方法无法合法消费同一 E4 Scenario，否则不得删除方法；
+    不得因某方法慢、表现差、超时或结果不好而删除。
+
+# ---------------------------------------------------------------------------
+# 4. 公平运行边界（所有方法共享；与 E1/E2 一致）
+# ---------------------------------------------------------------------------
+fairness:
+  shared: [scenario, seed, derived-data rules, hard constraints, Evaluator,
+           timeout policy, hardware budget, failure accounting]
+  timeout_seconds: 30.0
+  same_scenario_across_methods: true   # 同一 Trace window 只构造一次 Scenario，全部方法共享
+  forbidden:
+    - "禁止只调优 CARS / 给 CARS 单独预处理"
+    - "禁止隐藏 timeout/异常/不可行"
+    - "禁止因 E4 某方法表现强/弱而删除它"
+    - "禁止新增/替换 Baseline（白名单冻结）"
+
+# ---------------------------------------------------------------------------
+# 5. 公共 Scenario 语义（E4 场景构造边界）
+# ---------------------------------------------------------------------------
+scenario_semantics:
+  model: "AADA -> RCLA（Contract V4；无 Repair 层）"
+  deadline: "无 deadline 模型（deadline_seconds 占位 1000.0，逻辑不使用）"
+  lambda_j: "固定名义故障率（U[0.001,0.003]）；Trace 不得改写；禁止恢复 lambda_eff"
+  success_semantics: "z_i = I[R_i >= R_i^min]（仅可靠性/物理可行性；无 V_D 族）"
+  scenario_input: "S_t = {Gamma_t, D_t, M_t, B_t, R_t^req}（Schema V4）"
+  trace_role: >
+    Trace 只提供 workload dynamics（时变负载强度/压力/时序），驱动窗口选择与
+    window 内负载水平；MEC 基础设施（服务器/设备/链路/任务参数/λ_j）为
+    冻结 synthetic-fixed 参数（与 E1-V2/E2-V2 公共尺度一致）。
+  n_and_topology: "M=8，全连接；N 与压力水平由冻结窗口/桥接规则确定（Pilot 阶段冻结）"
+  scenario_generation: "确定性生成（同 window+seed 同 Scenario）；禁未来信息"
+
+# ---------------------------------------------------------------------------
+# 6. 指标（统一 Evaluator；无 V_D 族；不发明新 Trace 指标）
+# ---------------------------------------------------------------------------
+metrics:
+  primary: TSSR
+  secondary: [Rbar_eff, Ubar_eff]
+  diagnostic: [V_R]
+  efficiency: method_runtime_ms
+  efficiency_supplementary: total_wall_time_ms
+  robustness: [completion_rate, timeout_count, method_error_count]
+  mechanism_or_environment_diagnostics:
+    - trace_window_id
+    - workload_size_N
+    - workload_intensity
+    - workload_burstiness        # NOT_AVAILABLE（无直接依据，不得编造）
+    - workload_temporal_variation
+    - edge_feasible_ratio
+    - local_feasible_ratio
+    - aggregate_reliability_floor_demand
+    - total_capacity
+    - per_server_pressure
+    - max_pressure
+    - LI_dem
+    - scenario_status
+  forbidden_metrics: [V_D, V_D_only, V_D_and_R, deadline_violation_rate, deadline_only_rate,
+                      joint_violation_rate, lambda_eff, ruad_gamma, gamma, kappa_R, kappa_D]
+  metric_rule: >
+    不为了 E4 发明复杂 Trace 指标；burstiness / temporal variation 若无直接依据
+    登记 NOT_AVAILABLE。
+
+# ---------------------------------------------------------------------------
+# 7. 统计协议
+# ---------------------------------------------------------------------------
+statistics:
+  unit: "统计单位 = Trace window（或槽）级指标（同窗口多 seed 聚合）"
+  summary: mean ± std
+  inference: paired bootstrap 95% CI（与 E1-V2-1/E2-V2-1 同口径；rng 固定）
+  seed_policy: "禁止因结果不好增删/筛选 seed 或窗口；formal-test 后禁止调参"
+  aggregation_rule: "逐实例结果全部保留；禁止仅存聚合均值而丢弃原始记录"
+
+# ---------------------------------------------------------------------------
+# 8. 运行时语义
+# ---------------------------------------------------------------------------
+runtime_semantics:
+  shared_timeout_seconds: 30.0
+  method_runtime_ms: "主口径=算法执行时间（与 E1-V2-1/E2-V2-1 一致）"
+  total_wall_time_ms: "端到端补充参考（含实验框架固定开销，全部方法公平）"
+  failure_accounting: "TIMEOUT/METHOD_ERROR/infeasible 全部如实记录，不删除不重跑"
+
+# ---------------------------------------------------------------------------
+# 9. Trace 证据边界（冻结；E4 正式论文表述限制）
+# ---------------------------------------------------------------------------
+trace_evidence_boundary:
+  allowed_descriptions: [workload-derived, trace-enhanced, semi-synthetic]
+  forbidden_descriptions:
+    - "真实 MEC production deployment"
+    - "真实在线运营系统验证"
+    - "真实 MEC task execution measurement（除非原始数据直接提供该字段）"
+  classification_source_table: configs/e4_v2/e4_v2_trace_field_mapping.yaml
+  note: >
+    Trace 真实成分仅限时间戳/负载观测（azure/shanghai workload、NEP cpu_pressure/
+    region/hotspot）；服务器/设备/链路/任务参数与可靠性物理模型均为 synthetic-fixed。
+
+# ---------------------------------------------------------------------------
+# 10. 禁止 Claim（outcome-neutral）
+# ---------------------------------------------------------------------------
+prohibited_claims:
+  - "CARS 一定最好 / 一定在所有 Trace 窗口胜出"
+  - "真实 Trace 已证明实际 MEC 部署有效"
+  - "新算法优于已有方法（E4 不做新算法比较）"
+  - "E4 证明/否定 E0-E3 任何结论（只检验趋势保持/边界）"
+  - "把 synthetic-fixed 参数描述为真实观测"
+  - "把 NOT_AVAILABLE 指标（如 burstiness）当作有效证据"
+
+outcome_neutral_claim_rules:
+  allowed_conclusions: [supported, conditionally_supported, not_supported]
+  rule: >
+    E4 检验 trace-enhanced 环境下主要趋势是否保持、退化或出现边界；
+    不预设 CARS 结果；不得事后移动验收终点。
+
+# ---------------------------------------------------------------------------
+# 11. Pilot/Formal 隔离规则
+# ---------------------------------------------------------------------------
+isolation:
+  pilot_access: "仅 calibration + pilot 分区（禁 formal 分区）"
+  pilot_use: "仅环境可辨识性与动态覆盖检查；NOT_FORMAL"
+  formal_access: "仅 E4-V2-2（须用户授权）；E4-V2-0/E4-V2-1 禁止访问"
+  window_selection_rule: >
+    窗口选择必须 algorithm-neutral（workload intensity / demand-capacity ratio /
+    burst level / edge-feasible ratio / server pressure / temporal variation）；
+    禁止以 CARS 赢多少 / CARS 排名第几 / 哪个窗口最有利为选择标准。
+  partition_inheritance: "严格继承既有 time_ordered 70/15/15 split（data manifests）"
+  no_formal_tuning: "formal 阶段禁止选参/调参/选窗口"
+
+# ---------------------------------------------------------------------------
+# 12. 本阶段（E4-V2-0）范围
+# ---------------------------------------------------------------------------
+stage_scope:
+  executed: [read_only_trace_confirmation, protocol_freeze, mapping_contract, tests]
+  not_executed: [pilot_runs, formal_runs, any_method_run, any_preprocessing,
+                 any_data_modification]
+  formal_runs: 0
+  preprocessing_executed: false
+  algorithm_modified: false

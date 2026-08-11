@@ -1,0 +1,30 @@
+# E3 正式实验环境定义（E3_FORMAL_ENVIRONMENT_V1）
+
+**版本**：`E3_FORMAL_ENVIRONMENT_V1`
+**日期**：2026-08-07
+**状态**：**FROZEN**（正式协议见 e3_formal_protocol_v1.yaml §1；本文件为环境定义权威副本）
+
+```text
+N                = 100
+M                = 16
+compute_scale    = 0.52
+nu_distribution  = {0: 0.40, 4: 0.30, 8: 0.30}
+task_mix         = {easy: 0.45, critical: 0.80, hard: 1.60}，权重 {0.30, 0.40, 0.30}
+generation       = 继承 candidate 系列规则（确定性 RNG(seed)；仅 seed 改变随机实例）
+任务             = c = 10000 × 0.52 × m_i；D∈[2.698,3.943]；α∈[0.51,0.71]；R_min∈[0.873,0.937]；d=1000
+设备             = f_loc=2000；λ_loc=0.002；κ=1.0；p=0.5
+服务器           = F=[4500,5000,5500,6000,6500,7000,8000,9000]×2（Σ=103000，CV_F≈0.221）
+                  λ=[0.0042,0.0052,0.0062,0.0066,0.0071,0.0078,0.0086,0.0097]×2
+链路             = 全连接 100×16=1600；B=1e6；h=1e-9；σ²=1e-10；p_err=0.01（R_tx=0.99）
+可靠性语义       = λ_j 固定名义故障率；任务风险异质性 λ_j·ν_i·c_i（ν∈{0,4,8}）
+生成器           = scripts/e3/build_e3_preset_environment.py
+                  （--scale 0.52 --nu-dist "0:0.4,4:0.3,8:0.3" --tag nuB --seed {301..305}）
+
+formal seeds     = [301, 302, 303, 304, 305]
+seed_class       = formal_test
+validation       = 201/202/203（仅历史证据，不并入正式均值）
+```
+
+正式 protocol / environment freeze / scenario hashes 见：
+- configs/e3_formal/e3_formal_protocol_v1.yaml
+- results/e3/e3_formal/environment_freeze.json

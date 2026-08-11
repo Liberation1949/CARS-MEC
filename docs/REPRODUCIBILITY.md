@@ -1,0 +1,60 @@
+# Reproducibility
+
+本文档说明如何复现 CARS 正式实验，以及复现的范围与边界。
+
+## 1. 环境
+
+- Python ≥ 3.9（开发与正式验证使用 Python 3.9）；
+- 运行时依赖：PyYAML、jsonschema（见 `requirements.txt` / `pyproject.toml`）；
+- 测试与出图依赖：pytest、matplotlib（可选，`[project.optional-dependencies] test/reproduce`）。
+
+```bash
+python -m pip install -e .
+```
+
+## 2. 确定性
+
+所有随机过程显式接收 seed。同一「代码版本 + 配置 + 数据划分 + seed + 环境」应产生相同的离散决策、状态与规范化结果记录；浮点结果按契约冻结容差比较。正式实验中 training / validation(pilot) / formal-test 数据划分互斥；formal-test 禁止用于选参。
+
+## 3. 快速验证
+
+```bash
+python scripts/quick_start.py
+```
+
+输出单实例决策与 TSSR / Rbar_eff / Ubar_eff / runtime / 确定性指纹。
+
+## 4. 正式实验复现
+
+正式实验脚本位于 `scripts/reproduce/<experiment>/`。每个实验包含：环境构建（`build_*_environment.py`）、Pilot/Formal 运行（`run_*_pilot.py` / `run_*_formal.py`）、聚合与统计（`aggregate_*.py`）、完整性检查（`check_*_integrity.py`）。
+
+| 实验 | 脚本目录 | 是否需要外部 Trace |
+|------|---------|-------------------|
+| E0 负载诱导服务退化与机制表征 | `scripts/reproduce/e0_v2/` | 否 |
+| E1 任务规模与异构资源下的性能评估 | `scripts/reproduce/e1_v2/`（规模）+ `e2_v2/`（异构） | 否 |
+| E2 组件消融与机制分析 | `scripts/reproduce/e3_v2/` | 否 |
+| E3 Trace 增强外部有效性评估 | `scripts/reproduce/e4_v2/` | 是（见 docs/DATA.md） |
+| E4 小规模精确最优参照（Exact Oracle） | `scripts/reproduce/e4_exact/` | 否 |
+
+**formal-test seed 守卫**：正式运行脚本带有 `--authorize-formal-seeds` 授权守卫（例如 `run_e4_exact_3_formal.py`、`run_e4_v2_2_formal.py`）。只有显式授权后才访问 formal-test seed 分区；Pilot/校准使用独立 seed 分区。
+
+## 5. 配置
+
+正式协议与环境冻结位于 `configs/`：
+
+- `cars_v4/`：正式 CARS 方法配置（AADA→RCLA，无 Repair）；
+- `e0_v2/`、`e1_v2/`、`e2_v2/`、`e3_v2/`、`e3_formal/`：E0–E2 与消融环境/协议；
+- `e4_v2/`：Trace 增强协议、字段映射、环境选择（含 `${CARS_DATA_ROOT}` 占位）；
+- `e4_exact/`：Exact Oracle 求解器与正式协议（N-grid、timeout、预算）；
+- `r6/frozen_method_configs/`：六个 Baseline 的 frozen 配置。
+
+## 6. 参考结果
+
+`reference_results/` 提供各正式实验的轻量机器可读聚合摘要（数值全部来自既有正式结果，不重新计算 Claim、不重跑实验）。完整逐实例结果不随本公开仓库分发。
+
+## 7. 复现范围与限制
+
+- 无 GNN、无 Repair、无 deadline 模型；
+- Exact Oracle 仅适用于极小规模（正式包络 N∈{4,5,6}、M=4、LOW/TRANSITION、固定 formal seeds），不声称对大规模实例可计算；
+- Trace 增强实验为 semi-synthetic / trace-enhanced 证据，非真实 MEC 生产部署验证；
+- 硬件/环境差异可能影响运行时间，但不影响确定性决策与规范化结果（浮点按契约容差比较）。

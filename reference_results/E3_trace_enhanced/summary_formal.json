@@ -1,0 +1,3060 @@
+{
+  "azure": {
+    "HIGH": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.785197,
+          "std": 0.032729
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.764086,
+          "std": 0.032341
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.147211,
+          "std": 0.02159
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.214803,
+          "std": 0.032729
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 41.56,
+          "std": 7.37878
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.982091,
+          "std": 0.019114
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.944394,
+          "std": 0.019982
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.189455,
+          "std": 0.01639
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.017909,
+          "std": 0.019114
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 55.86,
+          "std": 10.939854
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.604709,
+          "std": 0.046879
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.586413,
+          "std": 0.044522
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": -0.025061,
+          "std": 0.04669
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.395291,
+          "std": 0.046879
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.79215,
+          "std": 0.02663
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.76987,
+          "std": 0.026394
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.221673,
+          "std": 0.019093
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.20785,
+          "std": 0.02663
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 1334.66,
+          "std": 108.197155
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.730332,
+          "std": 0.030132
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.711299,
+          "std": 0.029486
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.269668,
+          "std": 0.030132
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.965137,
+          "std": 0.024623
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.923427,
+          "std": 0.023976
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.176467,
+          "std": 0.016574
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.034863,
+          "std": 0.024623
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 4157.8,
+          "std": 120.463272
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.809812,
+          "std": 0.033885
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.787488,
+          "std": 0.03359
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.150581,
+          "std": 0.021709
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.190188,
+          "std": 0.033885
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3.4,
+          "std": 6.406247
+        }
+      }
+    },
+    "TRANSITION": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.805862,
+          "std": 0.038347
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.784449,
+          "std": 0.037592
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.188071,
+          "std": 0.031242
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.194138,
+          "std": 0.038347
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 32.2,
+          "std": 6.60303
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.992848,
+          "std": 0.011725
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.957936,
+          "std": 0.014198
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.228825,
+          "std": 0.025139
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.007152,
+          "std": 0.011725
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 39.3,
+          "std": 8.379141
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.662758,
+          "std": 0.050715
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.642111,
+          "std": 0.049055
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.119507,
+          "std": 0.067736
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.337242,
+          "std": 0.050715
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.807448,
+          "std": 0.0337
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.784954,
+          "std": 0.033318
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.274393,
+          "std": 0.030844
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.192552,
+          "std": 0.0337
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 989.0,
+          "std": 148.714223
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.735333,
+          "std": 0.036877
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.716474,
+          "std": 0.035763
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.264667,
+          "std": 0.036877
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.990971,
+          "std": 0.014679
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.947575,
+          "std": 0.014935
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.205752,
+          "std": 0.023571
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.009029,
+          "std": 0.014679
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3755.94,
+          "std": 174.100823
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.839826,
+          "std": 0.044075
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.817327,
+          "std": 0.04353
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.204429,
+          "std": 0.036865
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.160174,
+          "std": 0.044075
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3.1,
+          "std": 6.204031
+        }
+      }
+    }
+  },
+  "nep": {
+    "HIGH": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.7774,
+          "std": 0.039233
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.756024,
+          "std": 0.038603
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.141051,
+          "std": 0.022702
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.2226,
+          "std": 0.039233
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 23.4,
+          "std": 7.771744
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9544,
+          "std": 0.041577
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.919478,
+          "std": 0.041371
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.172474,
+          "std": 0.023965
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0456,
+          "std": 0.041577
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 21.3,
+          "std": 8.112336
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.5986,
+          "std": 0.054991
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.580559,
+          "std": 0.052578
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": -0.056478,
+          "std": 0.041968
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.4014,
+          "std": 0.054991
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.7896,
+          "std": 0.037092
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.766935,
+          "std": 0.036047
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.220401,
+          "std": 0.018095
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.2104,
+          "std": 0.037092
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 464.46,
+          "std": 28.045827
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.728,
+          "std": 0.038678
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.709375,
+          "std": 0.037593
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.272,
+          "std": 0.038678
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9668,
+          "std": 0.031141
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.925635,
+          "std": 0.03034
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.175736,
+          "std": 0.012327
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0332,
+          "std": 0.031141
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3270.28,
+          "std": 88.586916
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.8052,
+          "std": 0.03817
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.78309,
+          "std": 0.037157
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.145325,
+          "std": 0.027121
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.1948,
+          "std": 0.03817
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.94,
+          "std": 3.722419
+        }
+      }
+    },
+    "LOW": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.795,
+          "std": 0.049
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.773567,
+          "std": 0.047727
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.17093,
+          "std": 0.022204
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.205,
+          "std": 0.049
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 24.54,
+          "std": 7.743927
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9844,
+          "std": 0.026993
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.948201,
+          "std": 0.027894
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.208686,
+          "std": 0.023878
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0156,
+          "std": 0.026993
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 24.46,
+          "std": 7.75425
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.6406,
+          "std": 0.050136
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.620502,
+          "std": 0.048625
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.06041,
+          "std": 0.039754
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.3594,
+          "std": 0.050136
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.794,
+          "std": 0.035496
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.771442,
+          "std": 0.034764
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.258223,
+          "std": 0.022288
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.206,
+          "std": 0.035496
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 574.12,
+          "std": 33.90318
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.728,
+          "std": 0.038678
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.709375,
+          "std": 0.037593
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.272,
+          "std": 0.038678
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9906,
+          "std": 0.018484
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.946992,
+          "std": 0.018972
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.204303,
+          "std": 0.017689
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0094,
+          "std": 0.018484
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3321.68,
+          "std": 48.33278
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.8262,
+          "std": 0.039033
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.803343,
+          "std": 0.038468
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.179798,
+          "std": 0.027297
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.1738,
+          "std": 0.039033
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 1.28,
+          "std": 4.340691
+        }
+      }
+    },
+    "TRANSITION": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.7852,
+          "std": 0.04286
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.764229,
+          "std": 0.042217
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.149711,
+          "std": 0.020375
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.2148,
+          "std": 0.04286
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 24.4,
+          "std": 7.823043
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9648,
+          "std": 0.046744
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.929621,
+          "std": 0.045949
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.186411,
+          "std": 0.029522
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0352,
+          "std": 0.046744
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 22.5,
+          "std": 7.707788
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.6192,
+          "std": 0.053361
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.599982,
+          "std": 0.051224
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": -0.001044,
+          "std": 0.036607
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.3808,
+          "std": 0.053361
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.6,
+          "std": 2.939388
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.7906,
+          "std": 0.037224
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.768164,
+          "std": 0.036331
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.237791,
+          "std": 0.017383
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.2094,
+          "std": 0.037224
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 515.98,
+          "std": 29.179095
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.728,
+          "std": 0.038678
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.709375,
+          "std": 0.037593
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.272,
+          "std": 0.038678
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.9798,
+          "std": 0.024697
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.937359,
+          "std": 0.024878
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.190584,
+          "std": 0.01516
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.0202,
+          "std": 0.024697
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3308.64,
+          "std": 52.461704
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.8154,
+          "std": 0.037374
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.792822,
+          "std": 0.03653
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.162387,
+          "std": 0.026279
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.1846,
+          "std": 0.037374
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 2.18,
+          "std": 5.406256
+        }
+      }
+    }
+  },
+  "shanghai": {
+    "HIGH": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.805797,
+          "std": 0.025476
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.784143,
+          "std": 0.025353
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.171243,
+          "std": 0.021462
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.194203,
+          "std": 0.025476
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 34.2,
+          "std": 6.4
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.98913,
+          "std": 0.013064
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.953148,
+          "std": 0.014683
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.211508,
+          "std": 0.015848
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.01087,
+          "std": 0.013064
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 43.5,
+          "std": 6.264982
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.64058,
+          "std": 0.036116
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.620756,
+          "std": 0.034496
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.058566,
+          "std": 0.026644
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.35942,
+          "std": 0.036116
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.798551,
+          "std": 0.030366
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.776362,
+          "std": 0.03009
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.248086,
+          "std": 0.010739
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.201449,
+          "std": 0.030366
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 1123.5,
+          "std": 29.309555
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.734783,
+          "std": 0.034933
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.715882,
+          "std": 0.033584
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.265217,
+          "std": 0.034933
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.983333,
+          "std": 0.017467
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.940532,
+          "std": 0.017646
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.195076,
+          "std": 0.016634
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.016667,
+          "std": 0.017467
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 3904.4,
+          "std": 36.68024
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 10,
+          "mean": 0.821739,
+          "std": 0.03998
+        },
+        "rbar_eff": {
+          "n": 10,
+          "mean": 0.799698,
+          "std": 0.039056
+        },
+        "ubar_eff": {
+          "n": 10,
+          "mean": 0.176317,
+          "std": 0.024192
+        },
+        "v_r": {
+          "n": 10,
+          "mean": 0.178261,
+          "std": 0.03998
+        },
+        "method_runtime_ms": {
+          "n": 10,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      }
+    },
+    "LOW": {
+      "bpso_rata_la": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.801406,
+          "std": 0.037258
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.780275,
+          "std": 0.036292
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.176834,
+          "std": 0.02377
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.198594,
+          "std": 0.037258
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 31.62,
+          "std": 3.830875
+        }
+      },
+      "cars": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.99216,
+          "std": 0.013526
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.956348,
+          "std": 0.015267
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.219729,
+          "std": 0.018051
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.00784,
+          "std": 0.013526
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 40.66,
+          "std": 7.572609
+        }
+      },
+      "foa": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.651738,
+          "std": 0.038054
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.631525,
+          "std": 0.036913
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.095189,
+          "std": 0.026984
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.348262,
+          "std": 0.038054
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.64,
+          "std": 3.135347
+        }
+      },
+      "jtora_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.805568,
+          "std": 0.034005
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.782965,
+          "std": 0.033344
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.263338,
+          "std": 0.01417
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.194432,
+          "std": 0.034005
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 1012.14,
+          "std": 47.901987
+        }
+      },
+      "local_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.734466,
+          "std": 0.039003
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.715598,
+          "std": 0.037482
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.265534,
+          "std": 0.039003
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 0.0,
+          "std": 0.0
+        }
+      },
+      "nfa_adapted": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.988027,
+          "std": 0.014069
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.944967,
+          "std": 0.014417
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.202644,
+          "std": 0.019729
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.011973,
+          "std": 0.014069
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 3850.9,
+          "std": 89.256092
+        }
+      },
+      "reliability_only": {
+        "cars": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "bpso_rata_la": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "jtora_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "nfa_adapted": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "reliability_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "local_only": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "foa": {
+          "n": 0,
+          "mean": null,
+          "std": null
+        },
+        "tssr": {
+          "n": 50,
+          "mean": 0.829265,
+          "std": 0.044856
+        },
+        "rbar_eff": {
+          "n": 50,
+          "mean": 0.807079,
+          "std": 0.044073
+        },
+        "ubar_eff": {
+          "n": 50,
+          "mean": 0.189636,
+          "std": 0.026011
+        },
+        "v_r": {
+          "n": 50,
+          "mean": 0.170735,
+          "std": 0.044856
+        },
+        "method_runtime_ms": {
+          "n": 50,
+          "mean": 1.9,
+          "std": 5.146844
+        }
+      }
+    }
+  }
+}

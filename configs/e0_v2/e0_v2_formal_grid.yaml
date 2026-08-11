@@ -1,0 +1,55 @@
+# E0-V2-1 Formal 网格冻结（E0-V2-1 Pilot 结论；E0-V2-2 使用）
+# 版本: E0_V2_FORMAL_GRID_V1
+# 日期: 2026-08-09
+# 依据: configs/e0_v2/e0_v2_1_pilot_protocol.yaml（选择规则）；
+#       results/e0_v2/e0_v2_1_pilot/（200 runs：N={20..260} × seeds 201-205 × 4 方法）；
+#       用户 2026-08-09 设计（候选 A/B 规则："若 AADA-RCLA 在 N=200 仍几乎完全稳定则右移"）。
+# 选择规则: 负载响应曲线覆盖（低/过渡/明显退化）；严禁按性能排名/Full 获胜幅度选网格。
+
+formal_grid_version: E0_V2_FORMAL_GRID_V1
+
+selected_grid: [20, 50, 80, 110, 140, 170, 200]    # 候选 A
+n_points: 7
+candidate_trigger_evaluation: >
+  候选 B（{20,50,80,110,150,200,250}）的右移触发条件是"AADA-RCLA 在 N=200 仍几乎
+  完全稳定"。Pilot 实测（5 seeds mean）：AADA-RCLA TSSR N=200 = 0.954（明显低于 1.0，
+  且 N=260=0.937），不满足触发条件 -> 冻结候选 A。
+
+formal_seeds: [601, 602, 603, 604, 605, 606, 607, 608, 609, 610,
+               611, 612, 613, 614, 615, 616, 617, 618, 619, 620]
+formal_seeds_status: NEW_PAIRED_UNSEEN
+methods_main: [reliability_only, bpso_rata_la, cars_aada_rcla_candidate]
+methods_diagnostic: [local_only]
+total_runs: 420          # 3 x 7 x 20
+paired_invariant: "所有方法对每个 (seed, N) 使用完全相同的 (tasks, servers, links)"
+
+# 网格区域覆盖（Pilot 证据；NOT_FORMAL）
+coverage_basis:
+  stable_zone: [20, 50]
+  stable_evidence: "AADA-RCLA TSSR=1.0 (N<=80)；reliability_only 0.99/0.96"
+  transition_zone: [80, 110]
+  transition_evidence: "AADA-RCLA TSSR 1.0->0.998；reliability_only 0.88->0.86（退化开始）"
+  degraded_zone: [140, 170, 200]
+  degraded_evidence: "AADA-RCLA TSSR 0.98->0.97->0.954；reliability_only ~0.81（明显退化）"
+  keep_at_least_20_80: true      # 20/80 已保留（E3 压力锚点）
+  n150_note: "候选 A 不含 150（由 140/170 覆盖过渡->退化区）；用户候选 A 即为 {20,50,80,110,140,170,200}"
+
+# 关键 Pilot 观察（如实记录；NOT_FORMAL，正式结论以 E0-V2-2 为准）
+pilot_findings:
+  - id: P1
+    text: "无持续加速坍缩：三主方法 TSSR 近似线性/减速退化（AADA-RCLA 0.99->0.80 区间未现 |s_late|>|s_early| 持续成立）——正式 E0-V2-2 以 segmented regression 定论（可能 ordinary degradation）"
+  - id: P2
+    text: "机制链证据成立：N↑ 时 reliability_only V_F 0->0.47、BPSO 0->0.12（卸载任务 underfloor 增加），AADA-RCLA V_F 全程 0（RCLA floor 保证）——退化由 resource under-allocation 驱动"
+  - id: P3
+    text: "AADA-RCLA V_R 全程 <=0.063（N=260），reliability_only 0->0.20、BPSO 0->0.22；TSSR 退化主要由 V_R 解释"
+  - id: P4
+    text: "reliability_only 的 max G/F 超过 1（N>=80，1.05-1.52）：指派任务 floor 承诺超容量（诊断量，非硬约束）；实际分配由 Evaluator 容量约束判定——是 reliability_only 退化的机制解释"
+  - id: P5
+    text: "local_only TSSR ~0.70-0.75 不随 N 变化（不卸载、无边缘竞争）；Ubar_eff=0 已确认符合正文定义（metrics.py F-39：本地执行 U_i=0）——诊断控制，不入主图"
+
+# 状态
+status: FROZEN
+forbidden:
+  - "在 formal seeds 601-620 上运行（E0-V2-2 前禁止）"
+  - "在正式结果出来后调整网格"
+  - "按性能排名选择网格"

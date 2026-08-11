@@ -1,0 +1,67 @@
+# E4-EXACT Pilot 候选搜索包络（CANDIDATE_ONLY；不是 Formal 冻结）
+# 版本: E4_EXACT_PILOT_CANDIDATE_GRID_R2_V1
+# 日期: 2026-08-09（R1 E4-EXACT-0 冻结）；2026-08-10（R2 修订，CR_E4_EXACT_SCALE_REDUCTION_OPTIMIZATION_V1）
+# 阶段: E4-EXACT-2（候选包络；NOT_EXECUTED）
+# 说明: R2 修订——候选 {6,8,10,12} 因 E4-EXACT-2 R1 Pilot 实测（N=6/8 全 600s TIMEOUT）
+#       不可计算，CR 批准缩小为 {4,6}（N=4 实测 40s certified；N=6 需 7200s timeout 完成）。
+
+grid_version: E4_EXACT_PILOT_CANDIDATE_GRID_R2_V1
+status: CANDIDATE_ONLY
+revision_note: "R2：CR_E4_EXACT_SCALE_REDUCTION_OPTIMIZATION_V1（用户 2026-08-10 批准）；R1 见 _r1_oldgrid_archive"
+
+# ---------------------------------------------------------------------------
+# 1. 候选规模
+# ---------------------------------------------------------------------------
+candidate_scale:
+  m_candidate: 4                        # 服务器数（候选）
+  n_candidate: [4, 6]                   # 任务数（候选；CR 批准缩小）
+  n_candidate_upper_bound_note: >
+    N=6 为候选上界；能否作为 Formal 规模取决于 R2 Pilot 的 Oracle runtime 与
+    exactness certificate 可行性，不得事后预设。
+  discrete_space_note: >
+    完整离散枚举空间上界 ~ prod_i |V_i|（每任务本地 + 合法物理边）；M=4/N<=6 下
+    R2 Pilot 实测确认（N=4 certified；N=6 视 runtime）。
+
+# ---------------------------------------------------------------------------
+# 2. 压力档位（最多 3 个代表性档位；复用当前环境族）
+# ---------------------------------------------------------------------------
+pressure_regimes:
+  - label: LOW
+    candidate_n: 4
+    note: "低负载代表性档位（R2 候选）"
+  - label: TRANSITION
+    candidate_n: 6
+    note: "过渡代表性档位（R2 候选）"
+  # HIGH 档（N=8+）因 Exact Oracle 不可计算（R1 Pilot 实测）而无法覆盖——如实记录。
+
+environment_compatibility:
+  environment_family: "复用当前已冻结 environment family（E1-V2 公共尺度 sf1_vMEDIUM 等）"
+  construction: "通过缩小 N/M 从当前环境族得到小规模实例；不重新设计新的物理模型"
+  materializer: >
+    兼容：src/cars/simulator/scenario_materializer.py 支持 sampled（seed 确定性抽样生成）
+    与 explicit 两种模式；小规模 N/M（M=4, N in {6,8,10,12}）可通过 sampled 模式
+    确定性生成 Schema V4 场景。
+  p0_compatibility: "P0 定义（IV-B C1-C6）与规模无关；小规模实例仍为完整 Omega_phy"
+
+# ---------------------------------------------------------------------------
+# 3. Seed 候选（只登记；本阶段零访问）
+# ---------------------------------------------------------------------------
+seed_candidates:
+  pilot_seeds: [3401, 3402, 3403, 3404, 3405]        # 候选登记；NOT_FORMAL
+  formal_seeds: [3501, 3502, 3503, 3504, 3505, 3506, 3507, 3508, 3509, 3510]  # 候选登记；禁止访问
+  non_overlap_note: "已核对与历史范围 {201-205,301-305,401-410,601-620,1101-1110,2101-2110,2401-2403,2501-2510} 不重叠"
+
+# ---------------------------------------------------------------------------
+# 4. 候选预算（E4-EXACT-2 Pilot 参考；本阶段不执行）
+# ---------------------------------------------------------------------------
+candidate_pilot_budget:
+  per_instance_oracle_timeout_candidate_seconds: 300.0   # 候选；Pilot 校准后冻结
+  total_pilot_compute_budget_note: "E4-EXACT-2 冻结时确定；本阶段不承诺具体 runs 数"
+
+# ---------------------------------------------------------------------------
+# 5. 本文件不构成 Formal 冻结的明确声明
+# ---------------------------------------------------------------------------
+formal_not_frozen:
+  - "本 grid 不是 Formal grid"
+  - "Formal 最大 N / seeds / 窗口 / timeout 均在 E4-EXACT-2 Pilot 后按实测冻结"
+  - "不得依据 CARS gap 是否好看选择 Formal 最大 N"

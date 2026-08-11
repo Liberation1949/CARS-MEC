@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cars"
+version = "0.1.0"
+description = "CARS (Capacity-Aware Reliability Stabilization Framework): reliability-aware online scheduling for multi-user MEC (AADA -> RCLA)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "PyYAML>=6.0",
+    "jsonschema>=4.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "matplotlib>=3.5",
+]
+reproduce = [
+    "matplotlib>=3.5",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

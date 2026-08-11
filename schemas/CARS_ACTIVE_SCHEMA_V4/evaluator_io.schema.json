@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/evaluator_io.schema.json",
+  "title": "CARS Active Schema - Evaluator IO",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "External Evaluator 输入输出容器（T4）。直接依据：Contract Part 6.5（External Evaluator 职责：独立重算全部指标，正式口径）、Part 5.1（T4 时点）、正文 III-E / IV-C（F-19..F-25, F-38..F-43, F-34 等结果量）。Evaluator 是'照镜子'，不修复方法结果。本 Schema 表达结构承载能力；指标计算公式、正式指标白名单与失败计分规则在 R2 Evaluator 契约冻结（登记 IMPLEMENTATION_SPEC_GAP）。",
+  "$defs": {
+    "LexicographicTriple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tssr", "mean_effective_reliability", "mean_effective_utility"],
+      "properties": {
+        "tssr": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "x-unit": "ratio",
+          "description": "TSSR = (1/N) sum z_i（F-21/F-42；首要指标，分母恒为 N）"
+        },
+        "mean_effective_reliability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "x-unit": "probability",
+          "description": "Rbar_eff = (1/N) sum R_i^valid（F-22/F-43）"
+        },
+        "mean_effective_utility": {
+          "type": "number",
+          "x-unit": "dimensionless",
+          "description": "Ubar_eff = (1/N) sum U_i^eff（F-41；可负，无上下界）"
+        }
+      }
+    },
+    "TaskResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "success",
+        "evaluable",
+        "end_to_end_delay_seconds",
+        "end_to_end_reliability",
+        "effective_reliability",
+        "utility",
+        "effective_utility",
+        "failure_reason"
+      ],
+      "properties": {
+        "task_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "任务标识，关联 Task.task_id"
+        },
+        "success": {
+          "$ref": "common.schema.json#/$defs/binary_int",
+          "description": "z_i（F-19/F-38）"
+        },
+        "evaluable": {
+          "$ref": "common.schema.json#/$defs/binary_int",
+          "description": "e_i = I[struct^path^exec^cap]（F-23）；V_D/V_R 只统计 e_i=1"
+        },
+        "end_to_end_delay_seconds": {
+          "$ref": "common.schema.json#/$defs/inf_or_nonnegative_number",
+          "description": "T_i(Pi)（F-08）；+inf 用显式 sentinel 'inf'（Contract Part 8.2）"
+        },
+        "end_to_end_reliability": {
+          "$ref": "common.schema.json#/$defs/probability",
+          "description": "R_i(Pi) 中间量/诊断量（F-14, DG-08）"
+        },
+        "effective_reliability": {
+          "$ref": "common.schema.json#/$defs/probability",
+          "description": "R_i^valid = z_i * R_i（F-20）"
+        },
+        "utility": {
+          "type": "number",
+          "x-unit": "dimensionless",
+          "description": "U_i（F-39；本地执行 U_i=0）"
+        },
+        "effective_utility": {
+          "type": "number",
+          "x-unit": "dimensionless",
+          "description": "U_i^eff = U_i if z_i=1 else 0（F-40，闭合 0*(-inf) 问题）"
+        },
+        "failure_reason": {
+          "$ref": "common.schema.json#/$defs/failure_reason",
+          "description": "失败原因分类（Contract Part 3.2）；SUCCESS 表示成功"
+        }
+      }
+    },
+    "EvaluatorInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "state_timepoint", "scenario_id", "decision"],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T4",
+          "x-unit": "timepoint",
+          "description": "Evaluator 在 T4 独立重算（Contract Part 5.1/6.5）"
+        },
+        "scenario_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "关联 Scenario.scenario_id"
+        },
+        "decision": {
+          "$ref": "schedule_decision.schema.json",
+          "description": "待评价的最终方案 Pi*"
+        }
+      }
+    },
+    "EvaluatorOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "state_timepoint",
+        "scenario_id",
+        "task_results",
+        "system_metrics"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T4",
+          "x-unit": "timepoint",
+          "description": "Evaluator 输出时点 T4"
+        },
+        "scenario_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "关联 Scenario.scenario_id"
+        },
+        "task_results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TaskResult" },
+          "x-unit": "task",
+          "description": "逐任务结果（维度 N）"
+        },
+        "system_metrics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tssr",
+            "mean_effective_reliability",
+            "mean_effective_utility",
+            "deadline_violation_rate",
+            "reliability_violation_rate",
+            "deadline_only_rate",
+            "reliability_only_rate",
+            "joint_violation_rate"
+          ],
+          "properties": {
+            "tssr": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "TSSR（F-21/F-42）"
+            },
+            "mean_effective_reliability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "probability",
+              "description": "Rbar_eff（F-22/F-43）"
+            },
+            "mean_effective_utility": {
+              "type": "number",
+              "x-unit": "dimensionless",
+              "description": "Ubar_eff（F-41）"
+            },
+            "deadline_violation_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "V_D = (1/N) sum e_i I[T_i>D]（F-24）"
+            },
+            "reliability_violation_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "V_R = (1/N) sum e_i I[R_i<R^min]（F-25）"
+            },
+            "deadline_only_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "V_D-only（F-34；E0 归因诊断）"
+            },
+            "reliability_only_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "V_R-only（F-34；E0 归因诊断）"
+            },
+            "joint_violation_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "x-unit": "ratio",
+              "description": "V_D∩R（F-34；满足 V_D = V_D-only + V_D∩R, V_R = V_R-only + V_D∩R）"
+            }
+          }
+        }
+      }
+    }
+  }
+}

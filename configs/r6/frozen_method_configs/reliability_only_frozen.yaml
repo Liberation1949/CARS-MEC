@@ -1,0 +1,6 @@
+method_id: reliability_only
+config_label: reliability_only_frozen_r6
+scenario_config: configs/r3/reliability_only/small_scenario.yaml
+eps_cmp: 1.0e-09
+method_seed: 1
+hard_timeout_seconds: 30.0

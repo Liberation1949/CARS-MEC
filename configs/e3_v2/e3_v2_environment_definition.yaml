@@ -1,0 +1,86 @@
+# E3-V2 三压力环境定义（E3-0 冻结；AADA–RCLA 组件消融）
+# 版本: E3_V2_ENVIRONMENT_DEFINITION_V1
+# 日期: 2026-08-09
+# 依据: 用户 2026-08-09 设计；E1_ENVIRONMENT_V1（无 deadline 模型，已验证可辨识）。
+# 取代: 旧 E3 preset（RUAD/CALA/Repair 服务）不再适用。
+
+environment_definition_version: E3_V2_ENVIRONMENT_DEFINITION_V1
+generator: scripts/experiments/e3_v2/build_e3_v2_environment.py
+
+# ---------------------------------------------------------------------------
+# 1. 三压力档语义（用户设计；机制触发目标）
+# ---------------------------------------------------------------------------
+pressure_levels:
+  low:
+    role: "验证 RCLA -> LA 退化性质"
+    mechanism_target: "local success 多、RCLA floor 大多不激活"
+    selection_criterion:
+      - "active_floor_task_count 显著少于 transition/high（或接近 0）"
+      - "local_failure_count 低（rescue 触发少）"
+  transition:
+    role: "主消融场景"
+    mechanism_target: "local-success 与 local-failure 混合，Phase-1/2 都真正触发"
+    selection_criterion:
+      - "N_local_fail > 0（rescue 任务存在）"
+      - "Phase-2 候选存在（本地成功任务存在可准入 EDGE）"
+      - "active_floor_task_count > 0"
+  high:
+    role: "AADA/RCLA stress test（capacity stress）"
+    mechanism_target: "rescue 任务多、(G_j/F_j) 较高、floor 大量激活，但系统尚未完全不可服务"
+    selection_criterion:
+      - "N_local_fail 明显多于 low"
+      - "max_j G_j/F_j 较高（capacity stress）"
+      - "active_floor_task_count 大量激活"
+      - "TSSR(full) 仍显著 > 0（未完全不可服务）"
+
+# ---------------------------------------------------------------------------
+# 2. 结构参数（继承 E1_ENVIRONMENT_V1 定稿；无 deadline 模型）
+# ---------------------------------------------------------------------------
+structure:
+  m: 8
+  topology: fully_connected
+  compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  server_base: 10000
+  server_heterogeneity: "F_j = 10000 * (1 + 0.3 * (j mod 3))"
+  fragility_tiers: [[0.0, 0.4], [8.0, 0.3], [16.0, 0.3]]
+  lambda_loc: 0.002
+  lambda_j: "U[0.001, 0.003]"
+  r_min: "U[0.85, 0.95]"
+  deadline: "无 deadline 模型（deadline_seconds 占位字段，逻辑不使用）"
+  system_params: "只 kappa_R（无 deadline 模型）"
+
+# ---------------------------------------------------------------------------
+# 3. 三档 N 候选（前缀一致性；正式值待 E3-1 pilot 按机制触发标准确认）
+# ---------------------------------------------------------------------------
+n_candidates:
+  low: 20
+  transition: 80
+  high: 150
+  note: >
+    N 候选继承 E1 梯度（N=20/80/150，CARS TSSR 1.0 -> 0.873）。E3-1 pilot
+    （seeds 201-203，NOT_FORMAL）只允许按上节 mechanism_target /
+    selection_criterion 确认三档是否触发对应机制；不得按 "Full 是否赢最多"
+    选择场景。确认后冻结正式三档 N。
+
+# ---------------------------------------------------------------------------
+# 4. 正式/非正式种子（用户 2026-08-09 设计）
+# ---------------------------------------------------------------------------
+seeds:
+  pilot: [201, 202, 203]
+  pilot_status: NOT_FORMAL
+  formal: [401, 402, 403, 404, 405, 406, 407, 408, 409, 410]
+  formal_status: NEW_PAIRED_UNSEEN
+  rationale: >
+    旧 E3 formal seeds（301-305）已参与过算法分析与修改，不再作为真正未见过的
+    confirmatory formal-test；正式 paired seeds 全部更换为全新的 401-410。
+  invariant: "所有 variant 对每个 seed 使用同一 Scenario 实例；fixed-assignment 更进一步同一 X/A hash"
+
+# ---------------------------------------------------------------------------
+# 5. 禁止（环境级）
+# ---------------------------------------------------------------------------
+forbidden:
+  - "用旧 E3 preset（RUAD/CALA/Repair 服务）作正式环境"
+  - "根据 Full CARS 是否赢最多选择场景"
+  - "两种极端环境：全任务本地成功（AADA 不干活）/ 全任务无可恢复 EDGE（任何版本都失败）"
+  - "在 formal seeds 上调参"

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/schedule_decision.schema.json",
+  "title": "CARS Active Schema - Schedule Decision (Pi = {X, A, F})",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "完整调度方案 Pi = {X, A, F}。直接依据：正文 IV-A（IV-A.1 Offloading Decision、IV-A.2 Task-to-Server Assignment、IV-A.4 Computing Resource Allocation）、IV-B（C1-C6）、Contract Part 1.6（DV-01..DV-04）、Part 3.1（Omega_phy）。跨字段不变量（validate_active_schema.py 检查）：len(X)==N；len(A)==N 且每行 len==M；len(F)==N 且每行 len==M；sum_j A[i][j]==X[i] (C3)；X[i]==0 => A[i][j]==0 且 F[i][j]==0；A[i][j]==0 => F[i][j]==0 (C5)；0<=F[i][j]<=A[i][j]*F_j (C5)；sum_i F[i][j]<=F_j (C6)；A[i][j]==1 => (i,j) 存在对应 WirelessLink（结构层 C4；e_phy 公式计算留待 R2）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "offloading_decision",
+    "assignment_matrix",
+    "resource_allocation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "CARS_ACTIVE_SCHEMA_V4",
+      "x-unit": "version",
+      "description": "Active Schema 版本标识"
+    },
+    "offloading_decision": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/binary_int" },
+      "x-unit": "binary",
+      "description": "X = {x_i}，维度 N；x_i=0 本地执行，x_i=1 卸载（IV-A.1, DV-01）"
+    },
+    "assignment_matrix": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "common.schema.json#/$defs/binary_int" }
+      },
+      "x-unit": "binary",
+      "description": "A = [a_ij]，维度 N x M；a_ij=1 当且仅当 tau_i 指派给 S_j（IV-A.2, DV-02）"
+    },
+    "resource_allocation": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number", "minimum": 0 }
+      },
+      "x-unit": "cycles/s",
+      "description": "F = [f_ij]，维度 N x M，f_ij >= 0；a_ij=0 => f_ij=0（C5）；a_ij=1 时 f_ij 为 S_j 分配给 tau_i 的 CPU 速率（IV-A.4, DV-03）"
+    }
+  }
+}

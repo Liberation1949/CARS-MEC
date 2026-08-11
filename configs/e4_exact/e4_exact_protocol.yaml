@@ -1,0 +1,122 @@
+# E4-EXACT 总体协议（Small-Scale Exact-Oracle Evaluation）
+# 版本: E4_EXACT_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E4-EXACT-0（合同与协议冻结）
+# 状态: FROZEN_ONLY / NOT_EXECUTED
+# 直接依据: experiment_docs/III_VII.md（III-E.2/E.3、IV-A/B/D、VI-E.2）
+#           > CARS_EXECUTABLE_THEORY_CONTRACT_V4 > CARS_ACTIVE_SCHEMA_V4
+#           > 统一 Evaluator（src/cars/evaluator + src/cars/results canonical semantics）
+#           > 当前正式 CARS（configs/cars_v4/cars_frozen_v4.yaml）
+
+experiment_id: e4_exact
+manuscript_id: E4
+engineering_id: E4-EXACT
+protocol_version: E4_EXACT_PROTOCOL_V1
+status: FROZEN_ONLY / NOT_EXECUTED
+
+# ---------------------------------------------------------------------------
+# 1. 唯一目标与定位
+# ---------------------------------------------------------------------------
+purpose: >
+  在可精确求解的小规模实例上，以原问题 P0 的精确字典序最优解作为 Oracle，
+  定量评估 CARS 与真正最优解之间的距离（optimality gap / oracle gap）。
+  本实验不构成新的综合性能排名实验。
+research_question:
+  en: "RQ4: How close is CARS to the exact lexicographic optimum of P0 on tractable small-scale instances?"
+  zh: "在可精确求解的小规模实例上，CARS 与原问题 P0 的精确字典序最优解之间存在多大差距？"
+
+# ---------------------------------------------------------------------------
+# 2. P0 objective hierarchy（CONFIRMED_FACT；正文 IV-D）
+# ---------------------------------------------------------------------------
+objective_hierarchy:
+  tier_1: TSSR            # (1/N) sum z_i；III-E.3 / IV-C.3（F-21/F-42）
+  tier_2: mean_effective_reliability   # (1/N) sum z_i R_i；III-E.3 / IV-C.4（F-22/F-43）
+  tier_3: mean_effective_utility       # (1/N) sum U_i^eff；IV-C.5（F-41）
+  lexicographic_compare: "先比 Tier-1；相等才比 Tier-2；前两层相等才比 Tier-3"
+  not_weighted_sum: true               # 字典序目标不是加权和（IV-D.2）
+  feasible_set: Omega_phy              # 完整合法可行域 = 正文 IV-B C1-C6
+  constraints:
+    - C1_binary_offloading
+    - C2_binary_assignment
+    - C3_offloading_assignment_consistency
+    - C4_link_admissibility
+    - C5_resource_activation
+    - C6_server_physical_capacity
+
+# ---------------------------------------------------------------------------
+# 3. 共享语义（公平性）
+# ---------------------------------------------------------------------------
+shared_evaluator: src/cars/evaluator   # 公共 Evaluator（T4 独立重算全部指标；Contract V4 §3）
+canonical_result: src/cars/results/canonical_result.py   # canonical record（X/A/F + status + metrics）
+schema_version: CARS_ACTIVE_SCHEMA_V4
+decision_variables: [X, A, F]          # 与 Schema V4 schedule_decision {X,A,F} 一致
+comparison_methods:
+  - oracle                            # Exact Oracle（E4-EXACT-1 实现；本阶段未实现）
+  - cars                              # 当前正式 CARS（AADA→RCLA；configs/cars_v4）
+paired_scenario: true                  # 同 (instance, seed) 下 Oracle 与 CARS 共享完全相同的 Scenario
+shared_physical_models: true           # 同一物理模型（src/cars/simulator）
+shared_failure_accounting: true        # 同一失败计分（timeout/error/infeasible 全保留）
+
+# ---------------------------------------------------------------------------
+# 4. Candidate Pilot envelope（仅候选搜索包络，不是 Formal 冻结）
+# ---------------------------------------------------------------------------
+candidate_pilot_envelope:
+  status: CANDIDATE_ONLY               # 非 Formal 冻结；正式最大 N 由 E4-EXACT-2 Pilot 后确定
+  m_candidate: 4
+  n_candidate: [6, 8, 10, 12]          # 上界 N=12 为候选；不得在本阶段声称 Formal 一定运行到 N=12
+  pressure_regimes: [LOW, TRANSITION, HIGH]   # 最多 3 个代表性档位
+  environment_family: "复用当前已冻结 environment family，通过缩小 N/M 得到小规模实例；不得为 Exact 重新设计对 CARS 有利的新物理模型"
+  detail: configs/e4_exact/e4_exact_pilot_candidate_grid.yaml
+
+# ---------------------------------------------------------------------------
+# 4b. Deterministic ordering（可复现）
+# ---------------------------------------------------------------------------
+deterministic_ordering: true
+deterministic_ordering_note: "全部排序/选择键为确定性元组比较（Contract V4 §4.6/§4.7）；相同输入产生相同离散决策与规范化结果；Oracle 与 CARS 均按确定性规则运行"
+
+# ---------------------------------------------------------------------------
+# 5. Timeout 政策
+# ---------------------------------------------------------------------------
+timeout_policy:
+  cars_timeout_seconds: 30.0           # 沿用正式 CARS hard_timeout_seconds
+  oracle_per_instance_timeout_candidate: 300.0   # 候选；E4-EXACT-2 Pilot 校准后冻结
+  timeout_semantics: "超时实例不得计为 Exact 完成；如实记录 TIMEOUT"
+
+# ---------------------------------------------------------------------------
+# 6. Seed 隔离政策（本阶段只登记，不访问）
+# ---------------------------------------------------------------------------
+seed_isolation_policy:
+  existing_ranges_note: "已有范围 201-205, 301-305, 401-410, 601-620, 1101-1110, 2101-2110, 2401-2403, 2501-2510（E0-E4-V2 历史登记）"
+  pilot_seeds_registered: [3401, 3402, 3403, 3404, 3405]      # 只登记；NOT_FORMAL
+  formal_seeds_registered: [3501, 3502, 3503, 3504, 3505, 3506, 3507, 3508, 3509, 3510]  # 只登记；禁止访问
+  formal_seeds_accessed: false          # FORMAL_SEEDS_ACCESSED = NO
+  pilot_executed: false
+  formal_executed: false
+  oracle_implemented: false
+
+# ---------------------------------------------------------------------------
+# 7. Claim boundary（outcome-neutral；本阶段不产生任何实验 Claim）
+# ---------------------------------------------------------------------------
+claim_boundary:
+  stage_claim: "本阶段仅冻结合同与协议（PROTOCOL_FROZEN / ORACLE_DEFINITION_FROZEN / NOT_EXECUTED）"
+  not_claimed_in_this_stage:
+    - "CARS near-optimal"
+    - "CARS 达到字典序最优"
+    - "任何数值 oracle gap"
+  future_claim_rule: >
+    后续阶段是否可声称 "CARS remains close to the exact lexicographic optimum on
+    tractable small-scale instances" 完全由 E4-EXACT-3 正式数据决定，不预设。
+
+# ---------------------------------------------------------------------------
+# 8. 禁止事项（本阶段）
+# ---------------------------------------------------------------------------
+forbidden_in_stage:
+  - "实现或运行 Exact Oracle"
+  - "运行 Pilot / Formal"
+  - "访问 formal seeds"
+  - "修改 CARS 参数 / AADA / RCLA"
+  - "修改 reliability model / scenario physics / Evaluator / P0 / metric definition"
+  - "修改 III-VII 正文（experiment_docs/III_VII.md）"
+  - "恢复 deadline 或 lambda_eff / 旧 RUAD/CALA/Repair 语义"
+  - "覆盖/删除/移动/重命名/复用 历史 E4-V2 资产（configs/results/tests/scripts/reports）"
+  - "事后根据结果选择 epsilon 或最大 N"

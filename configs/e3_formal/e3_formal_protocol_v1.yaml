@@ -1,0 +1,65 @@
+# E3 正式实验唯一环境与协议冻结
+
+**版本**：`E3_FORMAL_ENVIRONMENT_V1` + `E3_FORMAL_PROTOCOL_V1`
+**日期**：2026-08-07
+**依据**：E3-FORMAL 阶段合同（用户授权）；AGENTS.md；PROJECT_STATE.md（E3_PRESET_V1）；
+E3_EXECUTION_CONTRACT_V1；E3 预设调参记录（νB 趋势一致版）
+**状态**：**FROZEN**（冻结后禁止再改；本阶段不得再调环境/算法/Evaluator）
+
+---
+
+## 1. 正式环境定义（E3_FORMAL_ENVIRONMENT_V1）
+
+直接冻结 E3 预设 νB 生成规则（validation 201/202/203 已验证；formal 仅 seed 改变随机实例）：
+
+```text
+N = 100
+M = 16
+compute_scale = 0.52
+nu_distribution = {0: 0.40, 4: 0.30, 8: 0.30}
+task_mix = {easy: 0.45, critical: 0.80, hard: 1.60}，权重 {0.30, 0.40, 0.30}
+生成规则 = 继承 candidate 系列（R6 分布规则）
+  - 任务：c = 10000 × scale × m_i；D∈[2.698,3.943]；α∈[0.51,0.71]；R_min∈[0.873,0.937]；d=1000
+  - 设备：f_loc=2000；λ_loc=0.002；κ=1.0；p=0.5
+  - 服务器（8 台规则双倍扩展）：F=[4500,5000,5500,6000,6500,7000,8000,9000]×2（Σ=103000，CV_F≈0.221）
+    λ=[0.0042,0.0052,0.0062,0.0066,0.0071,0.0078,0.0086,0.0097]×2
+  - 链路：全连接 100×16=1600；B=1e6；h=1e-9；σ²=1e-10；p_err=0.01（R_tx=0.99）
+  - 可靠性语义：λ_j 固定名义故障率；任务风险异质性 λ_j·ν_i·c_i（ν∈{0,4,8}）
+```
+
+## 2. 正式协议（E3_FORMAL_PROTOCOL_V1）
+
+```text
+seeds          = [301, 302, 303, 304, 305]（formal-test；201/202/203 仅为历史 validation 证据）
+paired         = true（同 seed 所有 variant 共享同一 Scenario canonical hash）
+timeout        = 30 s（MethodRunner 硬超时；TIMEOUT 作为正式失败记录，不隐藏）
+cars_config    = CR_RUAD_S3（configs/cr_ruad_s3/）
+ruad_semantics = Q+Z（J=C_Q+C_Z），无 gamma
+variants/seed  = 15 runs = 7 主消融（full_cars/tier/q/z/nod/la/noRepair）
+                + 5 pre-repair（tier/q/z/nod/la 的 e3_force_repair_off=True）
+                + 3 fixed-assignment（fixed_cala_full/nod/la，Repair OFF）
+Panel A = RUAD pre-repair（tier/q/z/full；full 的 pre=repair_no_repair）
+Panel B = CALA fixed-assignment（la/nod/full；复用同 seed Full RUAD 的 X^(0)/A^(0)）
+Panel C = Repair（full_cars pre/post；RepairGain=final−pre）
+指标     = TSSR / V_D / V_R / Rbar_eff / Ubar_eff / LI_dem / Z_max / Fail→Succ / Succ→Fail
+LI_dem   = (1/M)·Σ_j(ρ_j^dem − mean(ρ^dem))²（正文 III-E；来自 final_demand_pressure）
+Z_max    = max_j(final_fragility_load)
+```
+
+## 3. 禁止事项
+
+- 禁止再调环境 / RUAD/CALA/Repair / Evaluator / 参数；
+- 禁止根据 formal-test 结果换环境、换 seed、改参数；
+- 禁止使用 201/202/203 作为正式结果；
+- 禁止删除离群 seed、只选好看 seed、用 formal-test 再选环境；
+- 禁止自动进入 E4。
+
+## 4. 环境生成规则引用
+
+生成器：`scripts/e3/build_e3_preset_environment.py`（确定性 RNG(seed)）；
+参考 validation 实例 hash（仅历史证据，不并入正式均值）：
+- seed 201：`7a029e32527d8409…`
+- seed 202：`c129cdec42a5b4ff…`
+- seed 203：`fe43701536584a2b…`
+
+正式环境 canonical hash 由每个 formal seed 的 Scenario materialize 计算（见 environment_freeze.json）。

@@ -1,0 +1,146 @@
+# E4-EXACT Formal Protocol（E4-EXACT-2 Pilot 后冻结；E4-EXACT-3 唯一执行配置）
+# 版本: E4_EXACT_FORMAL_PROTOCOL_V1
+# 日期: 2026-08-09（E4-EXACT-2 冻结）
+# 阶段: E4-EXACT-2（Formal 配置冻结；NOT_EXECUTED）
+# 状态: FROZEN_ONLY / NOT_EXECUTED
+# 冻结结论: OK（E4-EXACT-2 R2-b 重跑完成；Formal N-grid={4,6} 满足 F1-F5；Formal 可执行）
+# 直接依据:
+#   - E4-EXACT-2 阶段合同 §八（F1-F5）、§九（N-grid）、§十三（seeds）、§十四（预算）、§十六
+#   - configs/e4_exact/e4_exact_2_pilot_protocol.yaml（Pilot matrix/实测；R2-b timeout 28800s）
+#   - results/e4_exact/e4_exact_2_pilot/formal_scale_selection.json（selection 结果；R2-b）
+#   - configs/e4_exact/e4_exact_environment_selected.yaml（冻结环境）
+# 说明: E4-EXACT-2 R2（CR 候选 {4,6}）Pilot 6/6 certified；R2-b 重跑 N=6/3403（7784s）后
+#   Formal N-grid 冻结为 [4,6]。E4-EXACT-3 已获用户授权（2026-08-10 用户确认方案 A：
+#   regime 绑定 Formal matrix 20 runs；formal seeds 3501-3510 授权访问）。
+
+experiment_id: e4_exact
+manuscript_id: E4
+engineering_id: E4-EXACT
+protocol_version: E4_EXACT_FORMAL_PROTOCOL_V1
+status: FROZEN_ONLY / NOT_EXECUTED
+authorized_to_execute: true   # 2026-08-10 用户授权（方案 A；formal seeds 3501-3510）
+freeze_result: OK
+freeze_result_note: >
+  E4-EXACT-2 R2（CR 候选 {4,6}；2026-08-10）+ R2-b 重跑：Pilot 6/6 全部
+  CERTIFIED_NUMERICAL_EXACT（N=4×3 实测 21-75s；N=6×3 实测 1720s/5707s/7784s，
+  per-instance timeout 28800s）。F1-F4 全部满足；Formal N-grid 冻结为 [4,6]，
+  总预算 72h（N=6 估算 ~43.2h）。Formal 可执行（E4-EXACT-3）。
+
+# ---------------------------------------------------------------------------
+# 1. 版本与哈希（Pilot 后冻结时填写）
+# ---------------------------------------------------------------------------
+oracle_version: E4_EXACT_SOLVER_V1
+oracle_hash: "（E4-EXACT-2 冻结时记录 src/cars/exact_oracle 目录 hash）"
+cars_version: "CARS_FROZEN_V4"
+cars_hash: "58605c900ea08dff（configs/cars_v4/cars_frozen_v4.yaml）"
+schema_version: CARS_ACTIVE_SCHEMA_V4
+evaluator_version: CARS_R2_EVALUATOR_CONTRACT_V1
+
+# ---------------------------------------------------------------------------
+# 2. 正式规模（Pilot selection 后冻结）
+# ---------------------------------------------------------------------------
+m: 4
+n_grid: [4, 5, 6]      # R2-b selection + MATH-FMIN-CR-R2（2026-08-11 用户批准）：加入 N=5
+pressure_regimes: [LOW, TRANSITION]  # regime 绑定 N：LOW→4, TRANSITION→{5,6}
+formal_seeds:
+  status: AUTHORIZED        # 2026-08-10 用户授权方案 A（--authorize-formal-seeds 运行时守卫）
+  accessed: false           # 首次实际访问由 E4-EXACT-3 runner 启动时登记
+  seeds_per_cell: 10        # Formal 每 (regime, N, seed) cell；3501-3510
+  list: [3501, 3502, 3503, 3504, 3505, 3506, 3507, 3508, 3509, 3510]
+
+formal_matrix:              # 方案 A + MATH-FMIN-CR-R2（2026-08-11）：regime 绑定 N，加入 N=5
+  structure: "regime-bounded（LOW→4, TRANSITION→{5,6}）；非笛卡尔积"
+  runs: 30                  # (LOW, 4) × 10 + (TRANSITION, 5) × 10 + (TRANSITION, 6) × 10
+  cells:
+    - {regime: LOW, n: 4, seeds: 10}
+    - {regime: TRANSITION, n: 5, seeds: 10}
+    - {regime: TRANSITION, n: 6, seeds: 10}
+
+# ---------------------------------------------------------------------------
+# 3. 共享语义（公平性）
+# ---------------------------------------------------------------------------
+shared_scenario: true
+shared_evaluator: true
+shared_physical_models: true
+shared_failure_accounting: true
+paired_design: true
+deterministic_ordering: true
+
+# ---------------------------------------------------------------------------
+# 4. Timeout 与预算（Pilot 后冻结）
+# ---------------------------------------------------------------------------
+oracle_timeout_seconds: 28800.0  # R2-b 冻结：N=6 实测 7784s；8h 上限（与 Pilot 一致）
+cars_timeout_seconds: 30.0       # 沿用正式 CARS hard timeout
+total_compute_budget_hours: 72.0 # R2-b 冻结：selection 总预算 72h
+estimated_formal_runs: 30        # 方案 A + N=5：regime 绑定（(LOW,4)×10 + (TRANSITION,5/6)×20）
+                                 # 注：N=5 visited≈59049（介于 N=4 的 6561 与 N=6 的 531441 之间），
+                                 #   8h per-instance timeout 覆盖；24 核并行预算更宽裕
+resume_policy: "deterministic resume；已完成实例不覆盖"
+failure_handling: "所有 timeout/infeasible/solver_error 完整保留；不计 Exact 完成"
+
+# ---------------------------------------------------------------------------
+# 5. Exactness 要求
+# ---------------------------------------------------------------------------
+exactness_required: true
+accepted_oracle_status:
+  - EXACT_OPTIMAL
+  - CERTIFIED_NUMERICAL_EXACT
+rejected_oracle_status:
+  - TIMEOUT_UNCERTIFIED
+  - NOT_EXACT
+  - SOLVER_ERROR
+
+# ---------------------------------------------------------------------------
+# 6. 正式指标（E4_EXACT_METRIC_DEFINITIONS_V1；E4-EXACT-0 冻结）
+# ---------------------------------------------------------------------------
+metrics:
+  - "Tier-1 gap（Delta_TSSR = TSSR_oracle - TSSR_cars）"
+  - "Tier-2 conditional gap（仅 Tier-1 match 时具字典序解释）"
+  - "Tier-3 conditional gap（仅 Tier-1/Tier-2 match 时）"
+  - "first-tier match"
+  - "full lexicographic match"
+  - "oracle runtime"
+  - "cars runtime"
+statistics:
+  unit: "instance = (regime, N, formal_seed)"
+  method: "paired bootstrap 95% CI（或当前项目统一 paired 统计方法；冻结后不得更换）"
+
+# ---------------------------------------------------------------------------
+# 7. 图表计划（E4 补充型小实验；1 图 + 1 表）
+# ---------------------------------------------------------------------------
+figure_plan:
+  - id: "Fig. E4-Exact-1"
+    title: "Oracle Gap vs Problem Size"
+    x: "N"
+    y: "Tier-1 gap"
+    panels: "<=2（可加 first-tier match rate panel）"
+table_plan:
+  - id: "Table E4-Exact-1"
+    fields:
+      - N
+      - Oracle Tier-1
+      - CARS Tier-1
+      - Tier-1 Gap
+      - First-tier Match Rate
+      - Conditional Tier-2 Gap
+      - Conditional Tier-3 Gap
+      - Oracle Runtime
+      - CARS Runtime
+
+# ---------------------------------------------------------------------------
+# 8. Claim boundary（outcome-neutral）
+# ---------------------------------------------------------------------------
+claim_boundary: >
+  E4 正式结论仅由 E4-EXACT-3 数据决定（supported / conditionally_supported /
+  not_supported / redesigned）。不预设 CARS near-optimal。
+
+# ---------------------------------------------------------------------------
+# 9. 禁止事项（Formal 执行期间）
+# ---------------------------------------------------------------------------
+forbidden:
+  - "Formal 后继续调参"
+  - "根据结果改变指标定义 / 容差 / epsilon"
+  - "删除不利 seed / timeout / infeasible"
+  - "将 pilot 包装为 formal"
+  - "访问或使用未登记 seeds"
+  - "修改 Oracle / Evaluator / CARS / 物理模型 / P0"

@@ -1,0 +1,156 @@
+# E3-V2 输出字段定义（机器可读；E3-0 冻结；AADA–RCLA 组件消融与机制验证）
+# 版本: E3_V2_VARIANT_FIELD_DEFINITIONS_V1
+# 日期: 2026-08-09
+# 依据: 用户 2026-08-09 设计；正文 VI-F.1；正文 V-B.6/V-C.3/VI-D/VI-E.1。
+# 用途: 下一阶段（E3-1 pilot / E3-2 formal）的机器可读字段定义：
+#   1) 各 variant 的精确参数覆盖（单一变化原则）；
+#   2) 机制诊断量（RescueRate / Phase2AcceptRate / gate 拒绝 / N_active_floor）；
+#   3) 精确性审计（epsilon_Delta_phi / KKT residual / capacity residual）；
+#   4) correctness diagnostics（max G/F、N_ALLOCATION_INFEASIBLE、失败来源表）；
+#   5) 运行时细分（preprocess / AADA-P1 / AADA-P2 / RCLA / total）。
+
+field_definitions_version: E3_V2_VARIANT_FIELD_DEFINITIONS_V1
+variant_matrix_version: E3_V2_VARIANT_MATRIX_V1
+manuscript_basis: "III_VI.md V-B.6 / V-C.3 / VI-C / VI-D / VI-E.1 / VI-F.1"
+
+# ---------------------------------------------------------------------------
+# 1. Variant 参数覆盖（注入到候选 config；默认 full/rcla 行为与正文一致）
+# ---------------------------------------------------------------------------
+variant_overrides:
+  full_cars:         {aada_variant: full,          allocation_mode: rcla}
+  w_no_rescue:       {aada_variant: no_rescue,     allocation_mode: rcla}
+  w_rescue_only:     {aada_variant: rescue_only,   allocation_mode: rcla}
+  w_no_alloc_aware:  {aada_variant: no_alloc_aware, allocation_mode: rcla}
+  w_no_utility_gate: {aada_variant: no_utility_gate, allocation_mode: rcla}
+  fixed_a_rcla:      {aada_variant: full,          allocation_mode: rcla}
+  fixed_a_la:        {aada_variant: full,          allocation_mode: ordinary_la}
+
+# ---------------------------------------------------------------------------
+# 2. 选择键定义（字典序最小 argmin / P0 字典序最优）
+# ---------------------------------------------------------------------------
+selection_key_definitions:
+  phase1_full:
+    key: ["Delta_phi_ij", "ell_R_ij/F_j", "server_id"]   # 升序 argmin
+    note: 分配感知边际代价 -> 归一化 floor -> server tie-break（正文 V-B.6）
+  phase1_no_alloc_aware:
+    key: ["ell_R_ij/F_j", "server_id"]                    # 升序 argmin
+    note: 去掉 Delta_phi（w_no_alloc_aware）
+  phase2_full:
+    lexicographic: ["max Delta_Rbar_eff", "|dR|<=eps 时 max Delta_U_sys",
+                    "并列 min Delta_phi", "server_id"]
+    gate: >
+      条件 3（正文 V-B.6）：Delta_Rbar_eff > -eps 允许；|Delta_Rbar_eff| <= eps
+      时需 Delta_U_sys > eps；Delta_Rbar_eff <= -eps 拒绝（即使 U>0）
+  phase2_no_utility_gate:
+    lexicographic: ["max Delta_Rbar_eff", "|dR|<=eps 时 min Delta_phi", "server_id"]
+    gate: "保留 Delta_Rbar_eff > -eps 门槛；去掉持平时需 Delta_U_sys>eps 的要求"
+  phase2_no_alloc_aware:
+    lexicographic: ["max Delta_Rbar_eff", "|dR|<=eps 时 max Delta_U_sys", "server_id"]
+    note: 去掉 Delta_phi tie-break（w_no_alloc_aware）
+
+# ---------------------------------------------------------------------------
+# 3. 机制记录（fixed-assignment / 精确性审计）
+# ---------------------------------------------------------------------------
+mechanism_records:
+  fixed_assignment:
+    steps: [run_full_aada_once, freeze_X0_A0, hash_X0_A0, run_rcla_on_XA, run_ordinary_la_on_XA]
+    invariant: "X/A hash 完全一致（两个 allocation 共享同一 X/A）"
+    fields: [x0_a0_hash, allocation_mode]
+  exactness_audit:
+    epsilon_delta_phi_definition: >
+      eps_DeltaPhi = |Delta_phi_ij - (phi_j*(Gamma_j ∪ {i}) - phi_j*(Gamma_j))|
+      = |(2Q_j s_i + s_i^2)/F_j - ((Q_j+s_i)^2 - Q_j^2)/F_j|
+    report: max_epsilon_dphi（应只剩浮点误差；正文 VI-C Lemma 2 精确性验证）
+  rcla_audit_fields:
+    - capacity_residual        # 容量精确饱和残差（Evaluator C6 容差内）
+    - kkt_residual             # KKT/active-set 一致性残差
+    - offloaded_reliability_violation_count  # RCLA 后卸载任务可靠性违约数（预期 0）
+    - N_ACTIVE_FLOOR           # active-floor 任务计数（服务器级求和）
+
+# ---------------------------------------------------------------------------
+# 4. 输出诊断字段（定义 + 来源）
+# ---------------------------------------------------------------------------
+output_fields:
+  TSSR:
+    source: External Evaluator (success_rate)
+    unit: ratio [0,1]
+  Rbar_eff:
+    source: External Evaluator (mean_effective_reliability)
+    unit: ratio [0,1]
+  Ubar_eff:
+    source: External Evaluator (mean_effective_utility)
+    unit: ratio [0,1]
+  V_R:
+    source: External Evaluator (reliability_violation_rate)
+    unit: ratio [0,1]
+  LI_dem:
+    source: 正文 III-E.3（LI^dem = (1/M)*sum_j (rho_j^dem - rho^dem_bar)^2）
+    unit: dimensionless
+  RescueRate:
+    definition: "N_local_fail_rescued / N_local_fail"
+    source: AADA diagnostics（rescued_local_failure_count / local_failure_count）
+    unit: ratio [0,1]
+  Phase2AcceptRate:
+    definition: "Phase-2 accepted offload count（utility_improving_offload_count）"
+    source: AADA diagnostics
+    unit: count
+  Phase2GateRejected:
+    definition: "因 Delta_Rbar_eff<=-eps 拒绝数 + 因 |dR|<=eps 且 U<=eps 拒绝数"
+    source: AADA diagnostics（phase2_gate_rejected_dRbar_count /
+             phase2_gate_rejected_utility_count）
+    unit: count
+  N_ACTIVE_FLOOR:
+    definition: "RCLA active-floor 任务总数（逐服务器求和）"
+    source: RCLA diagnostics（active_floor_task_count）
+    unit: count
+  max_G_over_F:
+    definition: "max_j G_j/F_j（reliability-floor 容量占用峰值）"
+    source: AADA diagnostics（per_server_G_over_F）
+    unit: ratio
+  N_ALLOCATION_INFEASIBLE:
+    definition: "运行全程 ALLOCATION_INFEASIBLE 次数（预期 0）"
+    source: RCLA diagnostics（allocation_infeasible）
+    unit: count
+  max_epsilon_dphi:
+    definition: "Lemma 2 精确性审计最大绝对误差（应仅浮点误差）"
+    source: AADA diagnostics
+    unit: dimensionless
+  capacity_residual:
+    source: RCLA diagnostics（max_capacity_residual）
+    unit: cycles/s
+  kkt_residual:
+    source: RCLA diagnostics（kkt_residual）
+    unit: dimensionless
+  offloaded_reliability_violation_count:
+    definition: "RCLA 后 EDGE 任务满足 floor 仍失败的可靠性违约数（预期 0）"
+    source: Evaluator failure decomposition（逐任务失败原因）
+    unit: count
+  runtime_breakdown:
+    definition: "{preprocess_ms, aada_phase1_ms, aada_phase2_ms, rcla_ms, total_ms}"
+    source: pipeline diagnostics（正文 §VI-E.1 / §V-D.2 复杂度实测）
+    unit: ms
+    note: "重点：Phase-2 utility gating 开销（最坏 O(N^3 M)，正文 V-D.2）"
+
+# ---------------------------------------------------------------------------
+# 5. 失败来源表（Prop 3 + Cor 2：floor 保证下卸载成功）
+# ---------------------------------------------------------------------------
+failure_source_table:
+  - source: "Local failure + no recoverable EDGE"
+    expected: "> 0（剩余失败的主要来源）"
+  - source: "EDGE reliability violation after RCLA"
+    expected: "0（AADA 准入成立且 RCLA 正常执行时，卸载任务满足 floor）"
+  - source: "ALLOCATION_INFEASIBLE"
+    expected: "0（Admission invariant，Lemma 3）"
+  - source: "Structural violation"
+    expected: "0（AADA 结构合法性，Prop 2）"
+
+# ---------------------------------------------------------------------------
+# 6. 禁止（字段/语义级）
+# ---------------------------------------------------------------------------
+forbidden:
+  - gamma
+  - ruad_gamma
+  - kappa_R_as_selection_target
+  - cala_kappa_ablation
+  - repair_blr_ablation
+  - ruad_q_z_ablation

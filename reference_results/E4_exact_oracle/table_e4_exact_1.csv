@@ -1,0 +1,4 @@
+N,Oracle_Tier1,CARS_Tier1,Tier1_Gap,First_Tier_Match_Rate,Conditional_Tier2_Gap,Conditional_Tier3_Gap,Oracle_Runtime_ms,CARS_Runtime_ms
+4,1.0,1.0,0.0,1,0.000791,4.3e-05,156256.2375,1.6
+5,1.0,1.0,0.0,1,0.000638,4.3e-05,1348965.5559,0.0
+6,1.0,1.0,0.0,1,0.000594,0.0,11945424.5353,1.6

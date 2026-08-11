@@ -1,0 +1,112 @@
+# E4-V2-2 Formal 协议（Trace-Enhanced 正式评估；E4-V2-2 已执行并关闭）
+# 版本: E4_V2_2_FORMAL_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-0（协议登记）→ E4-V2-2（2026-08-09 用户授权执行并关闭）
+# 状态: EXECUTED / CLOSED（正式评估已完成：2170 runs；formal 分区已访问；
+#       AUTHORIZED_TO_START_E4_V2_3_MANUSCRIPT=NO）
+# 直接依据: 用户 E4-V2-2 授权；E4_V2_PROTOCOL_V1；既有 Trace split manifest
+#       （time_ordered 70/15/15）；Contract V4；Schema V4。
+
+protocol_id: e4_v2_2_formal_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+overall_protocol: configs/e4_v2/e4_v2_protocol.yaml
+pilot_protocol: configs/e4_v2/e4_v2_1_pilot_protocol.yaml
+status: EXECUTED
+execution_status: CLOSED
+formal_runs_planned: 2170        # 31 窗口 × 10 seeds × 7 方法
+formal_data_accessed: true       # E4-V2-2 正式阶段已访问（用户授权）
+
+# ---------------------------------------------------------------------------
+# 1. Formal 数据分区（完整继承既有 split）
+# ---------------------------------------------------------------------------
+formal_partition:
+  inheritance: >
+    既有 processed Trace 已含独立 formal-test split（time_ordered 70/15/15，
+    不 shuffle）——**完整继承**，不新建、不移动、不重新划分。
+  formal_files:
+    azure: [splits/azure/azure_formal.jsonl]
+    nep: [splits/nep/nep_formal.jsonl]
+    shanghai: [splits/shanghai/shanghai_formal.jsonl]
+  formal_slot_counts: {azure: 606, nep: 1150, shanghai: 659}
+  partition_rule: >
+    确定性时间顺序分区（既有 split：calibration < pilot < formal，互斥）；
+    该规则不依赖任何方法结果，属 design-independent rule。
+  formal_windows: >
+    **E4-V2-1 已冻结 formal 确定性选择规则（E4_V2_ENVIRONMENT_SELECTED_V1）**：
+    formal 分区 -> 连续非重叠 24-slot 窗口 -> 窗口压力分数 p_win（azure/shanghai=
+    归一化 workload_intensity 均值；nep=cpu_pressure 中位数）-> 按 E4-V2-1 冻结的
+    dataset-relative 阈值分类（azure/nep P33/P66 三档；shanghai P33 两档）-> 每档
+    按时间顺序取前 5 个窗口。规则已在 E4-V2-1 冻结（不得在 formal 结果后微调；
+    E4-V2-1 未查看 formal 分布/结果）。
+  formal_environment_selection_rule: "FROZEN（configs/e4_v2/e4_v2_environment_selected.yaml；E4_V2_ENVIRONMENT_SELECTED_V1）"
+
+# ---------------------------------------------------------------------------
+# 2. Formal 执行规则（冻结合同；E4-V2-2 执行时按此）
+# ---------------------------------------------------------------------------
+formal_rules:
+  frozen_windows: "使用冻结窗口（Pilot 阶段冻结）"
+  independent_partition: "使用独立 formal-test 分区"
+  shared_scenario: "所有方法共享完全相同 Trace 窗口/Scenario/任务集合/服务器集合/随机成分/物理模型/Evaluator/timeout/统计口径"
+  no_tuning_after_formal: "formal 后禁止调参/选窗口/改映射"
+  full_failure_accounting: "timeout/失败完整统计；不删除异常窗口；不因结果不漂亮重新选 Trace"
+  method_pool: "与 E1/E2 一致（6 主 + FOA 诊断）"
+  timeout_seconds: 30.0
+
+# ---------------------------------------------------------------------------
+# 3. Formal 统计与指标（继承 E4_V2_PROTOCOL_V1）
+# ---------------------------------------------------------------------------
+statistics: "mean ± std + paired bootstrap 95% CI（与 E1-V2-1/E2-V2-1 同口径）"
+metrics: "TSSR 主 / Rbar_eff,Ubar_eff 次 / V_R 诊断 / method_runtime_ms 效率 / total_wall_time_ms 补充"
+
+# ---------------------------------------------------------------------------
+# 4. Formal Claim（outcome-neutral；用户冻结）
+# ---------------------------------------------------------------------------
+claim_rules:
+  allowed: [supported, conditionally_supported, not_supported]
+  outcome_neutral: true
+  trend_questions: [Q1, Q2, Q3, Q4]   # 见 e4_v2_protocol.yaml
+  evidence_boundary: "trace-enhanced / semi-synthetic；禁止真实 MEC 部署表述"
+  prohibited:
+    - "CARS 一定最好 / 一定在所有 Trace 窗口胜出"
+    - "真实 Trace 已证明实际 MEC 部署有效"
+    - "formal 后继续调参或选窗口"
+
+# ---------------------------------------------------------------------------
+# 5.5 正式矩阵语义（E4-V2-2 运行前冻结；用户 E4-V2-2 授权）
+# ---------------------------------------------------------------------------
+formal_matrix_semantics:
+  paired_unit: "(dataset, regime, formal_window, formal_seed)"
+  scenario_rule: >
+    每个 (dataset, regime, formal_window, formal_seed) 只生成一次 canonical Scenario：
+    窗口 p_win 驱动 workload（azure/shanghai N_t=50+round(150*p_win)；nep N_t=100 +
+    容量缩放 F_j=F_j^base*max(0.40,1-0.50*min(1,cpu_pressure/0.12))）；formal_seed
+    驱动 synthetic-fixed 随机实现（任务/设备/服务器/λ_j/R_min）。全部 7 方法共享同一 Scenario。
+  method_matrix: "window × formal_seed × method 笛卡尔积；7 方法（6 主 + FOA 诊断）"
+  window_selection_rule_frozen: "formal 分区 -> 24-slot 非重叠窗口 -> frozen p_win -> E4-V2-1 冻结阈值分类 -> 每档按时间顺序取前 5 个窗口"
+  undercoverage_handling: >
+    某档不足 5 个合法窗口时如实减少（不放宽阈值/不改窗口长度/不跨 split/不借档），
+    记录 FORMAL_REGIME_UNDERCOVERAGE Warning；这不构成 P1。
+  expected_runs_from_manifest: "由冻结 formal_window_manifest 机械推导（windows × 10 seeds × 7 methods）"
+
+# ---------------------------------------------------------------------------
+# 5. 隔离确认（本阶段与 Pilot 阶段）
+# ---------------------------------------------------------------------------
+isolation:
+  formal_data_accessed_by_stage:
+    E4_V2_0: false
+    E4_V2_1_PILOT: false
+    E4_V2_2_FORMAL: "NOT_EXECUTED（须用户授权）"
+  pilot_use_of_formal: forbidden
+  e4_v2_1_pilot_seeds: [2401, 2402, 2403]
+  e4_v2_1_pilot_seed_isolation: "{2401,2402,2403} ∩ {1101..1110}(E1) = ∅；∩ {2101..2110}(E2) = ∅；∩ {601..620}(E0-V2) = ∅；∩ {401..410}(E3-V2) = ∅；∩ {201..203}/{701..708}/{1201..1205}(pilot/calib) = ∅"
+  formal_seeds: [2501, 2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509, 2510]  # E4-V2-1 登记；禁止访问
+  formal_seed_policy: "E4-V2-2 正式阶段须用户授权；禁止因结果增删/筛选 seed"
+
+# ---------------------------------------------------------------------------
+# 6. 正式交付（E4-V2-2 时）
+# ---------------------------------------------------------------------------
+formal_deliverables:
+  - "results/e4_v2/e4_v2_2_formal/（raw_records + scenarios + summary + paired_delta + table + claim_audit + figures + integrity）"
+  - "reports/experiments/E4-V2-2_formal.md（唯一正式报告）"
+  - "configs/e4_v2/e4_v2_formal_protocol.yaml（本文件，运行时更新 execution_status）"

@@ -1,0 +1,85 @@
+# E3-V2 环境选择冻结（E3-V2-1 环境识别 Pilot 结论）
+# 版本: E3_V2_ENVIRONMENT_SELECTED_V1
+# 日期: 2026-08-09
+# 依据: configs/e3_v2/e3_v2_environment_definition.yaml（机制触发标准）；
+#       results/e3_v2/e3_v2_1_environment_pilot/（9 runs：N{20,80,150} × seeds 201-203）；
+#       results/e3_v2/e3_v2_1_environment_summary.json。
+# 选择规则: mechanism identifiability（严禁按 Full 获胜幅度选环境）。
+
+environment_selected_version: E3_V2_ENVIRONMENT_SELECTED_V1
+generator: scripts/experiments/e3_v2/build_e3_v2_environment.py
+
+selected:
+  LOW:        {N: 20, role: "floor 基本不激活 / 轻载机制不主导"}
+  TRANSITION: {N: 80, role: "主消融环境（机制覆盖最完整）"}
+  HIGH:       {N: 150, role: "capacity stress（G/F 高压、floor 大量激活、仍可服务）"}
+
+PRIMARY_E3_ENVIRONMENT: "TRANSITION"
+primary_N: 80
+
+selection_rule: "mechanism identifiability（不得依据 TSSR_Full - TSSR_ablation 选环境）"
+
+# 三档机制识别证据（seeds 201-203 汇总；NOT_FORMAL）
+identification_evidence:
+  LOW_N20:
+    N_active_floor_mean: 0.0
+    max_G_over_F_mean: 0.559
+    local_failure_ratio_mean: 0.317
+    RescueRate_mean: 1.0
+    Phase2AcceptRate_tasks_mean: 0.501
+    TSSR: "1.0 (3/3 seeds)"
+    verdict: "floor 不激活、G/F 有余量、轻载下机制不主导调度"
+  TRANSITION_N80:
+    N_active_floor_mean: 7.0
+    max_G_over_F_mean: 0.815
+    local_failure_ratio_mean: 0.275
+    rescue_triggered: true
+    phase2_accept_and_reject: "5-22 接受 vs 373-450 gate 拒绝（3/3 seeds 并存）"
+    N_ALLOCATION_INFEASIBLE: 0
+    TSSR: "1.0 (3/3 seeds)"
+    verdict: "Phase-1 全触发、Phase-2 接受+拒绝并存、floor 非零非饱和、未不可服务——机制覆盖最完整、跨 3 seeds 最稳定"
+  HIGH_N150:
+    N_active_floor_mean: 17.0
+    max_G_over_F_mean: 0.980
+    local_failure_ratio_mean: 0.260
+    RescueRate_mean: 0.926
+    Phase2AcceptRate_tasks_mean: 0.044
+    N_ALLOCATION_INFEASIBLE: 0
+    TSSR: "0.96-0.98"
+    verdict: "G/F 高压（0.978-0.982）、floor 大量激活、rescue 压力增加、仍可服务（非 UNSERVICEABLE_FOR_ABLATION）"
+
+# 正确性诊断（admission/RCLA；预期=0，全部满足）
+correctness:
+  N_ALLOCATION_INFEASIBLE: 0
+  max_epsilon_dphi: "1e-16 ~ 1e-15（Lemma 2 精确性，仅浮点误差）"
+
+# 关键发现（如实记录；非缺陷）
+findings:
+  - id: F1
+    text: >
+      Phase-2 gate 拒绝全部来自 Delta_Rbar_eff<=-eps（P0 字典序第一维）；
+      "持平时需 Delta_U_sys>eps"（utility 分支）在三档 9 runs 中从未触发（rej(U)=0）。
+      含义：当前环境 Rbar 变化几乎从不落入 eps 容差；w_no_utility_gate 与 full 变体
+      行为可能相同（Q3 的 utility gate 单独辨识可能受限）——E3-V2-2 需如实报告，
+      属环境真实属性，不是缺陷（Rbar 门槛在无 deadline 模型下主导，符合正文 P0 字典序）。
+  - id: F2
+    text: >
+      HIGH(N=150) 的 Phase-2 接受率接近 0（seed 203 为 0）：高压下卸载多数使
+      Rbar 下降被 P0 字典序拒绝——机制正确表现（高压下 Phase-2 保守），非缺陷。
+
+# 正式运行规格（E3-V2-2 待授权；本阶段不运行）
+formal_spec:
+  seeds: [401, 402, 403, 404, 405, 406, 407, 408, 409, 410]
+  grid: [{N: 20}, {N: 80}, {N: 150}]
+  primary_environment: "TRANSITION (N=80)"
+  units: [full_cars, w_no_rescue, w_rescue_only, w_no_alloc_aware, w_no_utility_gate,
+          fixed_a_rcla, fixed_a_la]
+  paired_invariant: "所有 variant 对每个 (seed,N) 使用同一 Scenario 实例；fixed-assignment 同一 X/A hash"
+  status: FROZEN_ONLY_NOT_EXECUTED
+
+forbidden:
+  - "在 formal seeds 401-410 上运行（本阶段禁止）"
+  - "按 Full 获胜幅度选择环境"
+  - "重新定义 variant"
+  - "修改正式 cars / Contract V3 / Schema V3 / III_VI"
+  - "多参数联合调整制造理想结果"

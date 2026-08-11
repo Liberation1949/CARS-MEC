@@ -1,0 +1,299 @@
+{
+  "case_id": "tiny-valid",
+  "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "V4 人工微型案例（有效，CR-CARS-PROMOTION-E1）：2 任务、2 设备、2 服务器。Task1 本地执行；Task2 卸载到 Server1；Server2 无任务。AADA 输出合法 X/A + 动态状态（Q/G）；RCLA 输出合法 F；MethodResult 与 EvaluatorIO 能承载最终结果。派生量数值为语义自洽的示例填充值；验证器只检查结构合法性与跨字段不变量。",
+  "objects": [
+    {
+      "object_name": "scenario",
+      "target_schema": "scenario.schema.json",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "tiny-valid",
+        "state_timepoint": "T0",
+        "system_params": {
+          "numeric_epsilon": 1e-12,
+          "rcla_solver": {
+            "rcla_mu_tol": 1e-09,
+            "rcla_max_iters": 200,
+            "rcla_mu_lo": 1e-12,
+            "rcla_mu_hi": 1000000000000.0,
+            "rcla_numeric_epsilon": 1e-12
+          }
+        },
+        "tasks": [
+          {
+            "task_id": "t1",
+            "device_id": "d1",
+            "data_bits": 1000,
+            "cpu_cycles": 4000,
+            "fragility": 0.0,
+            "delay_weight": 0.7,
+            "energy_weight": 0.3,
+            "deadline_seconds": 3.0,
+            "min_reliability": 0.9
+          },
+          {
+            "task_id": "t2",
+            "device_id": "d2",
+            "data_bits": 1000,
+            "cpu_cycles": 4000,
+            "fragility": 0.0,
+            "delay_weight": 0.6,
+            "energy_weight": 0.4,
+            "deadline_seconds": 3.0,
+            "min_reliability": 0.9
+          }
+        ],
+        "devices": [
+          {
+            "device_id": "d1",
+            "local_cpu_rate": 2000,
+            "local_failure_rate": 0.01,
+            "switch_capacitance": 1.0,
+            "tx_power_watts": 0.5
+          },
+          {
+            "device_id": "d2",
+            "local_cpu_rate": 2000,
+            "local_failure_rate": 0.01,
+            "switch_capacitance": 1.0,
+            "tx_power_watts": 0.5
+          }
+        ],
+        "servers": [
+          {
+            "server_id": "s1",
+            "capacity_cycles_per_sec": 4000,
+            "nominal_failure_rate": 0.05
+          },
+          {
+            "server_id": "s2",
+            "capacity_cycles_per_sec": 4000,
+            "nominal_failure_rate": 0.05
+          }
+        ],
+        "links": [
+          {
+            "link_id": "l11",
+            "source_device_id": "d1",
+            "target_server_id": "s1",
+            "bandwidth_hz": 1000000,
+            "channel_gain": 1e-09,
+            "noise_power": 1e-10,
+            "error_probability": 0.01
+          },
+          {
+            "link_id": "l12",
+            "source_device_id": "d1",
+            "target_server_id": "s2",
+            "bandwidth_hz": 1000000,
+            "channel_gain": 1e-09,
+            "noise_power": 1e-10,
+            "error_probability": 0.01
+          },
+          {
+            "link_id": "l21",
+            "source_device_id": "d2",
+            "target_server_id": "s1",
+            "bandwidth_hz": 1000000,
+            "channel_gain": 1e-09,
+            "noise_power": 1e-10,
+            "error_probability": 0.01
+          },
+          {
+            "link_id": "l22",
+            "source_device_id": "d2",
+            "target_server_id": "s2",
+            "bandwidth_hz": 1000000,
+            "channel_gain": 1e-09,
+            "noise_power": 1e-10,
+            "error_probability": 0.01
+          }
+        ]
+      }
+    },
+    {
+      "object_name": "aada_output",
+      "target_schema": "aada_io.schema.json#/$defs/AADAOutput",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "state_timepoint": "T1",
+        "offloading_decision": [
+          0,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "final_resource_competition": [
+          34.641016,
+          0.0
+        ],
+        "final_floor_reservation": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "object_name": "rcla_output",
+      "target_schema": "rcla_io.schema.json#/$defs/RCLAOutput",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "state_timepoint": "T2",
+        "resource_allocation": [
+          [
+            0,
+            0
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "object_name": "method_result",
+      "target_schema": "method_result.schema.json#/$defs/MethodResult",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "method_id": "CARS",
+        "method_status": "SUCCESS",
+        "scenario_id": "tiny-valid",
+        "seed": 42,
+        "decision": {
+          "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+          "offloading_decision": [
+            0,
+            1
+          ],
+          "assignment_matrix": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "resource_allocation": [
+            [
+              0,
+              0
+            ],
+            [
+              4000,
+              0
+            ]
+          ]
+        },
+        "module_statuses": [
+          {
+            "module": "aada",
+            "status": "SUCCESS"
+          },
+          {
+            "module": "rcla",
+            "status": "SUCCESS"
+          }
+        ],
+        "physically_feasible": true,
+        "task_success_indicators": [
+          1,
+          1
+        ],
+        "runtime_seconds": 0.5,
+        "timed_out": false,
+        "diagnostics": {}
+      }
+    },
+    {
+      "object_name": "evaluator_input",
+      "target_schema": "evaluator_io.schema.json#/$defs/EvaluatorInput",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "state_timepoint": "T4",
+        "scenario_id": "tiny-valid",
+        "decision": {
+          "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+          "offloading_decision": [
+            0,
+            1
+          ],
+          "assignment_matrix": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "resource_allocation": [
+            [
+              0,
+              0
+            ],
+            [
+              4000,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "object_name": "evaluator_output",
+      "target_schema": "evaluator_io.schema.json#/$defs/EvaluatorOutput",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "state_timepoint": "T4",
+        "scenario_id": "tiny-valid",
+        "task_results": [
+          {
+            "task_id": "t1",
+            "success": 1,
+            "evaluable": 1,
+            "end_to_end_delay_seconds": 2.0,
+            "end_to_end_reliability": 1.0,
+            "effective_reliability": 1.0,
+            "utility": 0.0,
+            "effective_utility": 0.0,
+            "failure_reason": "SUCCESS"
+          },
+          {
+            "task_id": "t2",
+            "success": 1,
+            "evaluable": 1,
+            "end_to_end_delay_seconds": 1.0003869,
+            "end_to_end_reliability": 0.99,
+            "effective_reliability": 0.99,
+            "utility": 0.6998839,
+            "effective_utility": 0.6998839,
+            "failure_reason": "SUCCESS"
+          }
+        ],
+        "system_metrics": {
+          "tssr": 1.0,
+          "mean_effective_reliability": 0.995,
+          "mean_effective_utility": 0.349942,
+          "deadline_violation_rate": 0.0,
+          "reliability_violation_rate": 0.0,
+          "deadline_only_rate": 0.0,
+          "reliability_only_rate": 0.0,
+          "joint_violation_rate": 0.0
+        }
+      }
+    }
+  ]
+}

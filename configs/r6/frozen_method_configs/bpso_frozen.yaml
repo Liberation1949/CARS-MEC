@@ -1,0 +1,14 @@
+method_id: bpso_rata_la
+config_label: bpso_frozen_r6
+scenario_config: configs/r3/bpso_rata_la/small_scenario.yaml
+population_size_max: 8
+max_iterations_max: 5
+particle_evaluation_cap_max: 112
+reliability_threshold: 0.9
+inertia_weight: 0.9
+cognitive_coefficient: 2.0
+social_coefficient: 2.0
+method_seed: 1
+hard_timeout_seconds: 30.0
+soft_deadline_margin: 3.0
+_test_hook_sleep_seconds_per_evaluation: 0.0

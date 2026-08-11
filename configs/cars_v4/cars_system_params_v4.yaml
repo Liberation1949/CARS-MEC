@@ -1,0 +1,22 @@
+# CARS CR-CARS-PROMOTION-E1 正式 SystemParams（Schema V4）
+# 版本: CARS_V4_SYSTEM_PARAMS_V1
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1（候选提升为正式 CARS + E1 合同）
+# 说明: V4 SystemParams = rcla_solver + numeric_epsilon（Contract V4 §7；
+#       Schema V4 core_entities SystemParams）。
+#       - rcla_solver：RCLA 确定性求解器冻结默认（active-set 解法不使用
+#         mu_tol/mu_lo/mu_hi，以 eps_cmp 为容差；保留 API 兼容）；
+#       - 无 cala_weights / repair_budget / repair_tolerances / kappa_R /
+#         kappa_D（V4 禁止 CALA/Repair 参数；CARS=AADA→RCLA，无修复层）。
+#       - 无 deadline 模型（deadline_seconds 占位字段，逻辑不使用）。
+# 直接依据: Contract V4 §7、Schema V4 core_entities SystemParams、
+#       CR_CARS_PROMOTION_E1_V1.md。
+
+system_params:
+  rcla_solver:
+    rcla_mu_tol: 1.0e-09
+    rcla_max_iters: 200
+    rcla_mu_lo: 1.0e-12
+    rcla_mu_hi: 1.0e+12
+    rcla_numeric_epsilon: 1.0e-12
+  numeric_epsilon: 1.0e-12

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/rcla_io.schema.json",
+  "title": "CARS Active Schema - RCLA IO",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "RCLA（Algorithm V-2）输入输出契约。直接依据：Contract V4 §5（RCLA 语义）、正文 V-C（V-C.1 原始 LA、V-C.2 RCLA 问题与 KKT、V-C.3 active-set 解法与退化、V-C.5 Algorithm V-2）。RCLA 输入：固定指派 A^(0) + 每服务器 Gamma_j + 冻结求解器参数；输出：F^(0) + 诊断。RCLA 不迁移任务、不改变 X/A（无修复层，V-C.4）。",
+  "$defs": {
+    "RCLAInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "state_timepoint",
+        "assignment_matrix",
+        "rcla_frozen_params"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T1",
+          "x-unit": "timepoint",
+          "description": "RCLA 在 T1 之后读取固定指派 A^(0)（Contract V4 §5）"
+        },
+        "assignment_matrix": {
+          "$ref": "schedule_decision.schema.json#/properties/assignment_matrix",
+          "description": "固定指派 A^(0)（来自 AADA）"
+        },
+        "rcla_frozen_params": {
+          "$ref": "core_entities.schema.json#/$defs/SystemParams",
+          "description": "冻结求解器参数（rcla_solver + numeric_epsilon；Contract V4 §7）"
+        }
+      }
+    },
+    "RCLAOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "state_timepoint",
+        "resource_allocation"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T2",
+          "x-unit": "timepoint",
+          "description": "RCLA 输出时点 T2：F^(0)（Contract V4 §6）"
+        },
+        "resource_allocation": {
+          "$ref": "schedule_decision.schema.json#/properties/resource_allocation",
+          "description": "F^(0)：f* = max(ell_R, sqrt(a/mu))，容量精确饱和；无 active floor 时精确退化为普通 LA（V-C.3）；使 Pi^(0) 满足 Omega_phy（C5-C6）"
+        }
+      }
+    },
+    "RCLADiagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "floor_sum",
+        "active_floor_task_count",
+        "max_capacity_residual",
+        "allocation_infeasible"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "floor_sum": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "cycles/s",
+          "description": "全部服务器 floor 之和 sum_{i in Gamma} ell_R_ij"
+        },
+        "active_floor_task_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "进入 active 集（f=ell_R）的 EDGE 任务总数"
+        },
+        "capacity_utilization": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0, "maximum": 1.0000001 },
+          "x-unit": "dimensionless",
+          "description": "逐服务器容量利用率 sum_i f_ij / F_j，维度 M"
+        },
+        "max_capacity_residual": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "cycles/s",
+          "description": "最大容量残差 |sum f - F_j|（容量精确饱和，满足 C6 容差）"
+        },
+        "kkt_residual": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "KKT 残差（active-set 构造精确满足；审计量）"
+        },
+        "allocation_infeasible": {
+          "type": "boolean",
+          "x-unit": "flag",
+          "description": "是否出现 ALLOCATION_INFEASIBLE（sum ell_R > F_j + eps；正常由 AADA 准入约束防止；实现回退普通 LA 并记录）"
+        },
+        "per_server": {
+          "type": "array",
+          "x-unit": "diagnostic",
+          "description": "逐服务器诊断（server_id / n_members / floor_sum / active_floor_task_count / capacity_utilization / capacity_residual / kkt_residual / allocation_infeasible）"
+        }
+      }
+    }
+  }
+}

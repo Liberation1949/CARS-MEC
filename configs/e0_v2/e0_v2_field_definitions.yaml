@@ -1,0 +1,141 @@
+# E0-V2 输出字段定义（机器可读；E0-V2-0 冻结；新版 E0 现象识别实验）
+# 版本: E0_V2_FIELD_DEFINITIONS_V1
+# 日期: 2026-08-09
+# 依据: 用户 2026-08-09 E0 设计；正文 III-E.3/4/5、III-F.1/2/3；
+#       E3-V2 字段定义（configs/e3_v2/e3_v2_variant_field_definitions.yaml）口径对齐。
+# 用途: E0-V2-1 pilot / E0-V2-2 formal / E0-V2-3 analysis 的机器可读字段定义：
+#   1) 正文核心指标（TSSR / Rbar_eff / Ubar_eff / V_R）；
+#   2) 机制诊断指标（V_F / chi_ij / median(f/ell^R) / max G/F / LI_dem / edge_ratio）；
+#   3) 环境与失败诊断（local_failure_rate / failure_sources / runtime）；
+#   4) 禁用字段（旧语义全部拒绝）。
+
+field_definitions_version: E0_V2_FIELD_DEFINITIONS_V1
+protocol_version: E0_V2_PROTOCOL_V1
+manuscript_basis: "III_VI.md III-E.3 / III-E.4 / III-E.5 / III-F.1 / III-F.2 / III-F.3 / VI-E.2 / VI-F.1"
+
+# ---------------------------------------------------------------------------
+# 1. 正文核心指标（优先级 TSSR > Rbar_eff > Ubar_eff；TSSR-first lexicographic 一致）
+# ---------------------------------------------------------------------------
+core_metrics:
+  TSSR:
+    source: "统一 Evaluator (system_metrics.tssr)"
+    definition: "TSSR = (1/N) sum_i z_i（正文 III-E.3；任务成功服务率）"
+    unit: ratio [0,1]
+  Rbar_eff:
+    source: "统一 Evaluator (system_metrics.mean_effective_reliability)"
+    definition: "Rbar_eff = (1/N) sum_i R_i^valid（成功任务按实际 R_i，未成功贡献 0；分母 N）"
+    unit: ratio [0,1]
+  Ubar_eff:
+    source: "统一 Evaluator (system_metrics.mean_effective_utility)"
+    definition: "Ubar_eff（正文 IV-C.5 分段定义；有效效用均值，分母 N）"
+    unit: ratio [0,1]
+  V_R:
+    source: "统一 Evaluator (system_metrics.reliability_violation_rate)"
+    definition: "V_R = (1/N) sum_i e_i * I{R_i < R_i^min}（正文 III-E.4；只统计结构与容量可评价任务）"
+    unit: ratio [0,1]
+
+# ---------------------------------------------------------------------------
+# 2. 机制诊断指标（正文重点只需 V_F 与 max G/F；其余进 raw JSON/CSV）
+# ---------------------------------------------------------------------------
+mechanism_metrics:
+  V_F:
+    name: "resource-underfloor ratio（资源不足率）"
+    definition: >
+      V_F = |{i in Gamma_edge : f_ij < ell_R_ij}| / |Gamma_edge|
+    edge_set: "Gamma_edge = {i : x_i = 1}（卸载任务集合）"
+    f_source: "decision.resource_allocation（最终资源分配；任务 i 在其指派服务器上的 f_ij）"
+    ellR_source: "derived.edge[i][j].ell_R（公共 DerivedState F-16；无 deadline 下 ell_succ=ell_R）"
+    meaning: "卸载任务中计算资源低于可靠性成功所需阈值的比例；N↑ -> V_F↑ 是退化机制链第一环"
+    unit: ratio [0,1]
+  chi_ij:
+    name: "normalized reliability-resource adequacy（归一化可靠性资源充裕度）"
+    definition: "chi_ij = f_ij / ell_R_ij"
+    meaning: "chi < 1 表示该边缘任务获得的计算资源低于可靠性成功所需阈值"
+    unit: dimensionless
+  median_f_over_ellR:
+    name: "median(f / ell^R)（卸载任务资源充裕度中位数）"
+    definition: "median over Gamma_edge of f_ij / ell_R_ij"
+    unit: dimensionless
+  max_G_over_F:
+    name: "峰值可靠性下限—容量占用（服务器压力）"
+    definition: "rho_j^R = G_j/F_j = sum_{i in Gamma_j} ell_R_ij / F_j；max_G_over_F = max_j rho_j^R"
+    meaning: "服务器已承诺可靠性容量占用峰值；E3 已用 max G/F 作机制诊断量"
+    unit: ratio [0,1]
+  LI_dem:
+    name: "需求负载不均衡（demand load imbalance）"
+    definition: "LI_dem = (1/M) sum_j (rho_j^dem - rho^dem_bar)^2；rho_j^dem = sum_i a_ij * f_i^loc / F_j"
+    source: "正文 III-E.5；E3-V2 runner 同口径（_li_dem）"
+    unit: dimensionless
+  edge_ratio:
+    name: "卸载任务比例"
+    definition: "|Gamma_edge| / N = (sum_i x_i) / N"
+    unit: ratio [0,1]
+
+# ---------------------------------------------------------------------------
+# 3. 环境与机制诊断（沿用 E3-V2 口径）
+# ---------------------------------------------------------------------------
+environment_diagnostics:
+  local_failure_rate:
+    source: "AADA diagnostics（候选）/ 公共状态计算（baseline）"
+    definition: "本地失败任务比例（无 deadline 下失败 = reliability violation）"
+  rescues:
+    source: "AADA diagnostics（候选）"
+    note: "AADA-RCLA 特有：RescueRate / Phase2AcceptRate / gate 拒绝（E0 可作次级解释量）"
+  failure_sources:
+    enum:
+      - LOCAL_FAILURE_NO_RECOVERABLE_EDGE
+      - EDGE_RELIABILITY_VIOLATION
+      - ALLOCATION_INFEASIBLE
+      - STRUCTURAL_VIOLATION
+      - OTHER
+    note: "不得隐藏；正文 Prop 3 + Cor 2 预期 EDGE_RELIABILITY_VIOLATION=0、ALLOCATION_INFEASIBLE=0"
+  runtime:
+    note: "记录但不用于选择/删除结果；R6 shared timeout=30s"
+    fields: [preprocess_runtime_ms, phase1_runtime_ms, phase2_runtime_ms,
+             allocation_runtime_ms, total_runtime_ms]
+
+# ---------------------------------------------------------------------------
+# 4. 每 run 记录结构（raw JSONL 一行）
+# ---------------------------------------------------------------------------
+record_fields:
+  identity: [seed, N, method, scenario_id, scenario_hash16, scenario_hash, method_status, timed_out]
+  core: [TSSR, Rbar_eff, Ubar_eff, V_R]
+  mechanism: [V_F, median_f_over_ellR, max_G_over_F, LI_dem, edge_ratio]
+  diagnostics: [local_failure_rate, failure_sources, runtime]
+  paired: [paired_scenario_shared]
+  formal_flag: [formal_seed_used]
+
+# ---------------------------------------------------------------------------
+# 5. 禁用字段（旧语义全部拒绝；配置校验 + 记录校验双重）
+# ---------------------------------------------------------------------------
+forbidden_fields:
+  - V_D
+  - deadline_violation_rate
+  - lambda_eff
+  - Q_j
+  - Z_j
+  - ruad_gamma
+  - gamma
+  - cala_kappa_ablation
+  - repair_blr_ablation
+  - ruad_q_z_ablation
+  - collapse_threshold   # 禁止固定坍缩阈值
+
+# ---------------------------------------------------------------------------
+# 6. 统计（E0-V2-2 formal）
+# ---------------------------------------------------------------------------
+statistics:
+  per_cell: "N x method: mean ± std（跨 20 paired seeds）"
+  paired_comparison: "同 (seed,N) 方法间 paired 差（如 AADA-RCLA vs BPSO 的退化斜率差）"
+  degradation_analysis: "前后斜率 + segmented regression + bootstrap 95% CI（E0-V2-3 analysis）"
+  forbidden: "根据结果事后改变指标/删除 seed/重调环境"
+
+# ---------------------------------------------------------------------------
+# 7. 禁止（字段/语义级）
+# ---------------------------------------------------------------------------
+forbidden:
+  - "固定 collapse threshold / index / 边界公式"
+  - "把 ordinary degradation 包装成 collapse"
+  - "根据结果事后选择'最好看'的环境"
+  - "使用 formal seeds 601-620 作 pilot"
+  - "修改正文指标口径"

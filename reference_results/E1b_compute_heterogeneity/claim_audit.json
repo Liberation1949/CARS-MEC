@@ -1,0 +1,59 @@
+{
+  "q1_degradation_least": {
+    "degradation_tssr_by_method": {
+      "cars": -0.010321792193422137,
+      "bpso_rata_la": -0.06187922077922077,
+      "jtora_adapted": 0.009908456589764966,
+      "nfa_adapted": 0.002467675340760532,
+      "reliability_only": 0.008160758492750412,
+      "local_only": 0.0,
+      "foa": -0.054224470766754435
+    },
+    "cars_least": false
+  },
+  "q2_advantage_zone": {
+    "paired_delta_tssr_at_1_2": {
+      "bpso_rata_la": {
+        "mean": 0.236471,
+        "ci_lo": 0.206471,
+        "ci_hi": 0.263529,
+        "n_paired_metric": 10
+      },
+      "jtora_adapted": {
+        "mean": 0.179412,
+        "ci_lo": 0.151176,
+        "ci_hi": 0.203529,
+        "n_paired_metric": 10
+      },
+      "nfa_adapted": {
+        "mean": 0.002941,
+        "ci_lo": -0.010588,
+        "ci_hi": 0.014706,
+        "n_paired_metric": 10
+      },
+      "reliability_only": {
+        "mean": 0.159412,
+        "ci_lo": 0.129412,
+        "ci_hi": 0.185294,
+        "n_paired_metric": 10
+      },
+      "local_only": {
+        "mean": 0.237059,
+        "ci_lo": 0.205294,
+        "ci_hi": 0.262941,
+        "n_paired_metric": 10
+      }
+    }
+  },
+  "q3_runtime": {
+    "method_runtime_ms_at_1_2": {
+      "cars": 50.1,
+      "bpso_rata_la": 40.6,
+      "jtora_adapted": 1410.8,
+      "nfa_adapted": 4192.1,
+      "reliability_only": 4.7,
+      "local_only": 0.0,
+      "foa": 0.0
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/predecision_state.schema.json",
+  "title": "CARS Active Schema - Predecision State",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "T0 决策前状态 = Scenario（AADA 的合法输入）。直接依据：Contract V4 §2（输入与预处理）、正文 V-A.1。AADA 只读取 T0 决策前状态；additionalProperties:false 天然拒绝任何 T2-T4 未来信息字段（如 resource_allocation）。",
+  "allOf": [
+    { "$ref": "scenario.schema.json" }
+  ]
+}

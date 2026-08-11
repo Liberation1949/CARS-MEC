@@ -1,0 +1,145 @@
+# E4-EXACT-2 Pilot 协议（可计算性校准；Formal 配置冻结前）
+# 版本: E4_EXACT_2_PILOT_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E4-EXACT-2
+# 状态: 初始 FROZEN_ONLY / NOT_EXECUTED；Pilot 完成后置 EXECUTED/CLOSED
+# 直接依据:
+#   - E4-EXACT-2 阶段合同（§七 Pilot 协议、§八 F1-F5、§九 N-grid、§十 runtime 指标）
+#   - configs/e4_exact/e4_exact_pilot_candidate_grid.yaml（E4-EXACT-0 冻结候选包络）
+#   - configs/e4_exact/e4_exact_protocol.yaml（E4_EXACT_PROTOCOL_V1）
+#   - E4-EXACT-1 runtime 实测（N=4/M=4 ~112s）与本阶段 runtime probe
+#     （N=5/M=4 E1-V2 场景 >40min 未完成；N=6/M=4 >45min 未完成——实测证据）
+
+pilot_protocol_version: E4_EXACT_2_PILOT_PROTOCOL_R2_V1
+revision: "R2（2026-08-10：CR_E4_EXACT_SCALE_REDUCTION_OPTIMIZATION_V1 用户批准：候选 {6,8,10,12}→{4,6}；Oracle 第一类优化（实例级并行）；E4-EXACT-2 修订重开 Pilot）"
+experiment_id: e4_exact
+engineering_id: E4-EXACT-2
+status: EXECUTED / CLOSED
+revision_note: >
+  R1（2026-08-09）Pilot 显示候选 {6,8,10,12} 在 600s 内均 TIMEOUT（FAIL_AND_REDESIGN）。
+  R2（2026-08-10）CR 批准后：候选缩小为 {4,6}（LOW→4, TRANSITION→6）；per-instance timeout
+  提高至 7200s（让 N=6 有机会完成 certified）；runner 实例级并行（Oracle 零改动）。
+execution_result: >
+  Pilot 执行完成：N=6×3 seeds（3401/3402/3403）+ N=8×1 seed（3401）全部在
+  per-instance timeout 600s 内 TIMEOUT_UNCERTIFIED（0/4 accepted）。
+  Formal Scale Selection = FAIL_AND_REDESIGN（F1/F2/F3 全部不满足；无候选 N）。
+  详见 results/e4_exact/e4_exact_2_pilot/ 与 E4-EXACT-2 报告。
+
+# ---------------------------------------------------------------------------
+# 1. Pilot 目标（仅可计算性校准；不产生性能 Claim）
+# ---------------------------------------------------------------------------
+purpose: >
+  在 E1-V2 environment family 缩小映射（M=4；s_f=1.0；V-MEDIUM）上，测量 Exact
+  Oracle 随 N 增长的计算成本，判断哪些规模能稳定获得 certified exact optimum，
+  并据此按冻结 F1-F5 规则选择 Formal N-grid / timeout / 预算。
+
+not_a_claim: "Pilot 结果不得用于任何 CARS near-optimal 性能 Claim"
+
+# ---------------------------------------------------------------------------
+# 2. Pilot 场景构造（E1-V2 环境族缩小映射）
+# ---------------------------------------------------------------------------
+scenario_construction:
+  environment_family: "E1-V2（configs/e1_v2/e1_v2_environment_selected.yaml：s_f=1.00, V-MEDIUM, M=8 全连接）"
+  scaling: "缩小 N/M：M=4（取前 4 台服务器 s1-s4，容量 10000/13000/16000/10000）；任务取嵌套前缀（seed 确定性）"
+  generator: "scripts/experiments/e1_v2/build_e1_v2_environment.py（n_max=12, m=4, s_f=1.0, fragility_profile=MEDIUM）"
+  schema: "CARS_ACTIVE_SCHEMA_V4（构造 schema_version 字段；公共 Evaluator 同一）"
+  no_new_physics: true
+  no_reliability_modification: true
+  no_capacity_rule_modification: true
+
+# ---------------------------------------------------------------------------
+# 3. Pilot Matrix（regime 绑定 N：E1-V2 zone 语义的缩小映射；grid candidate_n）
+# ---------------------------------------------------------------------------
+# 依据：e4_exact_pilot_candidate_grid.yaml pressure_regimes 的 candidate_n 绑定
+#   （LOW->6, TRANSITION->8, HIGH->12）；N=10 为 scale-only 跨档（TRANSITION_HIGH）。
+# 每 (N, regime) 登记 3 个 Pilot seeds（3401-3403 使用；3404-3405 备用）。
+pilot_matrix:
+  - {n: 4,  regime: LOW,             seed: 3401}
+  - {n: 4,  regime: LOW,             seed: 3402}
+  - {n: 4,  regime: LOW,             seed: 3403}
+  - {n: 6,  regime: TRANSITION,      seed: 3401}
+  - {n: 6,  regime: TRANSITION,      seed: 3402}
+  - {n: 6,  regime: TRANSITION,      seed: 3403}
+
+scale:
+  m: 4
+  n_candidates: [4, 6]
+  note: "R2 候选 {4,6}（CR 批准；N=4 实测 40s certified；N=6 需 7200s timeout 内完成）"
+
+# ---------------------------------------------------------------------------
+# 4. Seeds（Pilot 白名单；formal 只登记零访问）
+# ---------------------------------------------------------------------------
+seed_whitelist:
+  pilot_seeds: [3401, 3402, 3403, 3404, 3405]
+  formal_seeds: [3501, 3502, 3503, 3504, 3505, 3506, 3507, 3508, 3509, 3510]
+  formal_seeds_accessed: false
+  overlap_with_historical: "已核对与历史范围 {201-205,301-305,401-410,601-620,1101-1110,2101-2110,2401-2403,2501-2510} 不重叠"
+
+# ---------------------------------------------------------------------------
+# 5. Timeout 与预算（Pilot；Formal timeout 由 Pilot 后冻结）
+# ---------------------------------------------------------------------------
+timeout:
+  per_instance_oracle_timeout_seconds: 28800.0
+  # R2：候选 {4,6}。N=4 实测 40s；N=6 seed 波动大（29min/95min/>120min），
+  # R2-b（用户 2026-08-10 指示）timeout 扩大至 28800s（8h）重跑 N=6/3403。
+  # R1 的 600s 仅适用于旧候选 {6,8,10,12}（已作废）。
+  timeout_semantics: "超时实例如实记录 TIMEOUT_UNCERTIFIED；不计 Exact 完成；不删除"
+
+pilot_budget:
+  matrix_total_instances: 12
+  execution_note: >
+    基于可计算性实测（N=4=40s；N=5>600s timeout；N=6 预计 1-2h；N=8+ 数天级），
+    正式 Pilot 按最小可信水平执行：N=6×1 seed（600s timeout）+ N=8×1 seed（600s timeout），
+    其余实例由确定性标度外推（F1/F5：N=8 不满足则 N=10/12 必不满足）。
+    完整 12 实例 Pilot 的预算（N=6×3 各 1-2h + N=8+ 数天）不可承受，如实记录。
+
+# ---------------------------------------------------------------------------
+# 6. Formal Scale Selection Rule（预冻结；§八 F1-F5）
+# ---------------------------------------------------------------------------
+formal_scale_selection_rule:
+  F1: "该 N 在所有纳入考虑的 Pilot regimes/seeds 上 Oracle 均返回 EXACT_OPTIMAL 或 CERTIFIED_NUMERICAL_EXACT；不得出现 TIMEOUT_UNCERTIFIED/NOT_EXACT/SOLVER_ERROR"
+  F2: "exactness certificate 全部通过"
+  F3: "单实例 Oracle runtime <= frozen per-instance Pilot acceptance budget"
+  F4: "整体预计 Formal 计算预算 <= frozen total compute budget"
+  F5: "该 N 与前一规模相比仍提供新的规模信息"
+  max_n_definition: "满足 F1-F5 的最大候选 N"
+  no_post_hoc_adjustment: "不得因 CARS gap 大/小调整 Formal 最大 N"
+
+formal_n_grid_freeze_rule:
+  prefer_complete_subset: "优先保留从最小规模到最大可计算规模的完整候选子集（{6,8,10,12}->{6,8,10}->{6,8}）"
+  single_n_guard: "若只剩单一 N 可运行，不得直接进入 Formal；FAIL_AND_REDESIGN 或提交 CR"
+
+# ---------------------------------------------------------------------------
+# 7. 禁止事项（本 Pilot）
+# ---------------------------------------------------------------------------
+forbidden:
+  - "访问 formal seeds（3501-3510）"
+  - "依据 CARS gap / ranking 选择 N"
+  - "删除/隐藏慢实例、失败实例、timeout"
+  - "为保留更大 N 换 seed"
+  - "修改 Oracle 语义 / Evaluator / CARS 参数 / 物理模型 / P0"
+  - "扩大 candidate grid"
+
+# ---------------------------------------------------------------------------
+# 8. 记录字段（§十 Pilot runtime 指标）
+# ---------------------------------------------------------------------------
+pilot_record_fields:
+  - n
+  - m
+  - regime
+  - seed
+  - total_discrete_states
+  - visited_states
+  - safely_pruned_states
+  - feasible_states
+  - infeasible_states
+  - exactness_mode
+  - oracle_status
+  - total_oracle_runtime_ms
+  - evaluator_runtime_ms
+  - evaluator_calls
+  - enumeration_runtime_ms   # Oracle 语义冻结：内部不分解计时 -> None（如实记录不可得）
+  - continuous_solver_runtime_ms  # 同上 -> None
+  - best_objective_tuple
+  - certificate_pass
+  - status               # COMPLETED / TIMEOUT / ERROR

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/common.schema.json",
+  "title": "CARS Active Schema - Common Definitions",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "共享数值域、枚举与 sentinel 定义。直接依据：Executable Theory Contract Part 1（实体/变量/类型/单位/数学域）、Part 8（数值边界、+inf 统一表示）、Part 3.2（失败原因分类）、Part 9.4（状态语义）。",
+  "$defs": {
+    "nonnegative_number": {
+      "type": "number",
+      "minimum": 0,
+      "x-unit": "see field",
+      "description": "非负实数（Contract Part 8.3 资源域/权重域通用下界）"
+    },
+    "positive_number": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "x-unit": "see field",
+      "description": "正实数（Assumption 1 域：c_i>0, f_i^loc>0, F_j>0）"
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "x-unit": "probability",
+      "description": "闭区间概率 [0,1]（Contract Part 8.3 概率域）"
+    },
+    "open_unit_interval": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1,
+      "x-unit": "probability",
+      "description": "开区间概率 (0,1)：R_i^min 合法输入域（III-B.1, Contract Part 8.3）"
+    },
+    "binary_int": {
+      "type": "integer",
+      "enum": [0, 1],
+      "x-unit": "binary",
+      "description": "二元指示量 {0,1}"
+    },
+    "positive_integer": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "x-unit": "count",
+      "description": "正整数"
+    },
+    "nonnegative_integer": {
+      "type": "integer",
+      "minimum": 0,
+      "x-unit": "count",
+      "description": "非负整数"
+    },
+    "unique_id": {
+      "type": "string",
+      "minLength": 1,
+      "x-unit": "id",
+      "description": "非空唯一标识（id 字段无物理单位）"
+    },
+    "sentinel_inf": {
+      "const": "inf",
+      "x-unit": "sentinel",
+      "description": "+inf 显式 sentinel（Contract Part 8.2：+inf 必须用显式 sentinel，不得用任意大有限数近似）"
+    },
+    "inf_or_nonnegative_number": {
+      "oneOf": [
+        { "type": "number", "minimum": 0 },
+        { "const": "inf" }
+      ],
+      "x-unit": "see field",
+      "description": "非负实数或 +inf sentinel（T_i^exe、T_i、ell^D、ell^R、ell^succ 统一表示，Contract Part 8.2）"
+    },
+    "method_status": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "TIMEOUT",
+        "METHOD_ERROR",
+        "NO_IMPROVEMENT",
+        "BUDGET_EXHAUSTED",
+        "INPUT_INVALID"
+      ],
+      "x-unit": "status",
+      "description": "模块/方法状态枚举。直接依据：Contract Part 9.4 状态语义表。完整错误代码枚举（编号、附加信息）留待 R2 Evaluator 契约。"
+    },
+    "failure_reason": {
+      "type": "string",
+      "enum": [
+        "STRUCT_INVALID",
+        "PATH_AMBIGUOUS",
+        "EXEC_INVALID",
+        "CAPACITY_INFEASIBLE",
+        "DEADLINE_VIOLATION",
+        "RELIABILITY_VIOLATION",
+        "SUCCESS"
+      ],
+      "x-unit": "status",
+      "description": "任务失败原因分类，与 Contract Part 3.2 六条件判定顺序一一对应。SUCCESS 表示 z_i=1。更细粒度错误代码枚举留待 R2 Evaluator 契约。"
+    }
+  }
+}

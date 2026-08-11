@@ -1,0 +1,24 @@
+# CITATION.cff.template
+#
+# OS1（2026-08-11）：仓库内无直接作者/DOI/期刊证据，OS0/OS1 不得伪造作者信息。
+# 请论文作者确认以下字段后，将本文件重命名为 CITATION.cff。
+#
+# 参考格式（CITATION.cff 1.2.0）：
+# cff-version: 1.2.0
+# message: "If you use this software, please cite it as below."
+# title: <软件/论文标题，由作者确认>
+# abstract: <可选>
+# authors:
+#   - family-names: <姓>
+#     given-names: <名>
+#     orcid: <可选>
+# date-released: 2026-08-11
+# version: 0.1.0
+# license: MIT
+# preferred-citation:
+#   type: article
+#   authors: <作者>
+#   title: <论文标题>
+#   journal: <期刊/会议>
+#   year: <年份>
+#   doi: <若已有 DOI；无 DOI 时省略>

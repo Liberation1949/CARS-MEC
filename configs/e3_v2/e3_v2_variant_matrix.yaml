@@ -1,0 +1,95 @@
+# E3-V2 变体矩阵（E3-0 冻结；AADA–RCLA 组件消融与机制验证）
+# 版本: E3_V2_VARIANT_MATRIX_V1
+# 日期: 2026-08-09
+# 依据: 用户 2026-08-09 设计；正文 VI-F.1（Lemma 2/3/4、Prop 3 + Cor 2、
+#       Lemma 5-6 + Theorem 1 + Corollary 1、§VI-E.1 复杂度）；正文 V-B.6
+#       （Phase-2 P0 字典序门控）；正文 V-C.3（RCLA active-set / 退化）。
+# 取代: 旧 E3（RUAD Q/Z + CALA + Repair 消融）不再适用（正文已落笔 AADA→RCLA）。
+
+variant_matrix_version: E3_V2_VARIANT_MATRIX_V1
+design: "E3: AADA–RCLA component ablation and mechanism verification"
+questions:
+  Q1: "AADA Phase-1 local-failure rescue 是否真正贡献 TSSR"
+  Q2: "Delta_phi_ij 的 allocation-awareness 是否有实际作用"
+  Q3: "Phase-2 utility gate 是否避免无收益卸载"
+  Q4: "RCLA reliability floor 相比普通 LA 到底改变了什么"
+
+# 7 个执行单元：5 个 AADA 变体（同 rcla allocation）+ 2 个 fixed-assignment 对照
+# （同一 X^(0)/A^(0)，只换 allocation）。全部共享同一 Scenario 实例/seed。
+variants:
+  full_cars:
+    aada_variant: full
+    allocation_mode: rcla
+    answers: [Q1, Q2, Q3, Q4]
+    role: reference
+    note: 完整 AADA（Phase-1 rescue + Phase-2 P0 字典序门控）+ RCLA
+  w_no_rescue:
+    aada_variant: no_rescue
+    allocation_mode: rcla
+    answers: [Q1]
+    role: ablation
+    note: 关闭 Phase-1；本地失败任务不救援（保持 LOCAL/UNSERVED，Evaluator 诚实判定）
+  w_rescue_only:
+    aada_variant: rescue_only
+    allocation_mode: rcla
+    answers: [Q1, Q3]
+    role: ablation
+    note: 保留 Phase-1，关闭 Phase-2；本地成功任务全部保持 LOCAL
+  w_no_alloc_aware:
+    aada_variant: no_alloc_aware
+    allocation_mode: rcla
+    answers: [Q2]
+    role: ablation
+    note: 保留两阶段，去掉 Delta_phi_ij；Phase-1 用 (ell_R_ij/F_j, j) 选服务器；
+          Phase-2 并列时不再比较 Delta_phi（直接 server_id）
+  w_no_utility_gate:
+    aada_variant: no_utility_gate
+    allocation_mode: rcla
+    answers: [Q3]
+    role: ablation
+    note: Phase-2 去掉"可靠性持平时需 Delta_U_sys>eps"的 U 严格改善要求
+          （保留 Delta_Rbar_eff > -eps 门槛；持平时按较小 Delta_phi 选服务器）
+  fixed_a_rcla:
+    aada_variant: full
+    allocation_mode: rcla
+    answers: [Q4]
+    role: fixed_assignment
+    note: 冻结 X^(0)/A^(0) hash；与 fixed_a_la 共享同一 X/A；RCLA allocation
+  fixed_a_la:
+    aada_variant: full
+    allocation_mode: ordinary_la
+    answers: [Q4]
+    role: fixed_assignment
+    note: 冻结 X^(0)/A^(0) hash；同一 X/A 只把 RCLA 换成普通 LA（Theorem 3/Eq.25）
+
+# fixed-assignment 对照协议（RCLA 的干净因果证据；不得端到端 w/o RCLA）
+fixed_assignment_protocol:
+  steps:
+    - run_full_aada_once_to_get_X0_A0
+    - freeze_and_hash_X0_A0
+    - run_on_same_X0_A0_with_rcla
+    - run_on_same_X0_A0_with_ordinary_la
+  invariant: "X/A hash 完全一致；禁止因 allocation 方法不同重新运行 AADA"
+  rationale: >
+    直接端到端去掉 RCLA 会使 AADA Phase-2 的 tentative RCLA 也消失、指派随之改变，
+    无法区分差异来自 assignment 还是 allocation；因此必须冻结 (X^(0),A^(0)) 后
+    分别跑 RCLA 与 ordinary LA。
+
+# Admission Constraint：不消融，只验证（正确性不变量，非性能增强模块）
+admission_constraint: "NOT_ABLATED"
+admission_verification:
+  - max_j G_j/F_j
+  - N_ALLOCATION_INFEASIBLE
+expected_correctness: "N_ALLOCATION_INFEASIBLE = 0"
+note: >
+  G_j + ell_R_ij <= F_j + eps 是保证 RCLA floor 可行的正确性不变量（正文 V-B.5/
+  Lemma 3）。E3 做 capacity stress 并验证全程无 ALLOCATION_INFEASIBLE；若实际
+  非 0，属实现或理论合同问题，不是"消融效果不好"。
+
+# 明确禁止（旧消融框架全部废除）
+forbidden:
+  - ruad_q_z_ablation        # tier-only / Q-only / Z-only / Full RUAD
+  - cala_kappa_ablation      # CALA kappa_R / kappa_D 消融
+  - repair_blr_ablation      # Repair / BLR 消融（Repair 已删除）
+  - gamma
+  - kappa_R_as_aada_target   # kappa_R 不作为 AADA 选择目标

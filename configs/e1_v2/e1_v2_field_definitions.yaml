@@ -1,0 +1,84 @@
+# E1-V2 正式字段定义
+# 版本: E1_V2_FIELD_DEFINITIONS_V1
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1 + E1 Freeze/Pilot
+# 说明: E1 全部正式指标的机器可读口径定义。指标由统一 External Evaluator
+#       计算（Runner 唯一调用者；Schema V4 evaluator_io）。
+# 依据: 正文 IV-C（TSSR/Rbar_eff/Ubar_eff/V_R）、III-E.4（V_R）、
+#       Contract V4 §3（评价语义）、Schema V4（evaluator_io/method_result）。
+
+field_definitions:
+
+  TSSR:
+    full_name: "Task Success Service Ratio"
+    definition: "TSSR(Pi) = (1/N) * sum_i z_i(Pi)；z_i = I[R_i >= R_i^min]（正文 IV-C.3；无 deadline 模型成功只查可靠性）"
+    unit: "ratio in [0,1]"
+    evaluator_field: "evaluator_output.system_metrics.tssr"
+    role: primary
+
+  Rbar_eff:
+    full_name: "Mean Effective Reliability"
+    definition: "Rbar_eff = mean_i of effective reliability（正文 IV-C.4；含本地/边缘执行可靠性）"
+    unit: "probability in [0,1]"
+    evaluator_field: "evaluator_output.system_metrics.mean_effective_reliability"
+    role: secondary
+
+  Ubar_eff:
+    full_name: "Mean Effective Utility"
+    definition: "Ubar_eff = mean_i of effective utility；U_i = alpha_i*(T_loc-T_i)/T_loc + beta_i*(E_loc-E_i)/E_loc（正文 IV-C.5）"
+    unit: "dimensionless"
+    evaluator_field: "evaluator_output.system_metrics.mean_effective_utility"
+    role: secondary
+
+  V_R:
+    full_name: "Reliability Violation Rate"
+    definition: "V_R = |{i : R_i < R_i^min, e_i=1}| / N（正文 III-E.4；只统计结构与容量可评价任务；无 deadline 模型无 V_D 族）"
+    unit: "ratio in [0,1]"
+    evaluator_field: "evaluator_output.system_metrics.reliability_only_rate"
+    role: diagnostic
+
+  total_wall_time_ms:
+    full_name: "End-to-End Online Runtime"
+    definition: "R5 统一 Runner 字段 total_wall_time_ms（state_construction + method + evaluation；端到端）"
+    unit: "ms"
+    record_field: "runner_record.total_wall_time_ms"
+    role: efficiency
+    note: "E1 只报告端到端 runtime；模块级 runtime 拆解属 E3（AADA/RCLA/Repair decomposition 已由 E3-V2 完成）"
+
+  completion:
+    full_name: "Completion"
+    definition: "SUCCESS / BUDGET_EXHAUSTED / NO_IMPROVEMENT = 完成（有 Evaluator 输出）；TIMEOUT / METHOD_ERROR = 未完成"
+    record_field: "runner_record.method_status"
+    role: robustness
+
+  timeout_count:
+    full_name: "Timeout Count"
+    definition: "method_status == TIMEOUT 的次数（shared timeout=30s；不删除、不重跑）"
+    record_field: "runner_record.method_status"
+    role: robustness
+
+  method_error_count:
+    full_name: "Method Error Count"
+    definition: "method_status == METHOD_ERROR 的次数（异常不静默替代）"
+    record_field: "runner_record.method_status"
+    role: robustness
+
+  paired_delta:
+    full_name: "Paired Delta vs CARS"
+    definition: "Delta_X_s = X_CARS,s - X_baseline,s（同 seed 同 N 配对；X in {TSSR, Rbar_eff, Ubar_eff}）"
+    role: statistics
+    statistics: "mean ± std + 95% bootstrap CI（10000 resamples，rng 20260809）"
+
+forbidden_legacy_fields:
+  - V_D
+  - V_D_only
+  - V_D_and_R
+  - deadline_violation_rate
+  - deadline_only_rate
+  - joint_violation_rate
+  - lambda_eff
+  - ruad_gamma
+  - kappa_R
+  - kappa_D
+  - cala_weights
+  - repair_budget

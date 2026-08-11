@@ -1,0 +1,243 @@
+# E1-V2-0 环境校准协议（Environment Calibration and Freeze）
+# 版本: E1_V2_0_CALIBRATION_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E1-V2-0（用户 2026-08-09 授权；结果中立的 algorithm-neutral 环境校准）
+# 状态: 校准协议冻结（coarse -> Layer B sanity -> confirmatory -> 冻结一个环境）
+# 依据: 用户 2026-08-09 E1-V2-0 提示词；正文 III_VI.md（CARS=AADA→RCLA、
+#       无 deadline、固定名义故障率）；Contract V4；Schema V4；
+#       E1-V2 协议（configs/e1_v2/e1_v2_protocol.yaml）。
+
+protocol_id: e1_v2_0_calibration_protocol_v1
+phase: "E1-V2-0: Environment Calibration and Freeze"
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+
+# ---------------------------------------------------------------------------
+# 0. 阶段身份
+# ---------------------------------------------------------------------------
+unique_goal: >
+  在最新版 AADA→RCLA CARS、无 deadline、固定名义故障率的正文语义下，重新校准并
+  冻结一个适用于 E1"任务规模增长下性能与可扩展性"实验的 algorithm-neutral 工作
+  环境，使正式 N-sweep 覆盖轻载、过渡、高压和近饱和区，同时保持充分的方法可辨识度。
+not_performance_experiment: true    # 本阶段不产生论文性能 Claim
+max_rounds: 1                        # 只有实际 P0/P1 才允许第二轮
+
+forbidden:
+  - "不运行 formal-test"
+  - "不使用 formal seeds（1101-1110）"
+  - "不修改算法使其适配环境"
+  - "不修改 Evaluator"
+  - "不调优 CARS 或 Baseline"
+  - "不依据 CARS 是否第一选择环境"
+  - "不修改 III-VI 正文 / references / data"
+  - "不修改 Baseline 核心"
+  - "不进入 E1-V2-1 Formal"
+  - "不重开已关闭的 E0/E3"
+  - "不扫描 lambda_j 制造 CARS 优势"
+
+# ---------------------------------------------------------------------------
+# 1. Source of Truth（权威顺序）
+# ---------------------------------------------------------------------------
+source_of_truth:
+  - experiment_docs/III_VI.md
+  - src/cars/methods/cars_redesign/（AADA→RCLA 候选/正式实现）
+  - 公共 Simulator / Evaluator
+  - Baseline frozen implementations/configs
+  - E0-V2 / E3-V2 已完成环境与诊断结果
+  - 历史 E1_ENVIRONMENT_V1（仅作 calibration candidate，非必须继承）
+  - 历史 E1 正式结果只作问题诊断，不得用于选择"CARS 更容易获胜"的环境
+
+must_confirm_semantics:
+  - "CARS = AADA → RCLA；无 Repair"
+  - "无 deadline；任务成功只依据可靠性服务语义"
+  - "服务器名义故障率 lambda_j 固定；负载不直接改变 lambda_j"
+  - "负载通过有限容量竞争影响 f_ij、执行时间与任务可靠性"
+  - "E1 为 snapshot-based workload scalability experiment（唯一自变量 N）"
+stop_the_line:
+  - "正文/候选实现/公共 Evaluator 存在实质语义冲突 -> MANUSCRIPT_HARD_CONFLICT 或 P1"
+
+# ---------------------------------------------------------------------------
+# 2. E1 正式实验问题
+# ---------------------------------------------------------------------------
+e1_formal_question: >
+  当同时竞争有限边缘计算资源的任务数量持续增加时，CARS 与 Baselines 的任务成功
+  服务率、有效可靠性、有效效用及在线运行时间如何变化？
+design_invariant: "固定环境 + N↑ => 资源竞争逐渐增强（唯一变量 N + seed）"
+
+# ---------------------------------------------------------------------------
+# 3. 环境校准白名单
+# ---------------------------------------------------------------------------
+fixed_params:
+  M: 8
+  topology: "fully connected"
+  task_cpu_bands: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  f_loc_distribution: [[800, 0.5], [1200, 0.5]]
+  R_min_distribution: "U[0.85, 0.95]"
+  lambda_j: "U[0.001, 0.003]（固定名义故障率；禁止扫描）"
+  lambda_loc: 0.002
+  wireless_link_model: "当前公共模型（shannon/传输可靠性）"
+  deadline: "none（deadline_seconds 占位，逻辑不使用）"
+  timeout: 30.0
+  system_params: "Schema V4（rcla_solver + numeric_epsilon）"
+
+allowed_degrees_of_freedom:
+  s_F:
+    name: "总计算容量缩放"
+    values: [0.80, 1.00, 1.20]
+    applies_to: "仅服务器容量 F_j = 10000*(1+0.3*(j mod 3))*s_F；唯一允许改变的 capacity quantity"
+  fragility_profile:
+    name: "任务脆弱性强度"
+    profiles:
+      V-MILD: {nu: [0, 6, 12], prob: [0.4, 0.3, 0.3]}
+      V-MEDIUM: {nu: [0, 8, 16], prob: [0.4, 0.3, 0.3]}
+      V-HIGH: {nu: [0, 10, 20], prob: [0.4, 0.3, 0.3]}
+candidate_environments: "3 x 3 = 9 个候选（禁止第四个维度；若某 profile 数学非法则删除并说明依据）"
+
+# ---------------------------------------------------------------------------
+# 4. 诊断两层证据（环境选择先于算法排名）
+# ---------------------------------------------------------------------------
+layer_A_primary: "方法无关环境诊断（决策前指标；优先复用 DerivedState 既有定义）"
+layer_A_metrics:
+  - local_feasible_ratio        # b_loc==1 比例
+  - edge_feasible_ratio         # e_rec==1 边比例
+  - reliability_floor_distribution   # ell_R 分布（positive ratio/min/median/max）
+  - aggregate_min_floor_demand  # sum_i min_j ell_R_ij（至少一个 e_rec 边的任务）
+  - total_capacity              # sum_j F_j
+  - demand_capacity_ratio       # aggregate_min_floor_demand / total_capacity
+  - per_server_lower_bound_pressure   # 每服务器潜在 floor 压力（sum_i ell_R_ij over e_rec / F_j）
+  - pressure_dispersion         # per-server pressure 的 std
+  - predecision_infeasible_ratio      # len(predecision_infeasible)/N
+  - calibration_only: true      # CALIBRATION_ONLY_DIAGNOSTIC；不进 Evaluator 正式指标
+
+layer_B_secondary: "算法 sanity check（仅在 Layer A 筛出候选上运行）"
+layer_B_methods: [cars, bpso_rata_la, nfa_adapted, reliability_only]
+layer_B_purpose:
+  - "是否所有方法全部 ceiling"
+  - "是否所有方法全部 collapse/floor"
+  - "是否具有方法辨识度"
+  - "timeout 是否失控"
+layer_B_forbidden_rules:
+  - "CARS 第一 -> 环境好"
+  - "NFA 第一 -> 换环境"
+  - "CARS 优势最大 -> 环境最好"
+
+# ---------------------------------------------------------------------------
+# 5. Coarse Calibration
+# ---------------------------------------------------------------------------
+calibration_seeds: [701, 702, 703]      # 不得使用未来 formal seeds
+coarse_anchors: [20, 110, 200]
+coarse_flow: "9 env x 3 N anchors x 3 seeds 先跑 Layer A 诊断 -> 筛出最多 3 候选 -> 仅对 ≤3 环境跑 4 方法 Layer B sanity"
+
+# ---------------------------------------------------------------------------
+# 6. 候选环境接受标准（algorithm-neutral）
+# ---------------------------------------------------------------------------
+acceptance_criteria:
+  AC-E1-ENV-1: "存在轻载区：LOW 端系统非结构性不可行；大多数任务至少存在合法执行路径；不允许所有合理方法从起点即明显失效"
+  AC-E1-ENV-2: "存在过渡区：N 增时 capacity pressure 明显增加、reliability floor/capacity competition 激活增加、至少两种方法出现可测量性能下降；不能所有方法始终 TSSR≈1"
+  AC-E1-ENV-3: "存在高压但仍可服务区：高 N 时明显共享容量竞争；方法间有可辨识度；不能所有方法大面积接近 TSSR=0"
+  AC-E1-ENV-4: "不完全不可服务：正式 E1 主区间不能进入 all-method structural failure；near-saturation 最多允许作为最后一个压力点"
+  AC-E1-ENV-5: "选择理由与 CARS 排名无关：报告必须证明 selected environment was chosen by workload coverage and identifiability, not by CARS superiority"
+tie_break_deterministic:
+  - "四压力区覆盖更完整"
+  - "方法无关压力梯度更平滑"
+  - "ceiling/floor saturation 更少"
+  - "更接近已有 E0/E3 公共环境尺度"
+  - "参数改动更少"
+  - "绝对禁止以 CARS TSSR 更高作为 tie-break"
+
+# ---------------------------------------------------------------------------
+# 7. Confirmatory Calibration
+# ---------------------------------------------------------------------------
+confirm_seeds: [704, 705, 706, 707, 708]
+confirm_n_grid: [20, 50, 80, 110, 140, 170, 200]
+confirm_flow: "对最终候选最多 2 个环境运行 confirm seeds x 完整 N-grid（Layer A + Layer B sanity）；最终只冻结一个环境"
+nested_workload_requirement: "每个 seed 一次生成 N=200 最大实例；较小 N 为同一实例前 N 个任务；server set 完全相同；task prefix 字节级/字段级一致；除 N 外环境参数不得变化"
+
+# ---------------------------------------------------------------------------
+# 8. 冻结 E1 workload grid
+# ---------------------------------------------------------------------------
+formal_grid_priority: [20, 50, 80, 110, 140, 170, 200]
+zone_partition_basis:
+  - "决策前压力"
+  - "aggregate floor demand"
+  - "capacity utilization proxy"
+  - "所有方法整体响应"
+  - "禁止依据 CARS 优势出现的 N 划区"
+zones: [LOW, TRANSITION, HIGH, NEAR_SATURATION]
+mechanical_grid_adjustment:
+  A: "N=200 已大面积不可服务 -> 删除 200，最高点收缩到 170"
+  B: "N=200 仍全部接近 ceiling -> 追加 230 做 calibration；若 230 提供 near-saturation 则正式最高点可设 230"
+  forbidden: "不得因为某个 Baseline 赢而移动 N-grid"
+
+# ---------------------------------------------------------------------------
+# 9. 必须生成的文件
+# ---------------------------------------------------------------------------
+mandatory_outputs:
+  - configs/e1_v2/e1_v2_environment_calibration_protocol.yaml   # 本文件
+  - configs/e1_v2/e1_v2_environment_selected.yaml
+  - scripts/experiments/e1_v2/build_e1_v2_environment.py
+  - scripts/experiments/e1_v2/run_e1_v2_0_calibration.py
+  - scripts/experiments/e1_v2/aggregate_e1_v2_0_calibration.py
+  - results/e1_v2/e1_v2_0_calibration/calibration_raw.jsonl
+  - results/e1_v2/e1_v2_0_calibration/environment_diagnostics.json
+  - results/e1_v2/e1_v2_0_calibration/environment_comparison.csv
+  - results/e1_v2/e1_v2_0_calibration/selected_environment.json
+  - results/e1_v2/e1_v2_0_calibration/integrity.json
+  - tests/e1_v2/test_e1_v2_environment_calibration.py
+  - reports/experiments/E1-V2-0_environment_calibration.md   # 唯一正式报告
+  - "禁止生成正式 E1 图表和论文正文"
+
+# ---------------------------------------------------------------------------
+# 10. 冻结测试（15 项）
+# ---------------------------------------------------------------------------
+frozen_tests:
+  1: "same seed + same N -> scenario identical"
+  2: "nested workload prefix"
+  3: "same seed 下服务器集合不随 N 变化"
+  4: "N 是正式阶段唯一变化的 workload 变量"
+  5: "lambda_j 不随 workload 改变"
+  6: "deadline 字段不进入成功判据"
+  7: "candidate environments 参数严格在 whitelist 内"
+  8: "formal seeds 从未访问"
+  9: "CARS/Baseline 使用同一 canonical scenario"
+  10: "同一 Evaluator"
+  11: "同一 timeout"
+  12: "selected environment 与 CARS rank 无关"
+  13: "selected yaml 可重新生成同一场景"
+  14: "no algorithm/config tuning"
+  15: "no protected manuscript modification"
+also_run: [pytest tests/e1_v2/, full pytest, Schema validation, py_compile]
+
+# ---------------------------------------------------------------------------
+# 11. 人工微型案例
+# ---------------------------------------------------------------------------
+manual_case:
+  N: 4
+  M: 2
+  checks:
+    - "总容量增加时压力不得反向升高"
+    - "新增任务时 aggregate demand 不得下降"
+    - "lambda_j 保持不变"
+    - "reliability floor 计算与正文一致"
+    - "nested workload N=3 必须严格为 N=4 的前三任务"
+    - "environment scaling 只能改变允许的 capacity quantity"
+
+# ---------------------------------------------------------------------------
+# 12-16. Review / P0-P1 / Closure / Post-state / Return（见报告）
+# ---------------------------------------------------------------------------
+closure_gate:
+  - "1 个 E1 环境冻结"
+  - "完整 N-grid 冻结"
+  - "LOW/TRANSITION/HIGH 至少三档可辨识"
+  - "nested workload 通过"
+  - "formal seeds 未访问"
+  - "算法/参数零调优"
+  - "统一 Evaluator/timeout"
+  - "所有 calibration attempts 完整保存"
+  - "冻结测试通过"
+  - "P0=0"
+  - "P1=0"
+closure_status: ["PASS", "PASS_WITH_WARNINGS", "FAIL_AND_REDESIGN"]
+return_flags:
+  - "READY_FOR_E1_V2_1_FORMAL = YES/NO"
+  - "AUTHORIZED_TO_START_E1_V2_1_FORMAL = NO"

@@ -1,0 +1,319 @@
+# E4-V2 Trace 字段映射合同（Trace Field Mapping）
+# 版本: E4_V2_TRACE_FIELD_MAPPING_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-0（Trace 输入兼容性确认与实验协议冻结）
+# 状态: FROZEN（只读映射合同；不执行、不重处理）
+# 说明: 逐字段分类 Trace 字段 -> E4 Scenario 输入的语义映射。分类枚举：
+#       TRACE_OBSERVED（真实观测字段） / TRACE_DERIVED（既有冻结预处理派生字段） /
+#       SYNTHETIC_FIXED（实验系统冻结参数） / PROJECT_MODEL_DERIVED（当前模型派生量） /
+#       UNUSED（本 E4 不读取）。
+#       semantic_status 仅允许：CONFIRMED / WORKING_ASSUMPTION / UNUSED。
+#       不得凭想象补字段；无直接依据的指标（如 burstiness）登记 NOT_AVAILABLE。
+# 直接依据: 用户 E4-V2-0 指示；Contract V4（Scenario S_t = {Gamma_t, D_t, M_t, B_t, R_t^req}）；
+#       Schema V4（core_entities）；E1-V2/E2-V2 冻结环境语义；Trace 只读审计。
+
+mapping_version: E4_V2_TRACE_FIELD_MAPPING_V1
+date: 2026-08-09
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+schema_version: CARS_ACTIVE_SCHEMA_V4
+
+# ===========================================================================
+# 1. Trace 字段 -> E4 Scenario 输入（逐字段）
+# ===========================================================================
+trace_fields:
+
+  - source_field: timestamp
+    source_unit: ISO-8601 datetime
+    target_object: Scenario（E4 window 载体）
+    target_field: state_timepoint / window_id 派生
+    target_unit: T0 / 枚举
+    mapping_rule: >
+      时间顺序决定 window 划分与 window_id；每个 E4 窗口 = 一个连续 trace slot 段；
+      场景 T0 状态从该窗口的 trace 输入构造。禁止跨窗口使用未来信息。
+    evidence: 三数据集时间顺序验证通过（azure 2019-01-01..01-14；nep 2020-06-01..06-30；
+      shanghai 2014-05-31..11-30）；slot_id 时间唯一。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: slot_id
+    source_unit: enum
+    target_object: Scenario（window_id / trace_window_id 诊断量）
+    target_field: trace_window_id
+    target_unit: enum
+    mapping_rule: slot_id 作为 E4 窗口/槽的唯一标识与可追溯索引（原始溯源）。
+    evidence: 三数据集 slot_id 唯一且时间有序；split manifest 已列出。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: workload_intensity
+    source_unit: "raw（azure=调用数/槽；shanghai=用户数/槽；nep 无）；splits 内=[0,1] 归一化"
+    target_object: Scenario（负载强度驱动量 workload_intensity_t）
+    target_field: workload_intensity（E4 诊断量）
+    target_unit: "splits 内 dimensionless [0,1]；raw 为原生单位"
+    mapping_rule: >
+      splits/*.jsonl 中的 workload_intensity = clip((x-P5)/(P95-P5),0,1)（既有冻结归一化，
+      P5/P95 仅来自 calibration）作为 E4 窗口负载强度驱动量：驱动窗口内任务规模 N_t 或
+      压力缩放（具体数值桥接规则在 Pilot 协议冻结，本阶段不执行）。
+    evidence: 归一化一致性验证 0 不一致（抽样 2000 条 calibration）；azure raw=request_count、
+      shanghai raw=user_count 为真实观测；nep workload_intensity 全 0 = NOT_AVAILABLE。
+    evidence_strength: HIGH（归一化既有性）；映射桥接规则为设计假设
+    semantic_status: WORKING_ASSUMPTION
+    classification: TRACE_DERIVED
+
+  - source_field: request_count
+    source_unit: 请求数/槽
+    target_object: Scenario（负载证据量）
+    target_field: request_count（E4 诊断量）
+    target_unit: 请求数/槽
+    mapping_rule: azure/shanghai 作为 workload_intensity 的原始来源证据与交叉校验；
+      nep 全 0 = NOT_AVAILABLE，不使用。
+    evidence: azure workload_intensity==request_count；shanghai request_count 独立于 user_count。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: user_count
+    source_unit: 用户数/槽
+    target_object: Scenario（负载证据量）
+    target_field: user_count（E4 诊断量）
+    target_unit: 用户数/槽
+    mapping_rule: shanghai 作为 workload_intensity 原始来源（user_count==workload_intensity）；
+      azure/nep 全 0 = NOT_AVAILABLE，不使用。
+    evidence: shanghai workload_intensity==user_count（P5=428/P95=1287 与 user_count 一致）。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: cpu_pressure
+    source_unit: ratio_0_1（NEP 标注；异常值 max=11.29 保留为原始异常）
+    target_object: Server（可用容量压力驱动量，NEP 数据集）
+    target_field: capacity_cycles_per_sec（F_j）的 trace 侧缩放因子（仅 NEP）
+    target_unit: dimensionless 乘子
+    mapping_rule: >
+      NEP：cpu_pressure 作为服务器可用容量压力驱动（容量侧压力，类似 E2 的 F_j 异构；
+      只影响可用容量，绝不改写固定名义故障率 λ_j）。azure/shanghai 该字段全 null，
+      不使用（登记 NOT_AVAILABLE）。具体数值桥接规则在 Pilot 协议冻结。
+    evidence: NEP cpu_pressure 非空且为真实观测（136 sites，ratio_0_1）；
+      azure/shanghai 全 null。
+    evidence_strength: MEDIUM（字段真实性 HIGH；容量桥接规则为设计假设）
+    semantic_status: WORKING_ASSUMPTION
+    classification: TRACE_OBSERVED
+
+  - source_field: region_id
+    source_unit: enum
+    target_object: Scenario（空间标识诊断量）
+    target_field: trace_region_id（E4 诊断量）
+    target_unit: enum
+    mapping_rule: NEP/shanghai 作为空间来源标识与 E4 诊断（spatial/temporal coverage 描述）；
+      不改变任何模型公式。azure 全 null = NOT_AVAILABLE。
+    evidence: NEP region_id 非空；shanghai region_id 非空（经纬度小区，null 10.3%）；azure null。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: hotspot_distribution
+    source_unit: JSON dict（区域->占比）
+    target_object: Scenario（空间集中度诊断量，NEP）
+    target_field: trace_hotspot（E4 诊断量）
+    target_unit: dimensionless 分布
+    mapping_rule: 仅 NEP 作为空间集中度/热点描述诊断（temporal variation 语境）；
+      不进入任何模型公式。azure/shanghai 全 null = NOT_AVAILABLE。
+    evidence: NEP hotspot_distribution 非空；azure/shanghai null。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: burst_score
+    source_unit: dimensionless
+    target_object: null（不进入任何 E4 Scenario 字段）
+    target_field: null
+    target_unit: null
+    mapping_rule: >
+      三数据集恒为 0.0（占位字段，无真实 burstiness 证据）。按用户规则
+      "burstiness 无直接依据不得编造"，E4 的 burstiness 指标登记 NOT_AVAILABLE。
+    evidence: azure 4032/4032、nep 7663/7663、shanghai 4387/4387 全部为 0.0。
+    evidence_strength: HIGH（字段内容判定）
+    semantic_status: UNUSED
+    classification: UNUSED
+
+  - source_field: memory_pressure
+    source_unit: 未知
+    target_object: null
+    target_field: null
+    target_unit: null
+    mapping_rule: 三数据集全部 null，E4 不使用（NOT_AVAILABLE）。
+    evidence: azure 4032/4032、nep 7663/7663、shanghai 4387/4387 全 null。
+    evidence_strength: HIGH
+    semantic_status: UNUSED
+    classification: UNUSED
+
+  - source_field: bandwidth_state
+    source_unit: 未知
+    target_object: null
+    target_field: null
+    target_unit: null
+    mapping_rule: 三数据集全部 null，E4 不使用（NOT_AVAILABLE）。
+    evidence: 全 null。
+    evidence_strength: HIGH
+    semantic_status: UNUSED
+    classification: UNUSED
+
+  - source_field: rtt_state
+    source_unit: 未知
+    target_object: null
+    target_field: null
+    target_unit: null
+    mapping_rule: 三数据集全部 null，E4 不使用（NOT_AVAILABLE）。
+    evidence: 全 null。
+    evidence_strength: HIGH
+    semantic_status: UNUSED
+    classification: UNUSED
+
+  - source_field: missing_field_flags
+    source_unit: JSON 数组
+    target_object: null（完整性审计量）
+    target_field: null
+    target_unit: null
+    mapping_rule: 三数据集全部 "[]"（无记录级缺失标记）；E4 仅作完整性审计引用。
+    evidence: 全 "[]"。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: raw_source_hash
+    source_unit: 16-hex
+    target_object: null（溯源审计量）
+    target_field: null
+    target_unit: null
+    mapping_rule: 每条记录的原始来源 hash，E4 仅作可追溯性引用（不进入模型）。
+    evidence: 每记录存在。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+  - source_field: dataset_id / trace_segment_id
+    source_unit: enum
+    target_object: Scenario（数据集标识）
+    target_field: scenario_id 前缀（E4 诊断）
+    target_unit: enum
+    mapping_rule: 标识 E4 场景来源数据集/分段；保证跨数据集可追溯。
+    evidence: 字段存在且唯一。
+    evidence_strength: HIGH
+    semantic_status: CONFIRMED
+    classification: TRACE_OBSERVED
+
+# ===========================================================================
+# 2. 合成/固定字段 -> E4 Scenario 输入（SYNTHETIC_FIXED）
+#    这些字段全部来自当前冻结实验环境语义（与 E1-V2/E2-V2 一致），不由 Trace 提供。
+# ===========================================================================
+synthetic_fixed_fields:
+
+  - target_object: Server
+    target_field: capacity_cycles_per_sec（名义 F_j）
+    target_unit: cycles/s
+    source: 冻结环境（E1-V2 sf1_vMEDIUM / E2-V2 公共尺度；server_base_capacity + 容量规则）
+    mapping_rule: 名义容量从冻结环境生成（每窗口/每 seed 确定性）；Trace 仅可作可用容量侧
+      压力缩放（NEP cpu_pressure，见上），不改变名义值。
+    semantic_status: CONFIRMED（参数来源）
+    classification: SYNTHETIC_FIXED
+
+  - target_object: Server
+    target_field: nominal_failure_rate（λ_j）
+    target_unit: dimensionless
+    source: 冻结环境（U[0.001,0.003] 固定名义故障率）
+    mapping_rule: 固定名义 λ_j；Trace 不得改写（负载不改变 λ_j；禁止恢复 lambda_eff）。
+    semantic_status: CONFIRMED
+    classification: SYNTHETIC_FIXED
+
+  - target_object: Device
+    target_field: local_cpu_rate / local_failure_rate / switch_capacitance / tx_power_watts
+    target_unit: cycles/s / dimensionless / dimensionless / W
+    source: 冻结环境（device_tiers f_loc∈{800,1200}；local_lambda 0.002 等）
+    mapping_rule: 确定性生成，与 E1-V2/E2-V2 一致；Trace 不提供。
+    semantic_status: CONFIRMED
+    classification: SYNTHETIC_FIXED
+
+  - target_object: WirelessLink
+    target_field: bandwidth_hz / channel_gain / noise_power / error_probability
+    target_unit: Hz / gain / noise power / probability
+    source: 冻结链路模型（全连接拓扑；固定链路参数域）
+    mapping_rule: 确定性生成；Trace 不提供（bandwidth_state/rtt_state 数据中无有效值）。
+    semantic_status: CONFIRMED
+    classification: SYNTHETIC_FIXED
+
+  - target_object: Task
+    target_field: cpu_cycles / data_bits / fragility / delay_weight / energy_weight / min_reliability
+    target_unit: cycles / bits / dimensionless / dimensionless / dimensionless / (0,1)
+    source: 冻结环境（compute_tiers c_i∈{2000,5000,12000}；fragility ν∈{0,8,16}；α/β 三带；
+      R_min U[0.85,0.95]）
+    mapping_rule: 每窗口按冻结分布确定性生成 N_t 个任务；Trace 驱动 N_t 或压力缩放，
+      任务内部参数分布不变（无"更适合 CARS"的 Trace 派生版本）。
+    semantic_status: CONFIRMED（参数来源）
+    classification: SYNTHETIC_FIXED
+
+  - target_object: Scenario
+    target_field: M / topology / system_params
+    target_unit: 8 / fully connected / Schema V4
+    source: 冻结环境（M=8，全连接；rcla_solver + numeric_epsilon）
+    mapping_rule: 与 E1/E2 公共尺度一致；Trace 不提供。
+    semantic_status: CONFIRMED
+    classification: SYNTHETIC_FIXED
+
+# ===========================================================================
+# 3. 当前模型派生字段（PROJECT_MODEL_DERIVED）
+# ===========================================================================
+model_derived_fields:
+
+  - target_object: Task
+    target_field: deadline_seconds
+    target_unit: s
+    source: 当前模型占位（无 deadline 模型；Schema V4 保留字段）
+    mapping_rule: 固定占位值 1000.0（与 E1/E2 正式场景一致）；当前模型/Evaluator 不读取；
+      禁止恢复 deadline 语义。
+    semantic_status: CONFIRMED（占位语义）
+    classification: PROJECT_MODEL_DERIVED
+
+  - target_object: DerivedState / Evaluator 输出
+    target_field: ell_R / ell_succ / TSSR / Rbar_eff / Ubar_eff / V_R / LI_dem / edge-feasible /
+      local-feasible / per-server pressure / max pressure / scenario status
+    target_unit: 按 Schema V4 / 统一 Evaluator
+    source: 当前公共底座（R2 物理模型 + 统一 Evaluator）确定性计算
+    mapping_rule: 全部由当前模型/Evaluator 计算，Trace 不提供原始值；E4 只读评估输出。
+    semantic_status: CONFIRMED
+    classification: PROJECT_MODEL_DERIVED
+
+# ===========================================================================
+# 4. E4 指标/诊断量 -> 来源分类（E4 指标冻结，见 e4_v2_protocol.yaml）
+# ===========================================================================
+e4_metric_sources:
+  TSSR: PROJECT_MODEL_DERIVED（统一 Evaluator）
+  Rbar_eff: PROJECT_MODEL_DERIVED（统一 Evaluator）
+  Ubar_eff: PROJECT_MODEL_DERIVED（统一 Evaluator）
+  V_R: PROJECT_MODEL_DERIVED（统一 Evaluator 诊断）
+  method_runtime_ms: PROJECT_MODEL_DERIVED（Runner 统一计时语义）
+  trace_window_id: TRACE_OBSERVED（slot_id/timestamp）
+  workload_size_N: WORKING_ASSUMPTION（由 workload_intensity 桥接；正式规则在 Pilot 冻结）
+  workload_intensity: TRACE_DERIVED（既有归一化；raw 为 TRACE_OBSERVED）
+  workload_burstiness: NOT_AVAILABLE（burst_score 全 0 占位，不得编造）
+  workload_temporal_variation: TRACE_OBSERVED（时间序列直接支持；raw 分布非退化）
+  edge_feasible_ratio: PROJECT_MODEL_DERIVED
+  local_feasible_ratio: PROJECT_MODEL_DERIVED
+  aggregate_reliability_floor_demand: PROJECT_MODEL_DERIVED
+  total_capacity: SYNTHETIC_FIXED（名义）+ TRACE_OBSERVED（NEP 可用容量缩放）
+  per_server_pressure / max_pressure: PROJECT_MODEL_DERIVED
+  LI_dem: PROJECT_MODEL_DERIVED
+  scenario_status: PROJECT_MODEL_DERIVED
+
+# ===========================================================================
+# 5. 禁止事项（Review 反查锚点）
+# ===========================================================================
+forbidden:
+  - "不得将 burst_score 包装为真实 burstiness"
+  - "不得将任何 SYNTHETIC_FIXED 参数表述为真实观测"
+  - "不得恢复 deadline / lambda_eff / RUAD / CALA / Repair 语义"
+  - "不得以 Trace 改写固定名义 λ_j"
+  - "不得依据 CARS 表现选择 Trace 窗口"
+  - "不得创建'更适合 CARS'的 Trace 派生版本"
+  - "不得在 data/ 下写入任何文件"

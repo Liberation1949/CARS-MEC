@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/method_result.schema.json",
+  "title": "CARS Active Schema - Method Result",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "方法运行结果容器（T3 后）。直接依据：Contract Part 2.5（结果结构：方法标识/Scenario 标识/seed/X-A-F/模块状态/runtime/timeout/物理可行性/任务 QoS 成功/诊断/Evaluator 容器）、Part 9.4（状态语义）、Part 3.2（失败原因分类）。不得在此擅自冻结：完整错误代码枚举、正式实验指标白名单、指标计算公式、失败计分规则（登记 IMPLEMENTATION_SPEC_GAP，留待 R2）。",
+  "$defs": {
+    "ModuleStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "status"],
+      "properties": {
+        "module": {
+          "type": "string",
+          "enum": ["aada", "rcla"],
+          "x-unit": "module",
+          "description": "模块名（CARS 两模块：AADA + RCLA；Baseline 无此字段时可为空数组；V4 无 Repair 层）"
+        },
+        "status": {
+          "$ref": "common.schema.json#/$defs/method_status",
+          "description": "模块状态（Contract Part 9.4）"
+        }
+      }
+    },
+    "MethodResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "method_id",
+        "method_status",
+        "scenario_id",
+        "seed",
+        "decision",
+        "module_statuses",
+        "physically_feasible",
+        "task_success_indicators",
+        "runtime_seconds",
+        "timed_out",
+        "diagnostics"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "method_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "方法标识。正式白名单见 AGENTS.md §10（CARS / BPSO-RATA-LA / JTORA-adapted / NFA-adapted / reliability_only / local_only / FOA）；enum 冻结留待 Baseline 阶段"
+        },
+        "method_status": {
+          "$ref": "common.schema.json#/$defs/method_status",
+          "description": "方法级状态（Contract Part 9.4）"
+        },
+        "scenario_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "关联 Scenario.scenario_id"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "随机 seed。CARS 为确定性流水线无随机采样（Proposition 5）；seed 记录用于复现性审计（AGENTS.md §13）"
+        },
+        "decision": {
+          "$ref": "schedule_decision.schema.json",
+          "description": "最终方案 Pi* = {X*,A*,F*}（方法返回的完整决策）"
+        },
+        "module_statuses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ModuleStatus" },
+          "x-unit": "module",
+          "description": "CARS 三模块状态序列（ruad/cala/repair）；非 CARS 方法可为空数组"
+        },
+        "physically_feasible": {
+          "type": "boolean",
+          "x-unit": "flag",
+          "description": "Pi in Omega_phy 指示（Contract Part 3.3；物理可行性与 QoS 成功严格分离）"
+        },
+        "task_success_indicators": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/binary_int" },
+          "x-unit": "binary",
+          "description": "z_i 数组，维度 N（F-19/F-38；结果量而非决策变量）"
+        },
+        "runtime_seconds": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "s",
+          "description": "方法运行时间（复现性与超时审计用）"
+        },
+        "timed_out": {
+          "type": "boolean",
+          "x-unit": "flag",
+          "description": "是否超时（Contract Part 9.1；超时 => 全部 z_i=0 保留失败原因）"
+        },
+        "diagnostics": {
+          "type": "object",
+          "additionalProperties": true,
+          "x-unit": "diagnostic",
+          "description": "诊断信息容器（结构开放；完整错误代码枚举留待 R2 Evaluator 契约）"
+        }
+      }
+    }
+  }
+}

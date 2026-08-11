@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/core_entities.schema.json",
+  "title": "CARS Active Schema V3 - Core Entities",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "核心实体定义：Task / Device / Server / WirelessLink / SystemParams。直接依据：正文 III-B（III-B.1 Task Model、III-B.2 Mobile Device Model、III-B.3 Edge Server Model、III-B.4 Scheduling Variables）、Contract Part 1.2-1.5（T-01..T-09、D-01..D-04、S-01..S-02、L-01..L-04）、Contract Part 13（CFG-01..CFG-06 只登记语义，不冻结数值）。字段只能来自正文或 Contract，不得根据旧工程补字段。",
+  "$defs": {
+    "Task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "device_id",
+        "data_bits",
+        "cpu_cycles",
+        "fragility",
+        "delay_weight",
+        "energy_weight",
+        "deadline_seconds",
+        "min_reliability"
+      ],
+      "properties": {
+        "task_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "任务唯一标识 tau_i（III-A E-03）"
+        },
+        "device_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "产生该任务的设备标识，关联 Device.device_id（III-A：每设备每时隙至多一个任务）"
+        },
+        "data_bits": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "bits",
+          "description": "任务输入数据量 d_i（III-B.1, T-01）"
+        },
+        "cpu_cycles": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "CPU cycles",
+          "description": "计算需求 c_i，>0（Assumption 1）（III-B.1, T-02）"
+        },
+        "fragility": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "任务脆弱性（软错误敏感度）nu_i >= 0（III-B.1, T-03）"
+        },
+        "delay_weight": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "dimensionless",
+          "description": "时延权重 alpha_i > 0；不变量 alpha_i + beta_i = 1（III-B.1, T-04）"
+        },
+        "energy_weight": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "能耗权重 beta_i >= 0；不变量 alpha_i + beta_i = 1（III-B.1, T-05）"
+        },
+        "deadline_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "s",
+          "description": "截止期 D_i^deadline > 0（III-B.1, T-07）"
+        },
+        "min_reliability": {
+          "$ref": "common.schema.json#/$defs/open_unit_interval",
+          "description": "最低可靠性要求 R_i^min in (0,1)（III-B.1, T-08）"
+        }
+      }
+    },
+    "Device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "device_id",
+        "local_cpu_rate",
+        "local_failure_rate",
+        "switch_capacitance",
+        "tx_power_watts"
+      ],
+      "properties": {
+        "device_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "移动设备唯一标识 D_i（III-A E-01）"
+        },
+        "local_cpu_rate": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "cycles/s",
+          "description": "本地计算能力 f_i^loc > 0（Assumption 1）；本地频率为场景输入，不联合优化 DVS（III-B.2, D-01; III-C.1）"
+        },
+        "local_failure_rate": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "本地故障率 lambda_i^loc >= 0（III-B.2, D-02）"
+        },
+        "switch_capacitance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "dimensionless",
+          "description": "有效开关电容系数 kappa_i > 0（III-B.2, D-03）"
+        },
+        "tx_power_watts": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "W",
+          "description": "固定上行传输功率 p_i > 0（III-B.2, D-04; III-C.2）"
+        }
+      }
+    },
+    "Server": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "server_id",
+        "capacity_cycles_per_sec",
+        "nominal_failure_rate"
+      ],
+      "properties": {
+        "server_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "边缘服务器唯一标识 S_j（III-A E-02）"
+        },
+        "capacity_cycles_per_sec": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "cycles/s",
+          "description": "服务器最大计算容量 F_j > 0（Assumption 1）（III-B.3, S-01）"
+        },
+        "nominal_failure_rate": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "固定名义故障率 lambda_j >= 0，场景输入常数，不随负载状态变化（III-B.3, S-02; Contract Part 1.4 核心不变量）。禁止恢复 lambda_eff 或负载放大故障率。"
+        }
+      }
+    },
+    "WirelessLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "link_id",
+        "source_device_id",
+        "target_server_id",
+        "bandwidth_hz",
+        "channel_gain",
+        "noise_power",
+        "error_probability"
+      ],
+      "properties": {
+        "link_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "无线链路唯一标识"
+        },
+        "source_device_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "源设备标识，关联 Device.device_id"
+        },
+        "target_server_id": {
+          "$ref": "common.schema.json#/$defs/unique_id",
+          "description": "目标服务器标识，关联 Server.server_id"
+        },
+        "bandwidth_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "Hz",
+          "description": "有效带宽 B_ij（III-C.2, L-01）；带宽分配不作为优化变量（III-A）"
+        },
+        "channel_gain": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "channel power gain",
+          "description": "信道功率增益 h_ij（III-C.2, L-02）"
+        },
+        "noise_power": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "noise power",
+          "description": "噪声功率 sigma^2（III-C.2, L-03）"
+        },
+        "error_probability": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1,
+          "x-unit": "probability",
+          "description": "数据错误概率 p_ij^err in [0,1)（III-D.1, L-04; CFG-12 链路误码模型确定传输可靠性 R_ij^tx = 1 - p_ij^err）"
+        }
+      }
+    },
+    "SystemParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rcla_solver",
+        "numeric_epsilon"
+      ],
+      "properties": {
+        "rcla_solver": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rcla_mu_tol",
+            "rcla_max_iters",
+            "rcla_mu_lo",
+            "rcla_mu_hi",
+            "rcla_numeric_epsilon"
+          ],
+          "properties": {
+            "rcla_mu_tol": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "x-unit": "dimensionless",
+              "description": "RCLA 二分替代方案 mu 收敛容差（保留 API 兼容；active-set 解法不使用；Contract V4 §7）"
+            },
+            "rcla_max_iters": {
+              "$ref": "common.schema.json#/$defs/positive_integer",
+              "description": "RCLA 迭代上界（active-set 至多 |Gamma_j| 次迭代；二分替代方案上界；Contract V4 §7）"
+            },
+            "rcla_mu_lo": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "x-unit": "dimensionless",
+              "description": "RCLA 二分替代方案 mu 下界（保留 API 兼容；active-set 不使用；Contract V4 §7）"
+            },
+            "rcla_mu_hi": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "x-unit": "dimensionless",
+              "description": "RCLA 二分替代方案 mu 上界（保留 API 兼容；active-set 不使用；Contract V4 §7）"
+            },
+            "rcla_numeric_epsilon": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "x-unit": "dimensionless",
+              "description": "RCLA 数值保护 epsilon（实现级保护，不写入理论公式；Contract V4 §7）"
+            }
+          }
+        },
+        "numeric_epsilon": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "x-unit": "dimensionless",
+          "description": "数值下界保护 epsilon_num（实现级保护，不写入理论公式）（Contract V4 §7）"
+        }
+      }
+    }
+  }
+}

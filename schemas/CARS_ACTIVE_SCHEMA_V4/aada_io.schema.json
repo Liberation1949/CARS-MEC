@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/aada_io.schema.json",
+  "title": "CARS Active Schema - AADA IO",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "AADA（Algorithm V-1）输入输出契约。直接依据：Contract V4 §4（AADA 语义）、正文 V-B（V-B.1 统一动作空间、V-B.3 动态状态、V-B.5 准入约束、V-B.6 两阶段指派规则、V-B.7 Algorithm V-1）。AADA 输入：T0 决策前状态 + 冻结参数；输出：X^(0), A^(0) 及最终动态状态 Q_j（资源竞争）、G_j（可靠性 floor 保留）（V-B.7 Step 21）。AADA 不产生 F（禁止职责，V-B.4；F 由 RCLA 产生）。",
+  "$defs": {
+    "AADAInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "state_timepoint",
+        "predecision_state",
+        "frozen_params"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T0",
+          "x-unit": "timepoint",
+          "description": "AADA 在 T0 读取决策前状态；不得包含未来信息（Contract V4 §1）"
+        },
+        "predecision_state": {
+          "$ref": "predecision_state.schema.json",
+          "description": "T0 决策前状态（S_t；含任务本地属性、链路属性、边标记预处理）"
+        },
+        "frozen_params": {
+          "$ref": "core_entities.schema.json#/$defs/SystemParams",
+          "description": "SystemParams（V4：rcla_solver + numeric_epsilon；无 cala/repair 参数）"
+        }
+      }
+    },
+    "AADAOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "state_timepoint",
+        "offloading_decision",
+        "assignment_matrix",
+        "final_resource_competition",
+        "final_floor_reservation"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "state_timepoint": {
+          "const": "T1",
+          "x-unit": "timepoint",
+          "description": "AADA 输出时点 T1：X^(0), A^(0)（V-B.7 Step 21）"
+        },
+        "offloading_decision": {
+          "$ref": "schedule_decision.schema.json#/properties/offloading_decision",
+          "description": "X^(0)：x_i^(0) = sum_j a_ij^(0)"
+        },
+        "assignment_matrix": {
+          "$ref": "schedule_decision.schema.json#/properties/assignment_matrix",
+          "description": "A^(0)：满足 C1-C4（Proposition 2）"
+        },
+        "final_resource_competition": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "x-unit": "sqrt(cycles/s)",
+          "description": "最终资源竞争状态 Q_j(A) = sum_{k in Gamma_j} s_k，s_k = sqrt(alpha_k f_k^loc)，维度 M（V-B.3）"
+        },
+        "final_floor_reservation": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "x-unit": "cycles/s",
+          "description": "最终可靠性 floor 保留状态 G_j(A) = sum_{k in Gamma_j} ell_R_kj，维度 M（V-B.3）"
+        }
+      }
+    },
+    "AADADiagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "local_success_count",
+        "local_failure_count",
+        "rescued_local_failure_count",
+        "utility_improving_offload_count"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "CARS_ACTIVE_SCHEMA_V4",
+          "x-unit": "version",
+          "description": "Active Schema 版本标识"
+        },
+        "local_success_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "本地成功任务数（b_loc=1）"
+        },
+        "local_failure_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "本地失败任务数（b_loc=0）"
+        },
+        "rescued_local_failure_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "阶段一救援成功的本地失败任务数"
+        },
+        "no_feasible_edge_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "阶段一无可行 EDGE 保持 LOCAL/UNSERVED 的任务数（由统一 Evaluator 判定）"
+        },
+        "utility_improving_offload_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "tasks",
+          "description": "阶段二通过 P0 字典序门控的卸载任务数"
+        },
+        "phase2_gate_rejected_dRbar_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "candidates",
+          "description": "阶段二因 Delta_Rbar_eff <= -eps 被字典序门控拒绝的候选 EDGE 数（Lemma 4）"
+        },
+        "phase2_gate_rejected_utility_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-unit": "candidates",
+          "description": "阶段二因可靠性持平时 Delta_U_sys <= eps 被拒绝的候选 EDGE 数"
+        },
+        "max_epsilon_dphi": {
+          "type": "number",
+          "minimum": 0,
+          "x-unit": "dimensionless",
+          "description": "Lemma 2 精确性审计：max |Delta_phi - (phi*(Gamma∪{i}) - phi*(Gamma))|（仅浮点误差）"
+        },
+        "per_server_final_Q": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "x-unit": "sqrt(cycles/s)",
+          "description": "逐服务器最终 Q_j，维度 M"
+        },
+        "per_server_final_G": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "x-unit": "cycles/s",
+          "description": "逐服务器最终 G_j，维度 M"
+        },
+        "per_server_G_over_F": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "x-unit": "dimensionless",
+          "description": "逐服务器 G_j/F_j，维度 M（floor 压力）"
+        }
+      }
+    }
+  }
+}

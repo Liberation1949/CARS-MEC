@@ -1,0 +1,113 @@
+# E0-V2-1 阶段合同：Pilot（环境识别与 Formal 网格冻结）
+# 版本: E0_V2_1_PILOT_PROTOCOL_V1
+# 日期: 2026-08-09
+# 状态: FROZEN（本阶段执行 Pilot；Formal 不运行）
+# 依据: E0-V2-0 冻结协议（configs/e0_v2/e0_v2_protocol.yaml）+ 用户 2026-08-09 E0 设计
+#       + 正文 III-F.1/2/3（退化/坍缩观察方式）。
+
+# ---------------------------------------------------------------------------
+# 0. 阶段定义
+# ---------------------------------------------------------------------------
+stage_id: E0_V2_1
+stage_name: "E0 Pilot：负载扫描与 Formal 网格冻结"
+stage_goal: >
+  在 E0-V2-0 冻结的工具上执行 Pilot 负载扫描（N={20..260} × 5 seeds × 4 方法），
+  识别四区域（Stable -> Transition -> Degraded -> Near-unserviceable），
+  并在 pilot 结果基础上、看正式结果之前冻结 Formal 网格（7 个 N 点）与
+  formal paired seeds（[601..620]，已登记）。本阶段不运行 Formal（E0-V2-2 待授权）。
+workflow: "Freeze -> Confirm -> Execute -> Test -> Review -> Return -> Stop"
+authorized: true            # 用户 2026-08-09 授权 E0-V2-1
+next_stage: E0_V2_2         # Formal（不自动进入）
+
+# ---------------------------------------------------------------------------
+# 1. Pilot 规格（继承 E0-V2-0 协议；用户设计）
+# ---------------------------------------------------------------------------
+pilot_spec:
+  n_grid: [20, 40, 60, 80, 100, 120, 150, 180, 220, 260]
+  seeds: [201, 202, 203, 204, 205]
+  seeds_status: NOT_FORMAL
+  methods_main: [reliability_only, bpso_rata_la, cars_aada_rcla_candidate]
+  methods_diagnostic: [local_only]
+  total_runs: 200            # 10 N x 5 seeds x 4 methods
+  nested_tasks: "每 seed 生成一次 N_max=260 超场景，prefix 到各 N（Gamma 前缀链）"
+  paired_invariant: "所有方法对每个 (seed, N) 使用完全相同的 (tasks, servers, links)"
+  timeout_seconds: 30.0      # R6 冻结 shared timeout
+  output_dir: results/e0_v2/e0_v2_1_pilot
+
+# ---------------------------------------------------------------------------
+# 2. Pilot 目的与选择规则
+# ---------------------------------------------------------------------------
+purpose:
+  - "找到四区域：Stable -> Transition -> Degraded -> Near-unserviceable"
+  - "验证 N↑ -> V_F↑ -> V_R↑ -> TSSR↓ 机制链是否出现"
+  - "比较三主方法退化曲线：AADA-RCLA 是否退化更慢（Q3）"
+  - "为 Formal 网格冻结提供负载响应曲线依据（不是性能排名）"
+selection_rules:
+  - "只可调整 N 覆盖范围一次（不预设必须用哪组数字）"
+  - "formal grid 必须在看正式结果之前冻结"
+  - "至少保留 E3 已证明有压力意义的 N=20/80/150"
+  - "不得按'哪个方法赢最多'选择网格"
+  - "若 AADA-RCLA 在 N=200 仍几乎完全稳定 -> 候选 B 右移（{20,50,80,110,150,200,250}）"
+
+# ---------------------------------------------------------------------------
+# 3. Formal 网格冻结（本阶段产物；E0-V2-2 使用）
+# ---------------------------------------------------------------------------
+formal_grid_freeze:
+  deliverable: configs/e0_v2/e0_v2_formal_grid.yaml
+  candidate_a: [20, 50, 80, 110, 140, 170, 200]
+  candidate_b: [20, 50, 80, 110, 150, 200, 250]
+  n_points: 7
+  formal_seeds: [601, 602, 603, 604, 605, 606, 607, 608, 609, 610,
+                 611, 612, 613, 614, 615, 616, 617, 618, 619, 620]
+  formal_seeds_status: NEW_PAIRED_UNSEEN
+  freeze_basis: "pilot load-response 曲线形态（低/过渡/明显退化区域覆盖）"
+
+# ---------------------------------------------------------------------------
+# 4. 允许修改范围 / 禁止
+# ---------------------------------------------------------------------------
+allowed_modify:
+  - results/e0_v2/e0_v2_1_pilot/**     # Pilot 结果（本阶段主产物）
+  - configs/e0_v2/e0_v2_formal_grid.yaml  # Formal 网格冻结（本阶段产物）
+  - reports/experiments/               # 本阶段报告
+  - scripts/experiments/e0_v2/**       # 必要时运行参数微调（不改变算法/指标语义）
+forbidden:
+  - "调整算法参数 / 修改任务分布制造 collapse"
+  - "在 formal seeds 601-620 上运行"
+  - "修改保护对象（experiment_docs/references/data/src/schemas/既有 configs）"
+  - "修改 E3-V2 冻结配置"
+  - "把 pilot 包装成正式结果"
+  - "根据结果事后改变指标定义"
+  - "隐藏 timeout / METHOD_ERROR / 不可行"
+
+# ---------------------------------------------------------------------------
+# 5. AC（本阶段验收）
+# ---------------------------------------------------------------------------
+acceptance_criteria:
+  AC-1: "Pilot 200 runs 全部完成并记录（timeout/error 如实计）"
+  AC-2: "四区域定位明确（Stable/Transition/Degraded/Near-unserviceable）或如实报告未全部出现"
+  AC-3: "机制链证据：N↑ 时 V_F/max G/F/V_R 单调或不降、TSSR 不增（如实报告偏差）"
+  AC-4: "三主方法退化曲线可比；AADA-RCLA 相对退化速度如实报告（更快/更慢/相同均接受）"
+  AC-5: "Formal 网格 7 点冻结（候选 A 或 B），基于负载曲线而非性能排名"
+  AC-6: "formal seeds 601-620 未访问；pilot seeds 201-205 标记 NOT_FORMAL"
+  AC-7: "保护对象零修改；全量 pytest 无新增失败"
+  AC-8: "报告 + integrity 完整；P0=0；P1=0"
+
+# ---------------------------------------------------------------------------
+# 6. P0 / P1 / 停止条件
+# ---------------------------------------------------------------------------
+p0:
+  - "核心工具无法运行"
+  - "保护对象实际损坏"
+p1:
+  - "前缀一致性被破坏（同 seed 同 N 不同方法场景不一致）"
+  - "指标口径与 E0-V2-0 字段定义冲突"
+  - "formal seeds 被访问"
+  - "统一 Evaluator 未被唯一使用"
+  - "保护对象被未经授权修改"
+stop_conditions:
+  - "发现 MANUSCRIPT_HARD_CONFLICT"
+  - "需要修改保护对象但无批准"
+  - "出现真实 P0/P1 且无法在合同内修复"
+  - "用户撤回授权"
+completion_definition: "AC-1..AC-8 满足；P0=0；P1=0；PASS/PASS_WITH_WARNINGS/FAIL_AND_REDESIGN"
+max_rounds: 2

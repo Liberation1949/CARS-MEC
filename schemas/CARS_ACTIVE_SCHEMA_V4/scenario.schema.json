@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cars.example.org/schema/v4/scenario.schema.json",
+  "title": "CARS Active Schema - Scenario",
+  "version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "时隙级系统状态 S_t = {Gamma_t, D_t, M_t, B_t, R_t^req} 的完整场景载体（T0）。直接依据：正文 III-A（E-01..E-04）、III-B、Contract V4 Part 1.1（系统级实体与集合）。系统状态不含跨时隙历史负载、历史指派或未来信息（V-A.1）。跨字段不变量（由 validate_active_schema.py 检查）：task/device/server/link ID 唯一；tasks.length == devices.length == N；每个 task.device_id 与 link.source/target 引用存在；alpha_i+beta_i=1；SystemParams 不含 ruad_gamma / cala_weights / repair_budget / repair_tolerances / kappa_R / kappa_D（V4：CARS=AADA→RCLA，无 CALA/Repair 层）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "state_timepoint",
+    "system_params",
+    "tasks",
+    "devices",
+    "servers",
+    "links"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "CARS_ACTIVE_SCHEMA_V4",
+      "x-unit": "version",
+      "description": "Active Schema 版本标识"
+    },
+    "scenario_id": {
+      "$ref": "common.schema.json#/$defs/unique_id",
+      "description": "场景唯一标识"
+    },
+    "state_timepoint": {
+      "const": "T0",
+      "x-unit": "timepoint",
+      "description": "状态时点 T0：Scenario 与决策前状态（Contract Part 5.1）"
+    },
+    "system_params": {
+      "$ref": "core_entities.schema.json#/$defs/SystemParams",
+      "description": "冻结方法参数载体（只登记结构；正式数值在 Exploratory Tuning 阶段冻结，Contract Part 13 CFG-01..06）"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "core_entities.schema.json#/$defs/Task" },
+      "x-unit": "task",
+      "description": "任务集合 Gamma_t；不变量 len(tasks)==len(devices)==N（III-A E-03）"
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "core_entities.schema.json#/$defs/Device" },
+      "x-unit": "device",
+      "description": "移动设备集合 D_t（III-A E-01）"
+    },
+    "servers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "core_entities.schema.json#/$defs/Server" },
+      "x-unit": "server",
+      "description": "边缘服务器集合 M_t（III-A E-02）"
+    },
+    "links": {
+      "type": "array",
+      "items": { "$ref": "core_entities.schema.json#/$defs/WirelessLink" },
+      "x-unit": "link",
+      "description": "无线链路集合（B_t 的离散载体）；可空——无链路时任务只能本地执行（III-A）"
+    }
+  }
+}

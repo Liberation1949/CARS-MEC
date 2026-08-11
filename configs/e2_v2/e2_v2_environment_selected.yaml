@@ -1,0 +1,103 @@
+# E2-V2 冻结环境（E2_V2_ENVIRONMENT_SELECTED_V1）
+# 版本: E2_V2_ENVIRONMENT_SELECTED_V1
+# 日期: 2026-08-09
+# 阶段: E2-V2-0（Computational Heterogeneity Environment Calibration and Freeze；
+#       用户 2026-08-09 授权；result-neutral, algorithm-neutral）
+# 状态: FROZEN（E2 Formal 主实验的权威环境；除 CV_F 与 seed 外全部固定）
+# 选择依据: AC-E2-ENV-1..5 + 选择优先级 §9（workload coverage + heterogeneity
+#           gradient + identifiability + serviceability；预注册 tie-break N=170）
+#           —— NOT based on CARS rank/win/gain。
+# 直接依据: 用户 2026-08-09 E2 设计；E2-V2-0 校准协议（e2_v2_environment_calibration_protocol.yaml）；
+#       E1_V2_ENVIRONMENT_SELECTED_V1（sf1_vMEDIUM；F_total=101000）；
+#       Contract V4；Schema V4；E1-V2-0/E1-V2-1 校准报告。
+
+environment:
+  id: E2_V2_ENVIRONMENT_SELECTED_V1
+  s_f: 1.0
+  fragility_profile: MEDIUM
+  m: 8
+  topology: "fully connected"
+  deadline: "无 deadline 模型（deadline_seconds 占位 1000.0，逻辑不使用）"
+  compute_scale: 1.0
+  task_compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_tiers: {0: 0.4, 8: 0.3, 16: 0.3}      # V-MEDIUM（= E1 默认）
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  server_lambda: "U[0.001, 0.003]（固定名义故障率；不随 CV_F/负载改变）"
+  local_failure_rate: 0.002
+  min_reliability: "U[0.85, 0.95]"
+  total_capacity: 101000.0                        # F_total^E2 = F_total^E1（实测）
+  system_params: >
+    Schema V4（rcla_solver: rcla_mu_tol=1e-9/rcla_max_iters=200/rcla_mu_lo=1e-12/
+    rcla_mu_hi=1e12/rcla_numeric_epsilon=1e-12；numeric_epsilon=1e-12）
+
+capacity_generation:
+  rule: "F_j(theta) = F_total * exp(theta*z_j) / sum_k exp(theta*z_k)"
+  rank_template: [-1.5, -1.0, -0.5, -0.15, 0.15, 0.5, 1.0, 1.5]  # 固定对称模板
+  rank_rng: "独立 substream 'e2_capacity_rank'（每 seed 固定置换；跨 CV_F 同一结构拉开）"
+  theta_solve: "deterministic bisection 命中 CV_F^target"
+  tolerance_cv: 1.0e-4
+  tolerance_sumF: 1.0e-10 * F_total
+  invariant: "同 seed 跨 CV_F：任务/设备/信道/local CPU/ν/R_min/λ_j 全不变，仅 F_j 改变"
+
+formal_environment:
+  n: 170
+  m: 8
+  cv_f_grid: [0.0, 0.3, 0.6, 0.9, 1.2]            # homogeneous → mild → moderate → high → extreme
+  cv_f_extension_1_5: NOT_USED                    # 预注册条件未满足（CV=1.2 方法已明显分化，非全 ceiling）
+  f_total: 101000.0
+  s_f: 1.0
+  formal_seeds: [2101, 2102, 2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110]  # 只登记禁止访问
+  calibration_seeds: [1201, 1202, 1203, 1204, 1205]
+  same_scenario_across_methods: true
+
+# ---------------------------------------------------------------------------
+# 选择依据（AC-E2-ENV-5 明确性证明；NOT based on CARS rank）
+# ---------------------------------------------------------------------------
+selection_basis:
+  not_based_on_cars_rank: true
+  priority_applied:
+    1: "完整异构压力覆盖：N=170 d/c 0.870→0.956（HIGH 区完整）、per-server pressure max 16.0→34.5（2.16×）、edge_feasible 1.0→0.926"
+    2: "高端仍可服务：predecision_infeasible=0 全程；CV=1.2 下 cars 0.957 / nfa 0.951 / rel 0.812 / bpso 0.741（非大面积不可服务）"
+    3: "method-independent structural identifiability：HHI 0.125→0.305 单调、CV_realized 精确命中、F_total 恒定 101000"
+    4: "sanity 方法非零区分度：between-method TSSR range 0.20-0.22（全部 CV 点）"
+    5: "与 E1 公共尺度一致：N=170 为 E1 HIGH 区、F_total 完全相同、基础环境=sf1_vMEDIUM"
+    6: "预注册 tie-break：N=170 优先（N=140 d/c 仅达 0.80 上 TRANSITION，高压覆盖不足——结构事实，非 CARS 排名）"
+  layer_a_ac:
+    AC-E2-ENV-1: "PASS（CV_realized 精确、HHI 单调）"
+    AC-E2-ENV-2: "PASS（CV=0 时 local_feasible 0.729、d/c 0.870 可服务）"
+    AC-E2-ENV-3: "PASS（edge_feasible 1.0→0.926、concentration max/min 1→66.6）"
+    AC-E2-ENV-4: "PASS（preinf@1.2=0.0 < 0.20）"
+    AC-E2-ENV-5: "PASS（F_total=101000 全 CV 点一致）"
+  layer_b_sanity:
+    methods: [cars, bpso_rata_la, nfa_adapted, reliability_only]
+    timeout: 0
+    method_error: 0
+    no_all_ceiling: true
+    no_all_collapse: true
+    rejected_n200_reason: >
+      N=200 在 CV=0 时 d/c 已 >=1.03（E1 NEAR-SATURATION）；叠加异构会混淆
+      "near saturation" 与 "resource heterogeneity" 两种压力（结构与方法无关）。
+    cv_1_5_not_triggered: >
+      预注册条件 2（CV=1.2 时 method sanity 仍全部接近 ceiling）不满足——CV=1.2
+      下 bpso 0.741/rel 0.812 已明显低于 cars 0.957/nfa 0.951，方法已分化；
+      按协议不运行 1.5（不强行制造极端）。
+
+# ---------------------------------------------------------------------------
+# 校准证据（Layer A/B 3-seed mean；完整见 environment_diagnostics.json）
+# ---------------------------------------------------------------------------
+calibration_evidence:
+  seeds: [1201, 1202, 1203]
+  layer_a_n170:
+    d_c_by_cv: {0.0: 0.8698, 0.3: 0.8698, 0.6: 0.8827, 0.9: 0.9126, 1.2: 0.9568}
+    edge_feasible_by_cv: {0.0: 1.0, 0.3: 0.9985, 0.6: 0.9924, 0.9: 0.9752, 1.2: 0.9257}
+    pressure_max_by_cv: {0.0: 16.0, 0.3: 19.1, 0.6: 25.5, 0.9: 34.1, 1.2: 34.5}
+    hhi_by_cv: {0.0: 0.125, 0.3: 0.13625, 0.6: 0.17, 0.9: 0.22625, 1.2: 0.305}
+    preinf: 0.0 (全部 CV 点)
+  layer_b_n170_tssr:
+    cars: {0.0: 0.982, 0.3: 0.976, 0.6: 0.961, 0.9: 0.949, 1.2: 0.957}
+    bpso_rata_la: {0.0: 0.776, 0.3: 0.773, 0.6: 0.749, 0.9: 0.755, 1.2: 0.741}
+    nfa_adapted: {0.0: 0.965, 0.3: 0.953, 0.6: 0.955, 0.9: 0.957, 1.2: 0.951}
+    reliability_only: {0.0: 0.820, 0.3: 0.820, 0.6: 0.814, 0.9: 0.812, 1.2: 0.812}
+  note: >
+    本表为环境校准证据（Layer A 方法无关 + Layer B sanity）；CARS 排名未进入
+    环境评分（AC-E2-ENV-5）；正式性能结论以 E2 Formal（seeds 2101-2110）为准。

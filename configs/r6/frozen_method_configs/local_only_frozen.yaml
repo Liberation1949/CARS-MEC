@@ -1,0 +1,5 @@
+method_id: local_only
+config_label: local_only_frozen_r6
+scenario_config: configs/r3/local_only/small_scenario.yaml
+method_seed: 1
+hard_timeout_seconds: 30.0

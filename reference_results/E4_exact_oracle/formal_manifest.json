@@ -1,0 +1,257 @@
+{
+  "experiment": "e4_exact_3_formal",
+  "protocol_path": "C:\\Users\\XSh\\Desktop\\my_study\\论文资料\\我的论文\\论文3\\CARS_Project\\configs\\e4_exact\\e4_exact_formal_protocol.yaml",
+  "matrix_structure": "regime-bounded（方案 A；用户 2026-08-10）",
+  "matrix_total": 30,
+  "formal_seeds_authorized": true,
+  "formal_seeds_accessed": true,
+  "authorization_record": "user 2026-08-10 confirmed 方案 A（20 runs）",
+  "workers": 24,
+  "oracle_timeout_s": 28800.0,
+  "created_at": "2026-08-11T01:44:00",
+  "records": [
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3501,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3502,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3503,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3504,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3505,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3506,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3507,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3508,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3509,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 4,
+      "regime": "LOW",
+      "formal_seed": 3510,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3501,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3502,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3503,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3504,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3505,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3506,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3507,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3508,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3509,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 5,
+      "regime": "TRANSITION",
+      "formal_seed": 3510,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3501,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3502,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3503,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3504,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3505,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3506,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3507,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3508,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3509,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    },
+    {
+      "n": 6,
+      "regime": "TRANSITION",
+      "formal_seed": 3510,
+      "action": "RUN",
+      "status": "COMPLETED",
+      "oracle_status": "CERTIFIED_NUMERICAL_EXACT"
+    }
+  ],
+  "runs_completed_this_invocation": 30,
+  "runs_total": 30,
+  "runs_remaining": 0
+}

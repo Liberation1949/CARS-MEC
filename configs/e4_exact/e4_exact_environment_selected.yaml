@@ -1,0 +1,60 @@
+# E4-EXACT Formal 环境（E4-EXACT-2 Pilot 后冻结；E4-EXACT-3 唯一执行环境）
+# 版本: E4_EXACT_ENVIRONMENT_SELECTED_V1
+# 日期: 2026-08-09（E4-EXACT-2 冻结）
+# 阶段: E4-EXACT-2（Formal 配置冻结）
+# 状态: FROZEN（E4-EXACT-3 Formal 的权威环境；除 N/seed 外全部固定）
+# 冻结结论: OK（E4-EXACT-2 R2-b 重跑完成；Formal N-grid={4,6} 满足 F1-F5；Formal 可执行）
+# 直接依据:
+#   - E4-EXACT-2 阶段合同 §七（Pilot 协议、环境构造）
+#   - configs/e1_v2/e1_v2_environment_selected.yaml（E1-V2 环境族；s_f=1.00, V-MEDIUM）
+#   - configs/e4_exact/e4_exact_2_pilot_protocol.yaml（Pilot 实测）
+#   - results/e4_exact/e4_exact_2_pilot/formal_scale_selection.json
+
+environment:
+  id: E4_EXACT_ENVIRONMENT_SELECTED_V1
+  family: "E1-V2（s_f=1.00, V-MEDIUM）缩小映射"
+  s_f: 1.00
+  fragility_profile: MEDIUM
+  m: 4
+  topology: "fully connected（缩小自 M=8 全连接）"
+  compute_scale: 1.0
+  task_compute_tiers: [[2000, 0.4], [5000, 0.4], [12000, 0.2]]
+  fragility_tiers: {0: 0.4, 8: 0.3, 16: 0.3}
+  device_tiers: [[800, 0.5], [1200, 0.5]]
+  server_base_capacity: 10000
+  server_capacity_rule: "F_j = 10000 * (1 + 0.3 * (j mod 3)) * s_F（s_F=1.00；j=0..3）"
+  server_lambda: "U[0.001, 0.003]（固定名义故障率）"
+  local_failure_rate: 0.002
+  min_reliability: "U[0.85, 0.95]"
+  deadline: "无 deadline 模型（占位字段，逻辑不使用）"
+  link: "bandwidth=1e6, channel_gain=1e-9, noise_power=1e-10, error_probability=0.01（R_tx=0.99）"
+  nested_generation: "seed 确定性生成 n_max=12；任意 N<=12 用嵌套前缀"
+  schema: CARS_ACTIVE_SCHEMA_V4
+
+# ---------------------------------------------------------------------------
+# Formal grid / regimes / seeds（Pilot selection 后填充）
+# ---------------------------------------------------------------------------
+formal_grid: [4, 5, 6]   # R2-b selection + MATH-FMIN-CR-R2（2026-08-11）：N=4（LOW）+ N=5/6（TRANSITION）
+regimes: [LOW, TRANSITION]  # regime 绑定 N：LOW→4, TRANSITION→6
+formal_seeds: [3501, 3502, 3503, 3504, 3505, 3506, 3507, 3508, 3509, 3510]  # 仅登记；禁止访问
+
+# ---------------------------------------------------------------------------
+# Formal 预算（Pilot 后冻结）
+# ---------------------------------------------------------------------------
+formal_budget:
+  per_instance_oracle_timeout_seconds: 28800.0  # R2-b 冻结：N=6 实测 7784s；8h 上限
+  total_compute_budget_hours: 72.0              # R2-b 冻结：selection 总预算 72h
+  cars_timeout_seconds: 30.0
+  estimated_formal_runs: 40                     # 2 regimes × 10 seeds × 2 N
+
+# ---------------------------------------------------------------------------
+# 选择依据（E4-EXACT-2 Pilot 实测；NOT based on CARS rank）
+# ---------------------------------------------------------------------------
+selection_basis:
+  not_based_on_cars_rank: true
+  based_on: ["exact completion", "certified status", "runtime", "state-space size",
+             "representative scale coverage"]
+  pilot_evidence: "results/e4_exact/e4_exact_2_pilot/（pilot_raw_records / formal_scale_selection）"
+  result: "OK：候选 {4,6} 经 R2 + R2-b 全部 certified（N=6/3403 重跑 7784s 完成）；Formal N-grid=[4,6]"
+  next_step: "E4-EXACT-3 按冻结配置执行（authorized_to_execute 授权后）；Formal seeds 3501-3510 仅登记"
+  note: "详细选择理由见 results/e4_exact/e4_exact_2_pilot/formal_scale_selection.json 与 E4-EXACT-2 报告"

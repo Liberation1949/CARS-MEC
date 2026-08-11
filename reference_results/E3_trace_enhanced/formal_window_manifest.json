@@ -1,0 +1,363 @@
+{
+  "version": "E4_V2_2_FORMAL_WINDOW_MANIFEST_V1",
+  "window_len_slots": 24,
+  "selection_rule": "frozen thresholds (E4-V2-1) + first-5 per regime by time order",
+  "undercoverage_policy": "regime 不足 5 窗口则如实减少（FORMAL_REGIME_UNDERCOVERAGE Warning）",
+  "windows": [
+    {
+      "k": 24,
+      "window_id": "azure_formal_win_0001",
+      "start_slot": "azure_d12_slot_0282",
+      "start_ts": "2019-01-12T23:30:00",
+      "end_ts": "2019-01-13T01:25:00",
+      "p_win": 0.589565,
+      "regime": "TRANSITION",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 48,
+      "window_id": "azure_formal_win_0002",
+      "start_slot": "azure_d13_slot_0018",
+      "start_ts": "2019-01-13T01:30:00",
+      "end_ts": "2019-01-13T03:25:00",
+      "p_win": 0.3775,
+      "regime": "TRANSITION",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 72,
+      "window_id": "azure_formal_win_0003",
+      "start_slot": "azure_d13_slot_0042",
+      "start_ts": "2019-01-13T03:30:00",
+      "end_ts": "2019-01-13T05:25:00",
+      "p_win": 0.417582,
+      "regime": "TRANSITION",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 264,
+      "window_id": "azure_formal_win_0011",
+      "start_slot": "azure_d13_slot_0234",
+      "start_ts": "2019-01-13T19:30:00",
+      "end_ts": "2019-01-13T21:25:00",
+      "p_win": 0.604506,
+      "regime": "TRANSITION",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 288,
+      "window_id": "azure_formal_win_0012",
+      "start_slot": "azure_d13_slot_0258",
+      "start_ts": "2019-01-13T21:30:00",
+      "end_ts": "2019-01-13T23:25:00",
+      "p_win": 0.500924,
+      "regime": "TRANSITION",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 0,
+      "window_id": "azure_formal_win_0000",
+      "start_slot": "azure_d12_slot_0258",
+      "start_ts": "2019-01-12T21:30:00",
+      "end_ts": "2019-01-12T23:25:00",
+      "p_win": 0.784469,
+      "regime": "HIGH",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 96,
+      "window_id": "azure_formal_win_0004",
+      "start_slot": "azure_d13_slot_0066",
+      "start_ts": "2019-01-13T05:30:00",
+      "end_ts": "2019-01-13T07:25:00",
+      "p_win": 0.663505,
+      "regime": "HIGH",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 120,
+      "window_id": "azure_formal_win_0005",
+      "start_slot": "azure_d13_slot_0090",
+      "start_ts": "2019-01-13T07:30:00",
+      "end_ts": "2019-01-13T09:25:00",
+      "p_win": 0.829857,
+      "regime": "HIGH",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 144,
+      "window_id": "azure_formal_win_0006",
+      "start_slot": "azure_d13_slot_0114",
+      "start_ts": "2019-01-13T09:30:00",
+      "end_ts": "2019-01-13T11:25:00",
+      "p_win": 0.651801,
+      "regime": "HIGH",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 168,
+      "window_id": "azure_formal_win_0007",
+      "start_slot": "azure_d13_slot_0138",
+      "start_ts": "2019-01-13T11:30:00",
+      "end_ts": "2019-01-13T13:25:00",
+      "p_win": 0.688476,
+      "regime": "HIGH",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 24,
+      "window_id": "nep_formal_win_0001",
+      "start_slot": "nep_slot_1593195000",
+      "start_ts": "2020-06-27T02:10:00",
+      "end_ts": "2020-06-27T04:05:00",
+      "p_win": 0.063155,
+      "regime": "LOW",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 48,
+      "window_id": "nep_formal_win_0002",
+      "start_slot": "nep_slot_1593202200",
+      "start_ts": "2020-06-27T04:10:00",
+      "end_ts": "2020-06-27T06:05:00",
+      "p_win": 0.056994,
+      "regime": "LOW",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 72,
+      "window_id": "nep_formal_win_0003",
+      "start_slot": "nep_slot_1593209400",
+      "start_ts": "2020-06-27T06:10:00",
+      "end_ts": "2020-06-27T08:05:00",
+      "p_win": 0.062268,
+      "regime": "LOW",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 288,
+      "window_id": "nep_formal_win_0012",
+      "start_slot": "nep_slot_1593274200",
+      "start_ts": "2020-06-28T00:10:00",
+      "end_ts": "2020-06-28T02:05:00",
+      "p_win": 0.075995,
+      "regime": "LOW",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 312,
+      "window_id": "nep_formal_win_0013",
+      "start_slot": "nep_slot_1593281400",
+      "start_ts": "2020-06-28T02:10:00",
+      "end_ts": "2020-06-28T04:05:00",
+      "p_win": 0.061544,
+      "regime": "LOW",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 0,
+      "window_id": "nep_formal_win_0000",
+      "start_slot": "nep_slot_1593187800",
+      "start_ts": "2020-06-27T00:10:00",
+      "end_ts": "2020-06-27T02:05:00",
+      "p_win": 0.078365,
+      "regime": "TRANSITION",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 96,
+      "window_id": "nep_formal_win_0004",
+      "start_slot": "nep_slot_1593216600",
+      "start_ts": "2020-06-27T08:10:00",
+      "end_ts": "2020-06-27T10:05:00",
+      "p_win": 0.07962,
+      "regime": "TRANSITION",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 120,
+      "window_id": "nep_formal_win_0005",
+      "start_slot": "nep_slot_1593223800",
+      "start_ts": "2020-06-27T10:10:00",
+      "end_ts": "2020-06-27T12:05:00",
+      "p_win": 0.086988,
+      "regime": "TRANSITION",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 408,
+      "window_id": "nep_formal_win_0017",
+      "start_slot": "nep_slot_1593310200",
+      "start_ts": "2020-06-28T10:10:00",
+      "end_ts": "2020-06-28T12:05:00",
+      "p_win": 0.077969,
+      "regime": "TRANSITION",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 432,
+      "window_id": "nep_formal_win_0018",
+      "start_slot": "nep_slot_1593317400",
+      "start_ts": "2020-06-28T12:10:00",
+      "end_ts": "2020-06-28T14:05:00",
+      "p_win": 0.082246,
+      "regime": "TRANSITION",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 144,
+      "window_id": "nep_formal_win_0006",
+      "start_slot": "nep_slot_1593231000",
+      "start_ts": "2020-06-27T12:10:00",
+      "end_ts": "2020-06-27T14:05:00",
+      "p_win": 0.089929,
+      "regime": "HIGH",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 168,
+      "window_id": "nep_formal_win_0007",
+      "start_slot": "nep_slot_1593238200",
+      "start_ts": "2020-06-27T14:10:00",
+      "end_ts": "2020-06-27T16:05:00",
+      "p_win": 0.092891,
+      "regime": "HIGH",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 192,
+      "window_id": "nep_formal_win_0008",
+      "start_slot": "nep_slot_1593245400",
+      "start_ts": "2020-06-27T16:10:00",
+      "end_ts": "2020-06-27T18:05:00",
+      "p_win": 0.091001,
+      "regime": "HIGH",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 216,
+      "window_id": "nep_formal_win_0009",
+      "start_slot": "nep_slot_1593252600",
+      "start_ts": "2020-06-27T18:10:00",
+      "end_ts": "2020-06-27T20:05:00",
+      "p_win": 0.094381,
+      "regime": "HIGH",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 240,
+      "window_id": "nep_formal_win_0010",
+      "start_slot": "nep_slot_1593259800",
+      "start_ts": "2020-06-27T20:10:00",
+      "end_ts": "2020-06-27T22:05:00",
+      "p_win": 0.104821,
+      "regime": "HIGH",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 0,
+      "window_id": "shanghai_formal_win_0000",
+      "start_slot": "shanghai_slot_1414990800",
+      "start_ts": "2014-11-03T13:00:00",
+      "end_ts": "2014-11-04T12:00:00",
+      "p_win": 0.532984,
+      "regime": "LOW",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 24,
+      "window_id": "shanghai_formal_win_0001",
+      "start_slot": "shanghai_slot_1415077200",
+      "start_ts": "2014-11-04T13:00:00",
+      "end_ts": "2014-11-05T12:00:00",
+      "p_win": 0.529201,
+      "regime": "LOW",
+      "selection_rank": 2,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 48,
+      "window_id": "shanghai_formal_win_0002",
+      "start_slot": "shanghai_slot_1415163600",
+      "start_ts": "2014-11-05T13:00:00",
+      "end_ts": "2014-11-06T12:00:00",
+      "p_win": 0.540211,
+      "regime": "LOW",
+      "selection_rank": 3,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 72,
+      "window_id": "shanghai_formal_win_0003",
+      "start_slot": "shanghai_slot_1415250000",
+      "start_ts": "2014-11-06T13:00:00",
+      "end_ts": "2014-11-07T12:00:00",
+      "p_win": 0.5552,
+      "regime": "LOW",
+      "selection_rank": 4,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 96,
+      "window_id": "shanghai_formal_win_0004",
+      "start_slot": "shanghai_slot_1415336400",
+      "start_ts": "2014-11-07T13:00:00",
+      "end_ts": "2014-11-08T12:00:00",
+      "p_win": 0.513921,
+      "regime": "LOW",
+      "selection_rank": 5,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    },
+    {
+      "k": 408,
+      "window_id": "shanghai_formal_win_0017",
+      "start_slot": "shanghai_slot_1416459600",
+      "start_ts": "2014-11-20T13:00:00",
+      "end_ts": "2014-11-21T12:00:00",
+      "p_win": 0.589009,
+      "regime": "HIGH",
+      "selection_rank": 1,
+      "selection_reason": "first-5 by time order (frozen rule)"
+    }
+  ],
+  "undercoverage": [
+    {
+      "dataset": "azure",
+      "regime": "LOW",
+      "available": 0,
+      "requested": 5
+    },
+    {
+      "dataset": "shanghai",
+      "regime": "HIGH",
+      "available": 1,
+      "requested": 5
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+# E4-V2 Trace 输入只读清单（Trace Input Manifest）
+# 版本: E4_V2_TRACE_INPUT_MANIFEST_V1
+# 日期: 2026-08-09
+# 阶段: E4-V2-0（Trace 输入兼容性确认与实验协议冻结）
+# 状态: READ_ONLY_FROZEN_INPUT（本清单不复制、不修改、不重处理任何 data/ 文件）
+# 说明: 本文件记录 data/processed/e4_trace_enhanced/ 的只读输入事实。所有条目均由
+#       2026-08-09 只读检查（枚举/字段/单位/时间顺序/分区/归一化一致性）确认；
+#       不构成任何数据预处理授权。
+# 直接依据: 用户 E4-V2-0 指示；AGENTS.md（data/ 保护）；PROJECT_STATE.md W3。
+
+manifest_version: E4_V2_TRACE_INPUT_MANIFEST_V1
+date: 2026-08-09
+status: READ_ONLY_FROZEN_INPUT
+read_only_policy: >
+  data/processed/e4_trace_enhanced/ 下禁止任何 created / modified / deleted /
+  moved / renamed。本阶段在 data/ 下执行的操作数量 = 0。
+
+# ---------------------------------------------------------------------------
+# 1. 根路径与总体
+# ---------------------------------------------------------------------------
+trace_root: data/processed/e4_trace_enhanced
+absolute_root: ${CARS_DATA_ROOT}/Desktop/my_study/论文资料/我的论文/论文3/CARS_Project/data/processed/e4_trace_enhanced
+file_count: 19
+total_size_bytes: 101738196
+total_size_human: "~97.0 MiB"
+file_format: JSONL（每行一个 slot 记录）+ JSON（preprocessing_stats / split_manifest / split_summary）
+line_encoding: utf-8
+
+# ---------------------------------------------------------------------------
+# 2. 数据集清单
+# ---------------------------------------------------------------------------
+datasets:
+  azure:
+    dataset_id: azure
+    source_raw: data/Microsoft Azure Functions Trace 2019/
+    source_note: "Azure Functions Trace 2019：14 个每日文件（invocations_per_function_md.anon.d01..d14.csv 等）"
+    slot_granularity_minutes: 5
+    total_slots: 4032
+    time_start: "2019-01-01T00:00:00"
+    time_end: "2019-01-14T23:55:00"
+    workload_signal: workload_intensity == request_count（真实调用数，单位：调用数/槽）
+    pressure_signal: NOT_AVAILABLE（cpu_pressure/memory_pressure/bandwidth_state/rtt_state 全部 null）
+    spatial_signal: NOT_AVAILABLE（region_id/hotspot_distribution 全部 null）
+    burst_signal: NOT_AVAILABLE（burst_score 全 0.0 占位，无真实 burstiness 证据）
+    preprocessing_stats: data/processed/e4_trace_enhanced/azure/azure_preprocessing_stats.json
+    trace_slots: data/processed/e4_trace_enhanced/azure/azure_trace_slots.jsonl
+    split_manifest: data/processed/e4_trace_enhanced/manifests/azure_split_manifest.json
+
+  nep:
+    dataset_id: nep
+    source_raw: data/NEP EdgeWorkloadsTraces/
+    source_note: "NEP Edge Workloads Traces：PM/VM/VM_CPU/VM_BANDWIDTH/VM_BW_THREE_MONTHS/SITE_RTT（2020-06）"
+    slot_granularity_minutes: 5
+    total_slots: 7663
+    time_start: "2020-06-01T00:00:00"
+    time_end: "2020-06-30T23:55:00"
+    workload_signal: NOT_AVAILABLE（workload_intensity/request_count/user_count 全 0.0）
+    pressure_signal: cpu_pressure 真实（ratio_0_1；min 0.05718 / max 11.286683；P5 0.059971 / P95 0.106358）
+    spatial_signal: region_id + hotspot_distribution 真实（站点/地区分布）
+    burst_signal: NOT_AVAILABLE（burst_score 全 0.0 占位）
+    preprocessing_stats: data/processed/e4_trace_enhanced/nep/nep_preprocessing_stats.json
+    trace_slots: data/processed/e4_trace_enhanced/nep/nep_trace_slots.jsonl
+    split_manifest: data/processed/e4_trace_enhanced/manifests/nep_split_manifest.json
+
+  shanghai:
+    dataset_id: shanghai
+    source_raw: data/Shanghai Telecom Mobile Internet Access Trace/
+    source_note: "Shanghai Telecom Mobile Internet Access Trace（2014；12 个半月 xlsx 文件）"
+    slot_granularity_minutes: 60
+    total_slots: 4387
+    time_start: "2014-05-31T23:00:00"
+    time_end: "2014-11-30T23:00:00"
+    workload_signal: workload_intensity == user_count（真实活跃用户数，单位：用户/槽）
+    pressure_signal: NOT_AVAILABLE（cpu_pressure/memory_pressure/bandwidth_state/rtt_state 全部 null）
+    spatial_signal: region_id 真实（经纬度小区；null_lat_pct=10.3 / null_lon_pct=10.3）；hotspot_distribution null
+    burst_signal: NOT_AVAILABLE（burst_score 全 0.0 占位）
+    preprocessing_stats: data/processed/e4_trace_enhanced/shanghai/shanghai_preprocessing_stats.json
+    trace_slots: data/processed/e4_trace_enhanced/shanghai/shanghai_trace_slots.jsonl
+    split_manifest: data/processed/e4_trace_enhanced/manifests/shanghai_split_manifest.json
+
+# ---------------------------------------------------------------------------
+# 3. 统一字段列表（三数据集共享；16 字段）
+# ---------------------------------------------------------------------------
+fields:
+  - field: dataset_id
+    unit: enum
+    description: 数据集标识（azure/nep/shanghai）
+  - field: trace_segment_id
+    unit: enum
+    description: 时间分段标识（azure 按日 d01..d14；nep 按日 20200601..；shanghai 按年月 201405..）
+  - field: slot_id
+    unit: enum
+    description: 槽唯一标识（{dataset}_slot_{n} 或 {dataset}_slot_{unix}）
+  - field: timestamp
+    unit: ISO-8601 datetime（本地时区；无时区后缀）
+    description: 槽起始时间（决定时间顺序与 window 边界）
+  - field: request_count
+    unit: 请求数/槽
+    description: 槽内请求数（azure=调用数；shanghai=请求数；nep 全 0 = NOT_AVAILABLE）
+  - field: user_count
+    unit: 用户数/槽
+    description: 槽内活跃用户数（shanghai 真实；azure/nep 全 0 = NOT_AVAILABLE）
+  - field: workload_intensity
+    unit: 原始=数据集原生单位（azure 调用数 / shanghai 用户数 / nep 无）；splits 内=归一化 [0,1]
+    description: 负载强度（raw trace_slots 为原生单位；splits/*.jsonl 为 clip((x-P5)/(P95-P5)) 归一化）
+  - field: burst_score
+    unit: dimensionless
+    description: 突发性分数——全数据集恒为 0.0，判定为占位字段（无真实 burstiness 证据）；E4 登记 NOT_AVAILABLE
+  - field: cpu_pressure
+    unit: ratio_0_1（NEP 标注；超出 [0,1] 的异常值仅 NEP max=11.29 属原始异常保留）
+    description: CPU 压力（仅 NEP 真实；azure/shanghai 全 null）
+  - field: memory_pressure
+    unit: 未知（数据中全部 null）
+    description: 内存压力（三数据集全部 null = NOT_AVAILABLE）
+  - field: bandwidth_state
+    unit: 未知（数据中全部 null）
+    description: 带宽状态（三数据集全部 null = NOT_AVAILABLE）
+  - field: rtt_state
+    unit: 未知（数据中全部 null）
+    description: 往返时延状态（三数据集全部 null = NOT_AVAILABLE）
+  - field: region_id
+    unit: enum
+    description: 区域标识（NEP=站点名；shanghai=经纬度小区；azure 全 null）
+  - field: hotspot_distribution
+    unit: JSON dict（区域->占比，字符串编码）
+    description: 热点分布（仅 NEP 真实；azure/shanghai 全 null）
+  - field: missing_field_flags
+    unit: JSON 数组（字符串编码）
+    description: 缺失字段标记——三数据集全部为 "[]"（无记录级缺失标记）
+  - field: raw_source_hash
+    unit: 16-hex
+    description: 每条记录的原始来源 hash（既有预处理生成，仅溯源用途）
+
+# ---------------------------------------------------------------------------
+# 4. 时间顺序与顺序完整性（只读验证结论）
+# ---------------------------------------------------------------------------
+ordering_checks:
+  azure: time_ordered=True（2019-01-01T00:00:00 -> 2019-01-14T23:55:00）
+  nep: time_ordered=True（2020-06-01T00:00:00 -> 2020-06-30T23:55:00）
+  shanghai: time_ordered=True（2014-05-31T23:00:00 -> 2014-11-30T23:00:00）
+missing_records: 未发现（missing_field_flags 全 "[]"；无记录级缺失标记）
+
+# ---------------------------------------------------------------------------
+# 5. 已有 train/pilot/formal split（严格继承，不新建）
+# ---------------------------------------------------------------------------
+existing_split:
+  method: time_ordered
+  shuffle: false
+  ratios: [0.7, 0.15, 0.15]   # calibration / pilot / formal
+  azure: {calibration: 2822, pilot: 604, formal: 606}
+  nep: {calibration: 5364, pilot: 1149, formal: 1150}
+  shanghai: {calibration: 3070, pilot: 658, formal: 659}
+  partition_checks:
+    - "split ⊆ raw（每数据集 split slot_id 集合均为 raw 子集）：PASS"
+    - "calibration ∩ pilot = 0；calibration ∩ formal = 0；pilot ∩ formal = 0：PASS"
+    - "时间顺序：calibration < pilot < formal（无交错）：PASS"
+  split_files:
+    azure: [splits/azure/azure_calibration.jsonl, splits/azure/azure_pilot.jsonl, splits/azure/azure_formal.jsonl]
+    nep: [splits/nep/nep_calibration.jsonl, splits/nep/nep_pilot.jsonl, splits/nep/nep_formal.jsonl]
+    shanghai: [splits/shanghai/shanghai_calibration.jsonl, splits/shanghai/shanghai_pilot.jsonl, splits/shanghai/shanghai_formal.jsonl]
+
+# ---------------------------------------------------------------------------
+# 6. 归一化与预处理 provenance（既有冻结预处理；只确认，不重算）
+# ---------------------------------------------------------------------------
+preprocessing_provenance:
+  rule: workload_intensity = clip((x - P5) / (P95 - P5), 0, 1)
+  p5_p95_source: 仅从 calibration 分区计算（azure/shanghai 的 workload_intensity；nep 因全 0 无归一化）
+  verified_mismatches: 0（抽样 2000 条 calibration 记录逐条复核，与 splits 值一致）
+  azure: {P5: 2603302.0, P95: 3558447.0, n_samples: 2822}
+  shanghai: {P5: 428.0, P95: 1287.0, n_samples: 3070}
+  nep_workload: NOT_AVAILABLE（P5=P95=0.0；无 workload 信号）
+  nep_cpu_pressure_stats: {P5: 0.059971, P95: 0.106358, n_samples: 10727, min: 0.05718, max: 11.286683}
+  aggregation: {azure: 5min, nep: 5min, shanghai: 60min}
+  raw_counts: {azure: 14 files / slots_per_file 288, nep: 276268767 rows / 136 sites, shanghai: 6952921 rows / 12 files}
+  year_note: "shanghai 数据为 2014 年（非 2019）——既有预处理 stats 已注明，可作 temporal pattern 使用"
+  provenance_gap: >
+    仓库内不存在生成这些 processed 文件的预处理脚本（greenfield 重建后未保留）；
+    仅以目录内 preprocessing_stats / split_manifest / split_summary 作为既有 provenance。
+    本阶段不重新执行任何预处理。
+
+# ---------------------------------------------------------------------------
+# 7. 数据真实成分 vs 合成/固定成分（E4 语义边界）
+# ---------------------------------------------------------------------------
+real_components:
+  - "时间戳/timestamp（真实观测时间顺序）"
+  - "request_count / user_count / workload_intensity（azure/shanghai 真实负载观测）"
+  - "cpu_pressure / region_id / hotspot_distribution（NEP 真实观测）"
+synthetic_or_fixed_components:
+  - "E4 Scenario 中的服务器参数（容量 F_j、固定名义故障率 λ_j）"
+  - "设备参数（f_i^loc、λ_i^loc、κ_i、p_i）"
+  - "链路参数（B_ij、h_ij、σ²、p_ij^err）"
+  - "任务参数（c_i、d_i、ν_i、α_i、β_i、R_i^min）"
+  - "M=8 服务器数与拓扑"
+legacy_model_fields_present: false   # 数据中不含 deadline/lambda_eff/ruad/cala/repair 等旧模型字段
+
+# ---------------------------------------------------------------------------
+# 8. 文件清单与 SHA-256（全部 19 文件已计算全量 hash；文件较小，无截断）
+# ---------------------------------------------------------------------------
+file_hashes:
+  - path: azure/azure_preprocessing_stats.json
+    size: 552
+    sha256: 3ad9f1fd0c3d58dfe415da4ee11dfa86ce0a62095c9bbbb8a5b69d4047a5eb3b
+  - path: azure/azure_trace_slots.jsonl
+    size: 1733760
+    sha256: 3aed686a0590809970fc3cf5d44c509df954cdb98d1c80536706b1d05d6e739b
+  - path: manifests/azure_split_manifest.json
+    size: 1633
+    sha256: e0451e0726e9c72ce63507594a8010c1899e8e2d881b23358566a72040cdc6f0
+  - path: manifests/e4_split_summary.json
+    size: 6050
+    sha256: f59e4be938661263c73b6eac20dc9320410ef9da4b40206eff0fb9c4e8623c5c
+  - path: manifests/nep_split_manifest.json
+    size: 1752
+    sha256: 22f725a55af67ac55457f502b84d40714480312080fbadde75b87a2acfcf3cb4
+  - path: manifests/shanghai_split_manifest.json
+    size: 1690
+    sha256: 95e592c86072f75c4c11ee3ad0f11dcb1cab1518ec5aa9d45e7d40363bd7d843
+  - path: nep/nep_preprocessing_stats.json
+    size: 190
+    sha256: 9cb1245c66e4721bc71b8d5722769f3d0c4e3f5585cfb69288412554346191d2
+  - path: nep/nep_trace_slots.jsonl
+    size: 47103901
+    sha256: ba02dedcd371581acb02e719f94d865cf3a9d142cfe1011a7a9d1ddc7e30aec0
+  - path: shanghai/shanghai_preprocessing_stats.json
+    size: 335
+    sha256: 5f6286721c07d6505e310163a4c62bf7e6ecf215285bf51129885a6a21801dd2
+  - path: shanghai/shanghai_trace_slots.jsonl
+    size: 1986734
+    sha256: 274f8050b30fde0eece80ae66426d0fe8161d8d8345620e845b57803030b2e60
+  - path: splits/azure/azure_calibration.jsonl
+    size: 1235248
+    sha256: 2b3ad2150834fb1b2219898cd824053678f34e670071348279229a9c58be9fc8
+  - path: splits/azure/azure_formal.jsonl
+    size: 265475
+    sha256: 79ceb33be6da4c6df7665e7d454c6328c4fd71e7b78878474efa8fe8022c46f0
+  - path: splits/azure/azure_pilot.jsonl
+    size: 264087
+    sha256: e9da330ade797da922da0153f62f7d6610d4e8dd1177d9d84d2c0bec6ff6f897
+  - path: splits/nep/nep_calibration.jsonl
+    size: 32995547
+    sha256: ffab58a58129ca4a3ed10b5061694a33295b0b6ab0ab5f566ded154dd1781b6d
+  - path: splits/nep/nep_formal.jsonl
+    size: 7054499
+    sha256: 726d77ce561b420105bf97f650415b7a5498aa062a4012b210458f17a99be428
+  - path: splits/nep/nep_pilot.jsonl
+    size: 7053855
+    sha256: 42a0cdfacd55559cfe6d8c031f7d5a8f220a05f7dca94f94cc3abed450ae7ee0
+  - path: splits/shanghai/shanghai_calibration.jsonl
+    size: 1424415
+    sha256: 18606bc82474f6ea96118c148033b3c0d73ac0677ee8e2ac934deb89f3f98b95
+  - path: splits/shanghai/shanghai_formal.jsonl
+    size: 304406
+    sha256: 74dabd4d60b6967e5603e37923edad8df29cdffb0f39c624f5d577e0a5684d5a
+  - path: splits/shanghai/shanghai_pilot.jsonl
+    size: 304067
+    sha256: 54b215cbde3368cbe3770b843023353226a690b672ae9aa6a98f29aabea58272
+
+hash_note: >
+  全部 19 文件（合计约 97 MiB）已计算完整 SHA-256，无因文件过大而未计算的情况；
+  hash 仅用于只读完整性基线（pre/post 一致性），不构成数据重新处理。
+
+# ---------------------------------------------------------------------------
+# 9. 与当前正式语义的兼容性结论（E4-V2-0）
+# ---------------------------------------------------------------------------
+compatibility:
+  contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+  schema_version: CARS_ACTIVE_SCHEMA_V4
+  legacy_semantics_present_in_data: false
+  deadline_dependency: NONE（数据无 deadline 字段；模型无 deadline 语义）
+  lambda_eff_dependency: NONE（数据无 lambda_eff 字段；模型固定名义 λ_j）
+  ruad_cala_repair_dependency: NONE（数据无相关字段）
+  conclusion: COMPATIBLE_AS_TRACE_DRIVER
+  evidence_boundary: trace-enhanced / semi-synthetic（E4 正式论文表述仅限 workload-derived /
+    trace-enhanced / semi-synthetic 三类；不得表述为真实 MEC 部署验证）

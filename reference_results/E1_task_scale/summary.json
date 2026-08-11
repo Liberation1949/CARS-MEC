@@ -1,0 +1,43 @@
+{
+  "stage": "E1-V2-1 formal",
+  "status": "FORMAL",
+  "environment": "E1_V2_ENVIRONMENT_SELECTED_V1 (sf1_vMEDIUM)",
+  "seeds": [
+    1101,
+    1102,
+    1103,
+    1104,
+    1105,
+    1106,
+    1107,
+    1108,
+    1109,
+    1110
+  ],
+  "n_grid": [
+    20,
+    50,
+    80,
+    110,
+    140,
+    170,
+    200
+  ],
+  "methods": {
+    "main": [
+      "cars",
+      "bpso_rata_la",
+      "jtora_adapted",
+      "nfa_adapted",
+      "reliability_only",
+      "local_only"
+    ],
+    "diagnostic": [
+      "foa"
+    ]
+  },
+  "total_runs": 490,
+  "timeout_count": 0,
+  "method_error_count": 0,
+  "elapsed_seconds": 543.6
+}

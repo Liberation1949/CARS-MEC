@@ -1,0 +1,488 @@
+{
+  "case_id": "tiny-invalid-cases",
+  "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+  "description": "R1B 冻结非法案例清单：每个案例必须被 validate_active_schema.py 拒绝。expected_rejection 取值：schema_validation（JSON Schema 校验失败）/ cross_field_invariant（Schema 通过但跨字段不变量失败）/ forbidden_field（legacy_forbidden_fields 扫描发现）/ timepoint_violation（状态时点检查发现未来信息）/ unit_missing（字段单位检查发现缺失）。对应提示词 §4 与 R1B_ACTIVE_SCHEMA_FREEZE.md Part 6 的 10 项拒绝要求。",
+  "invalid_cases": [
+    {
+      "case_id": "INV-01",
+      "description": "一个任务同时本地和边缘执行：C3 违约（X[0]=0 但 A[0]=[1,0]）",
+      "violated_invariant": "C3: sum_j A[i][j] == X[i]",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "cross_field_invariant",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          0,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            0,
+            0
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-02",
+      "description": "一个任务分配到两台服务器：C3 违约（X[0]=1 但 A[0]=[1,1]）",
+      "violated_invariant": "C3: sum_j A[i][j] == X[i]",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "cross_field_invariant",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          1,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            2000,
+            2000
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-03",
+      "description": "本地任务具有非零边缘资源：C5 违约（X[0]=0, A[0]=[0,0] 但 F[0]=[100,0]）",
+      "violated_invariant": "C5: A[i][j]==0 => F[i][j]==0",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "cross_field_invariant",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          0,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            100,
+            0
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-04",
+      "description": "未指派边具有非零资源：C5 违约（A[0]=[1,0] 但 F[0]=[100,50]）",
+      "violated_invariant": "C5: A[i][j]==0 => F[i][j]==0",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "cross_field_invariant",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          1,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            100,
+            50
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-05",
+      "description": "X/A/F 维度错误：len(A)=1 但 len(X)=2（N 不一致）",
+      "violated_invariant": "维度一致性: len(X)==len(A)==len(F)==N",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "cross_field_invariant",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          0,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            0,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            0,
+            0
+          ],
+          [
+            4000,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-06a",
+      "description": "负资源：F[1][0] = -5 违反 f_ij >= 0",
+      "violated_invariant": "C5: 0 <= f_ij",
+      "target_schema": "schedule_decision.schema.json",
+      "expected_rejection": "schema_validation",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "offloading_decision": [
+          0,
+          1
+        ],
+        "assignment_matrix": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "resource_allocation": [
+          [
+            0,
+            0
+          ],
+          [
+            -5,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-06b",
+      "description": "非法概率：R_i^min = 1.5 超出开区间 (0,1)",
+      "violated_invariant": "R_i^min in (0,1)",
+      "target_schema": "scenario.schema.json",
+      "expected_rejection": "schema_validation",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-06b",
+        "state_timepoint": "T0",
+        "system_params": {
+          "numeric_epsilon": 1e-12,
+          "rcla_solver": {
+            "rcla_mu_tol": 1e-09,
+            "rcla_max_iters": 200,
+            "rcla_mu_lo": 1e-12,
+            "rcla_mu_hi": 1000000000000.0,
+            "rcla_numeric_epsilon": 1e-12
+          }
+        },
+        "tasks": [
+          {
+            "task_id": "t1",
+            "device_id": "d1",
+            "data_bits": 1000,
+            "cpu_cycles": 4000,
+            "fragility": 0.0,
+            "delay_weight": 0.7,
+            "energy_weight": 0.3,
+            "deadline_seconds": 3.0,
+            "min_reliability": 1.5
+          }
+        ],
+        "devices": [
+          {
+            "device_id": "d1",
+            "local_cpu_rate": 2000,
+            "local_failure_rate": 0.01,
+            "switch_capacitance": 1.0,
+            "tx_power_watts": 0.5
+          }
+        ],
+        "servers": [
+          {
+            "server_id": "s1",
+            "capacity_cycles_per_sec": 4000,
+            "nominal_failure_rate": 0.05
+          }
+        ],
+        "links": []
+      }
+    },
+    {
+      "case_id": "INV-07",
+      "description": "动态 lambda_eff：scenario 含 legacy_forbidden_fields 字段 lambda_eff",
+      "violated_invariant": "固定名义 lambda_j 不被动态改写（Contract Part 1.4）",
+      "target_schema": "scenario.schema.json",
+      "expected_rejection": "forbidden_field",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-07",
+        "state_timepoint": "T0",
+        "lambda_eff": 0.2,
+        "tasks": [],
+        "devices": [],
+        "servers": [],
+        "links": []
+      }
+    },
+    {
+      "case_id": "INV-08",
+      "description": "GNN/Teacher/checkpoint 字段：method_result 含 gnn_candidate 与 checkpoint",
+      "violated_invariant": "无独立 GNN/Teacher/Oracle/checkpoint（AGENTS.md、Contract Part 0.2）",
+      "target_schema": "method_result.schema.json#/$defs/MethodResult",
+      "expected_rejection": "forbidden_field",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "method_id": "CARS",
+        "method_status": "SUCCESS",
+        "scenario_id": "tiny-valid",
+        "seed": 42,
+        "decision": {
+          "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+          "offloading_decision": [
+            0,
+            1
+          ],
+          "assignment_matrix": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "resource_allocation": [
+            [
+              0,
+              0
+            ],
+            [
+              4000,
+              0
+            ]
+          ]
+        },
+        "module_statuses": [],
+        "physically_feasible": true,
+        "task_success_indicators": [
+          1,
+          1
+        ],
+        "runtime_seconds": 0.5,
+        "timed_out": false,
+        "gnn_candidate": {
+          "layer": 1
+        },
+        "checkpoint": "/tmp/ckpt.pt",
+        "diagnostics": {}
+      }
+    },
+    {
+      "case_id": "INV-09",
+      "description": "AADA 输入包含 T2-T4 未来信息：predecision_state 含 resource_allocation（F 只能在 RCLA 后产生）",
+      "violated_invariant": "AADA 输入不含未来信息（Contract V4 §1）",
+      "target_schema": "predecision_state.schema.json",
+      "expected_rejection": "timepoint_violation",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-09",
+        "state_timepoint": "T0",
+        "system_params": {
+          "numeric_epsilon": 1e-12,
+          "rcla_solver": {
+            "rcla_mu_tol": 1e-09,
+            "rcla_max_iters": 200,
+            "rcla_mu_lo": 1e-12,
+            "rcla_mu_hi": 1000000000000.0,
+            "rcla_numeric_epsilon": 1e-12
+          }
+        },
+        "tasks": [
+          {
+            "task_id": "t1",
+            "device_id": "d1",
+            "data_bits": 1000,
+            "cpu_cycles": 4000,
+            "fragility": 0.0,
+            "delay_weight": 0.7,
+            "energy_weight": 0.3,
+            "deadline_seconds": 3.0,
+            "min_reliability": 0.9
+          }
+        ],
+        "devices": [
+          {
+            "device_id": "d1",
+            "local_cpu_rate": 2000,
+            "local_failure_rate": 0.01,
+            "switch_capacitance": 1.0,
+            "tx_power_watts": 0.5
+          }
+        ],
+        "servers": [
+          {
+            "server_id": "s1",
+            "capacity_cycles_per_sec": 4000,
+            "nominal_failure_rate": 0.05
+          }
+        ],
+        "links": [],
+        "resource_allocation": [
+          [
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "INV-10a",
+      "description": "缺失关键 ID：task 对象缺 task_id（required 缺失）",
+      "violated_invariant": "required 完整性：task_id 必填",
+      "target_schema": "core_entities.schema.json#/$defs/Task",
+      "expected_rejection": "schema_validation",
+      "payload": {
+        "device_id": "d1",
+        "data_bits": 1000,
+        "cpu_cycles": 4000,
+        "fragility": 0.0,
+        "delay_weight": 0.7,
+        "energy_weight": 0.3,
+        "deadline_seconds": 3.0,
+        "min_reliability": 0.9
+      }
+    },
+    {
+      "case_id": "INV-10b",
+      "description": "缺失关键单位：字段定义缺 x-unit 与 description（unit 完整性检查失败）",
+      "violated_invariant": "每个叶子字段必须具有 x-unit 或 description（Step 4 第 6 条）",
+      "target_schema": null,
+      "expected_rejection": "unit_missing",
+      "payload": {
+        "$defs": {
+          "BadNumericField": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    {
+      "case_id": "INV-11",
+      "description": "旧 RUAD/三压力字段：scenario 含 ruad_pressure_weights（eta_rho/eta_Q/eta_Z）与 ruad_smoothing（s_Q/s_Z），正式 CARS 配置必须拒绝旧参数",
+      "violated_invariant": "当前正式 CARS（V4）只接受 rcla_solver；旧 eta_rho/eta_Q/eta_Z/s_Q/s_Z 字段被废止",
+      "target_schema": "scenario.schema.json",
+      "expected_rejection": "forbidden_field",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-11",
+        "state_timepoint": "T0",
+        "system_params": {
+          "ruad_pressure_weights": {
+            "eta_rho": 0.4,
+            "eta_Q": 0.3,
+            "eta_Z": 0.3
+          },
+          "ruad_smoothing": {
+            "s_Q": 1.0,
+            "s_Z": 1.0
+          },
+          "numeric_epsilon": 1e-12
+        },
+        "tasks": [],
+        "devices": [],
+        "servers": [],
+        "links": []
+      }
+    },
+    {
+      "case_id": "INV-12",
+      "description": "CR-R4-1 gamma 越界：ruad_gamma = 1.5 超出 [0,1]",
+      "violated_invariant": "ruad_gamma in [0,1]（V-B.4；CFG-01）",
+      "target_schema": "scenario.schema.json",
+      "expected_rejection": "schema_validation",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-12",
+        "state_timepoint": "T0",
+        "system_params": {
+          "ruad_gamma": 1.5,
+          "numeric_epsilon": 1e-12
+        },
+        "tasks": [],
+        "devices": [],
+        "servers": [],
+        "links": []
+      }
+    },
+    {
+      "case_id": "INV-RUAD-GAMMA",
+      "description": "场景 system_params 含 ruad_gamma：V4（及 V3）CARS 无可调混合权重，必须拒绝（forbidden field）",
+      "violated_invariant": "SystemParams 不含 ruad_gamma（CR-RUAD 废止；V4 继承）",
+      "target_schema": "scenario.schema.json",
+      "expected_rejection": "forbidden_field",
+      "payload": {
+        "schema_version": "CARS_ACTIVE_SCHEMA_V4",
+        "scenario_id": "inv-ruad-gamma",
+        "state_timepoint": "T0",
+        "system_params": {
+          "ruad_gamma": 1.0,
+          "numeric_epsilon": 1e-12
+        },
+        "tasks": [],
+        "devices": [],
+        "servers": [],
+        "links": []
+      }
+    }
+  ]
+}

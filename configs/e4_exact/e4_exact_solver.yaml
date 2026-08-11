@@ -1,0 +1,80 @@
+# E4-EXACT Exact Oracle Solver 配置
+# 版本: E4_EXACT_SOLVER_V1
+# 日期: 2026-08-09（E4-EXACT-1 冻结；E4-EXACT-2 补建落盘）
+# 阶段: E4-EXACT-1（实现与验证）；E4-EXACT-2 确认与补建
+# 状态: FROZEN（语义与 E4-EXACT-1 代码/测试冻结一致）
+# 直接依据:
+#   - src/cars/exact_oracle/（model/discrete_enumerator/feasibility/continuous_solver/
+#     lexicographic/certificate/oracle；E4-EXACT-1 创建）
+#   - tests/e4_exact/test_e4_exact_1_oracle.py（T1-T44 + 13 cross-check = 57 passed）
+#   - E4_EXACT_ORACLE_CONTRACT_V1.md（Exact 资格条件 A-D；Route A；证书）
+# 说明: 本文件在 E4-EXACT-1 报告 §5 中登记为 created，但实际未落盘；
+#       本版为 E4-EXACT-2 依据已冻结代码语义补建（不改语义、不重开验证）。
+
+solver_version: E4_EXACT_SOLVER_V1
+status: FROZEN
+optimization_record: >-
+  CR_E4_EXACT_SCALE_REDUCTION_OPTIMIZATION_V1（2026-08-10）：
+  1) 实例级并行（Pilot/Formal runner --workers N；Oracle 求解器零改动；按 matrix 顺序
+     写记录，确定性）——已实施；
+  2) KKT 二分迭代 200→80：尝试后回滚——80 次外层 mu 二分在 f 大 case 与 naive(200)
+     差 7.8e-8 > 1e-9（cross-check 失败）；KKT 迭代数必须保持 200（与冻结 naive=200 对齐）。
+  语义/枚举/证书判定均未改变。
+
+# ---------------------------------------------------------------------------
+# 1. 枚举模式
+# ---------------------------------------------------------------------------
+enumeration:
+  default_mode: EXACT_PRUNED        # 生产模式（E4-EXACT-1）
+  naive_mode: NAIVE_EXHAUSTIVE      # 仅独立 cross-check 验证用
+  state_space_note: >
+    离散 X/A 状态数上界 ~ prod_i (1 + |edge_servers_i|)，每任务 1 LOCAL + 全部
+    e_phy=1 的 EDGE；C3/C4 约束内。NAIVE 与 EXACT_PRUNED 离散层动作空间相同。
+
+# ---------------------------------------------------------------------------
+# 2. 安全剪枝规则（登记；未登记规则一律拒绝）
+# ---------------------------------------------------------------------------
+safe_pruning_rules:
+  - PRUNE-A     # C4 硬约束：a_ij=1 需 e_phy=1；枚举层排除 e_phy=0 边
+  - PRUNE-B     # 必败任务（b_loc=0 且无可达 edge）：z_i 恒 0，固定失败不影响最优
+
+# ---------------------------------------------------------------------------
+# 3. 连续子问题（Route A；每服务器固定成功集 S 的 Tier-2 凸问题）
+# ---------------------------------------------------------------------------
+continuous_solver:
+  method: "KKT / active-set + 单调二分"
+  convexity_basis: "ell^R > a/2（ln(R_tx/R_min) <= ln(1/0.8) < 2）=> R_i 在 [ell^R, inf) 严格凹增"
+  free_branch_solvability: "C >= sum_{free} f_i(mu_ub)（非 naive free-floor-sum）"
+  numerical_guard: "二分精度可能使 sum f 略超容量 -> free 部分缩放钳制（Evaluator C6 容差内）"
+  zero_floor: "a=0 任务 Tier-2 无贡献，按冻结 epsilon_min 约定分配（T21）"
+
+# ---------------------------------------------------------------------------
+# 4. 数值容差（仅复用 Contract/Evaluator 冻结容差；不新增、不事后选择）
+# ---------------------------------------------------------------------------
+tolerance:
+  eps_cmp: 1.0e-9          # 字典序比较绝对容差（Contract V4 §7 / E4-EXACT-1）
+  numeric_epsilon: 1.0e-12 # 数值保护（Contract V4 §7）
+  residual_tolerance: "10 * eps_cmp（certificate 残差判定；E4-EXACT-1 实现）"
+  kkt_max_iter: 200        # 连续求解二分/迭代上界（E4-EXACT-1 实现默认）
+
+# ---------------------------------------------------------------------------
+# 5. Oracle 状态（与 E4-EXACT-1 certificate 一致）
+# ---------------------------------------------------------------------------
+accepted_oracle_status:
+  - EXACT_OPTIMAL
+  - CERTIFIED_NUMERICAL_EXACT
+rejected_oracle_status:
+  - TIMEOUT_UNCERTIFIED
+  - NOT_EXACT
+  - SOLVER_ERROR
+other_oracle_status:
+  - INFEASIBLE            # 实例在 Omega_phy 上整体不可行（如实记录，不计 Exact 完成）
+
+# ---------------------------------------------------------------------------
+# 6. 不变量
+# ---------------------------------------------------------------------------
+invariants:
+  - "Oracle 与 CARS 共用同一公共 Evaluator / canonical metric semantics"
+  - "Oracle 不读取 CARS 输出；不修改公共模型/Evaluator/CARS"
+  - "不访问 formal seeds（3501-3510 仅登记）"
+  - "同一 code+config+scenario+seed 产生同一离散决策与证书"

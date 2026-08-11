@@ -1,0 +1,33 @@
+# CARS CR-CARS-PROMOTION-E1 正式方法配置（frozen；AADA → RCLA，无 Repair）
+# 版本: CARS_V4_CARS_FROZEN_V1
+# 日期: 2026-08-09
+# 阶段: CR-CARS-PROMOTION-E1（候选提升为正式 CARS + E1 合同）
+# 说明: 正式 CARS = AADA → RCLA（正文 V-A.4 Table V-1；Contract V4）。
+#       - aada_variant=full（完整两阶段：Phase-1 rescue + Phase-2 P0 字典序门控）；
+#       - allocation_mode=rcla（带 reliability floor 的 KKT/active-set）；
+#       - rcla_* 为确定性求解器冻结默认（Contract V4 §7；与候选
+#         configs/cr_algorithm_redesign/candidate_v1.yaml 一致）；
+#       - 无 kappa_R / kappa_D / cala_weights / repair_budget / repair_tolerances
+#         （V4 禁止 CALA/Repair 参数；Schema V4 legacy forbidden）。
+#       - scenario_config 指向参考场景（仅记录；正式 validation 由 E1 runner
+#         用生成器构造 paired 场景）。
+# 直接依据: Contract V4（CARS_EXECUTABLE_THEORY_CONTRACT_V4.md）、
+#       Schema V4（CARS_ACTIVE_SCHEMA_V4）、正文 V-B/V-C/V-D。
+
+method_id: cars
+config_label: cars_frozen_cr_cars_promotion_e1
+scenario_config: configs/cars_v4/scenario_low_v4.yaml
+
+eps_cmp: 1.0e-09          # R2 冻结判定容差（evaluator_contract.yaml §5）
+method_seed: 1
+hard_timeout_seconds: 30.0
+
+aada_variant: full
+allocation_mode: rcla
+
+# RCLA 确定性求解器参数（Contract V4 §7；冻结默认；非调参旋钮）
+rcla_mu_tol: 1.0e-09
+rcla_max_iters: 200
+rcla_mu_lo: 1.0e-12
+rcla_mu_hi: 1.0e+12
+rcla_numeric_epsilon: 1.0e-12

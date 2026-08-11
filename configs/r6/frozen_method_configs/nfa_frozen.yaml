@@ -1,0 +1,21 @@
+method_id: nfa_adapted
+config_label: nfa_frozen_r6
+scenario_config: configs/r3/nfa/small_scenario.yaml
+population_size_max: 8
+max_generations_max: 10
+beta_0: 1.0
+gamma: 2.0
+position_bounds:
+- -2.0
+- 2.0
+method_seed: 1
+objective_evaluation_cap_max: 4744
+hard_timeout_seconds: 30.0
+soft_deadline_margin: 3.0
+# E1 落实（2026-08-08 用户授权）：加权多目标 [成功数, 有效可靠性, 有效效用]，
+# 三方面都进入 NFA 内部目标（成功数主导 + 可靠性/效用兼顾）
+objective_weights:
+- 0.5
+- 0.25
+- 0.25
+_test_hook_sleep_seconds_per_evaluation: 0.0

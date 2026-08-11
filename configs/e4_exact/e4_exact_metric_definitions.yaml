@@ -1,0 +1,122 @@
+# E4-EXACT 指标定义（lexicographic oracle-gap 与 exact-match 指标）
+# 版本: E4_EXACT_METRIC_DEFINITIONS_V1
+# 日期: 2026-08-09
+# 阶段: E4-EXACT-0（冻结；NOT_EXECUTED）
+# 直接依据: experiment_docs/III_VII.md IV-D.3（字典序 Oracle gap 口径）
+#           + III-E.3 / IV-C.3-5（TSSR / Rbar_eff / Ubar_eff 口径）
+#           + Contract V4 §7（统一容差 eps_cmp=1.0e-9；numeric_epsilon=1.0e-12）
+# 注意: 所有"相同"的数值比较复用现有 Contract/Evaluator 容差 eps_cmp=1.0e-9，
+#       不得事后根据结果选择 epsilon。
+
+metric_definitions_version: E4_EXACT_METRIC_DEFINITIONS_V1
+
+# ---------------------------------------------------------------------------
+# 1. Oracle objective tuple（机器可解析）
+# ---------------------------------------------------------------------------
+oracle_objective_tuple:
+  - tier: 1
+    metric: TSSR
+    formula: "(1/N) * sum_i z_i(Pi)"
+    maximize: true
+    source: "III-E.3 / IV-C.3 (F-21/F-42)"
+  - tier: 2
+    metric: mean_effective_reliability
+    formula: "(1/N) * sum_i z_i(Pi) * R_i(Pi)"
+    maximize: true
+    source: "III-E.3 / IV-C.4 (F-22/F-43)"
+  - tier: 3
+    metric: mean_effective_utility
+    formula: "(1/N) * sum_i U_i^eff(Pi)"
+    maximize: true
+    source: "IV-C.5 (F-41)"
+
+# ---------------------------------------------------------------------------
+# 2. Delta（gap sign 固定为 Oracle - CARS）
+# ---------------------------------------------------------------------------
+delta_definitions:
+  sign_convention: "Oracle - CARS"
+  delta_tier_1:
+    symbol: Delta_TSSR
+    formula: "TSSR_oracle - TSSR_cars"
+    unit: "ratio [0,1]"
+  delta_tier_2:
+    symbol: Delta_R
+    formula: "Rbar_eff_oracle - Rbar_eff_cars"
+    conditional_on: "Delta_TSSR within tolerance == 0"
+  delta_tier_3:
+    symbol: Delta_U
+    formula: "Ubar_eff_oracle - Ubar_eff_cars"
+    conditional_on: "Delta_TSSR == 0 AND Delta_R == 0"
+
+lexicographic_interpretation:
+  level_1: "先判断 CARS 是否达到 Oracle 的 Tier-1（TSSR）最优值"
+  level_2: "仅当 Tier-1 目标值相同，才评价 Tier-2 optimality gap 的字典序意义"
+  level_3: "仅当 Tier-1、Tier-2 都相同，才评价 Tier-3 optimality gap 的字典序意义"
+  note: "可额外保存全部 raw numerical delta，但不得把三个 gap 简单加权为一个未经正文定义的 scalar gap"
+
+# ---------------------------------------------------------------------------
+# 3. Exact-match 指标
+# ---------------------------------------------------------------------------
+match_indicators:
+  first_tier_match:
+    definition: "TSSR_oracle == TSSR_cars（按 eps_cmp=1.0e-9 容差比较）"
+    type: boolean
+  full_lexicographic_match:
+    definition: "Tier-1 与 Tier-2 与 Tier-3 全部相同（按 eps_cmp 容差）"
+    type: boolean
+  exact_match:
+    definition: "full_lexicographic_match == true"
+    type: boolean
+  exact_match_rate:
+    definition: "exact_match 的实例占比（逐实例统计）"
+    type: "ratio [0,1]"
+  first_tier_match_rate:
+    definition: "first_tier_match 的实例占比（逐实例统计）"
+    type: "ratio [0,1]"
+
+# ---------------------------------------------------------------------------
+# 4. 运行时
+# ---------------------------------------------------------------------------
+runtime_fields:
+  - oracle_runtime_ms
+  - cars_runtime_ms
+runtime_note: >
+  Oracle runtime 与 CARS runtime 均记录；E4 核心 Claim 是 optimality gap，
+  不是"Oracle 慢多少"。Oracle runtime 主要作用是决定 E4-EXACT-2 Pilot 后
+  正式可承受的最大 N；不得根据 CARS gap 是否好看选择最大 N。
+
+# ---------------------------------------------------------------------------
+# 5. 状态与失败语义
+# ---------------------------------------------------------------------------
+status_definitions:
+  oracle_status:
+    - SUCCESS                # 合法 Pi in Omega_phy + 完整 exactness certificate
+    - TIMEOUT                # 超过 per-instance Oracle timeout；不计为 Exact 完成
+    - SOLVER_ERROR           # Oracle 内部异常；如实记录
+    - NOT_EXACT              # 无法证明 P0 字典序全局最优（只能给出 bound/heuristic）
+    - INFEASIBLE_INSTANCE    # 实例在 Omega_phy 上存在不可行域问题；如实记录
+  cars_status:
+    - SUCCESS
+    - TIMEOUT
+    - METHOD_ERROR
+    - BUDGET_EXHAUSTED
+  failure_accounting: "所有 timeout / infeasible / solver_error / not_exact 完整保留在正式统计中"
+
+# ---------------------------------------------------------------------------
+# 6. Exactness certification fields（见 E4_EXACT_ORACLE_CONTRACT_V1 §7）
+# ---------------------------------------------------------------------------
+exactness_certification_fields:
+  - enumeration_covered
+  - pruning_rules
+  - continuous_exactness
+  - continuous_certificate
+  - shared_evaluator_used
+  - lexicographic_optimum_certified
+
+# ---------------------------------------------------------------------------
+# 7. 数值容差（仅复用现有合同，不新增）
+# ---------------------------------------------------------------------------
+tolerance:
+  eps_cmp: 1.0e-09          # 判定比较绝对容差（R2/Contract V4 §7 冻结）
+  numeric_epsilon: 1.0e-12  # 数值保护（Contract V4 §7 冻结）
+  tolerance_policy: "复用现有 Contract/Evaluator 容差；不得事后选择 epsilon"
