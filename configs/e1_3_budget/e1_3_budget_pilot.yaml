@@ -1,0 +1,36 @@
+# ===========================================================================
+# E1-3 Stage 2：Pilot 校准配置（协议可执行性验证；NOT_FORMAL）
+# ===========================================================================
+# 版本: E1_3_BUDGET_PILOT_V1
+# 日期: 2026-08-09
+# 阶段: E1-3 Stage 2（Pilot 校准与 Formal 配置冻结）
+# 状态: PILOT（只验证协议可执行性；不生成正式性能结论）
+# 依据: Stage-1 协议 E1_3_BUDGET_SENSITIVITY_PROTOCOL_V1（唯一预算映射权威）
+#       + E1-V2-1 正式配置/results + E1-V2-1 pilot 场景（seeds 201-203）
+# ===========================================================================
+
+experiment_id: e1_3_budget_pilot
+protocol_version: e1_3_budget_sensitivity_protocol_v1
+stage: "Stage 2：Pilot 校准与 Formal 配置冻结（NOT_FORMAL）"
+status_date: "2026-08-09"
+
+pilot:
+  seeds: [201, 202, 203]            # 独立 pilot seeds（validation pool；∩ formal 1101-1110 = ∅）
+  scenario_n: 200
+  scenario_m: 8
+  scenario_files: "results/e1_3_budget/scenarios/scenario_seed{seed}_n200.yaml"
+  scenario_id_prefix: "e1_v2_1_pilot"
+  methods:
+    scanned: [bpso_rata_la, nfa_adapted]
+    reference: [cars]
+  budget_multipliers: [0.5, 1.0, 2.0, 4.0]
+  timeout_seconds: 30.0
+  total_runs: 27    # (2 scanned × 4 档 + 1 reference) × 3 seeds = 9 × 3
+  output_dir: results/e1_3_budget/budget_pilot
+  forbidden:
+    - "Pilot 结果不得作为论文正式性能证据"
+    - "不得使用 formal seeds 1101-1110"
+    - "不得根据 Pilot 调 baseline 性能超参/场景/seeds"
+    - "不得修改算法/Evaluator/正式指标"
+  gates: [A, B, C, D]               # A 配置单调 / B 消耗有效 / C runtime 可辨识 / D 可运行性
+  no_performance_conclusion: true

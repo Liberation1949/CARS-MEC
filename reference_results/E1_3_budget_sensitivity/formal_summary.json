@@ -1,0 +1,205 @@
+{
+  "cars_reference": {
+    "n": 10,
+    "rbar_eff": 0.916517,
+    "status": [
+      "SUCCESS"
+    ],
+    "t_alg_ms": 73.5,
+    "timeout": 0,
+    "tssr": 0.954,
+    "tssr_std": 0.014457,
+    "ubar_eff": 0.155942,
+    "v_r": 0.046
+  },
+  "paired_deltas": {
+    "bpso_rata_la": {
+      "1x-0.5x": {
+        "delta_tssr_mean": -0.0025,
+        "delta_tssr_std": 0.019268,
+        "n_pairs": 10
+      },
+      "2x-1x": {
+        "delta_tssr_mean": 0.01,
+        "delta_tssr_std": 0.015969,
+        "n_pairs": 10
+      },
+      "4x-1x": {
+        "delta_tssr_mean": 0.0095,
+        "delta_tssr_std": 0.011927,
+        "n_pairs": 10
+      },
+      "4x-2x": {
+        "delta_tssr_mean": -0.0005,
+        "delta_tssr_std": 0.019551,
+        "n_pairs": 10
+      },
+      "4x_vs_cars_tssr": {
+        "delta_tssr_list": [
+          -0.16,
+          -0.195,
+          -0.19,
+          -0.19,
+          -0.205,
+          -0.155,
+          -0.155,
+          -0.195,
+          -0.15,
+          -0.23
+        ],
+        "delta_tssr_mean": -0.1825,
+        "delta_tssr_std": 0.025025,
+        "n_pairs": 10
+      }
+    },
+    "nfa_adapted": {
+      "1x-0.5x": {
+        "delta_tssr_mean": 0.029,
+        "delta_tssr_std": 0.017146,
+        "n_pairs": 10
+      },
+      "2x-1x": {
+        "delta_tssr_mean": 0.0075,
+        "delta_tssr_std": 0.009014,
+        "n_pairs": 10
+      },
+      "4x-1x": {
+        "delta_tssr_mean": 0.0,
+        "delta_tssr_std": 0.0,
+        "n_pairs": 1
+      },
+      "4x-2x": {
+        "delta_tssr_mean": 0.0,
+        "delta_tssr_std": 0.0,
+        "n_pairs": 1
+      },
+      "4x_vs_cars_tssr": {
+        "delta_tssr_list": [
+          -0.04
+        ],
+        "delta_tssr_mean": -0.04,
+        "delta_tssr_std": 0.0,
+        "n_pairs": 1
+      }
+    }
+  },
+  "per_method_per_multiplier": {
+    "bpso_rata_la": {
+      "0.5": {
+        "consumed": 24.0,
+        "n": 10,
+        "rbar_eff": 0.744561,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 28.1,
+        "timeout": 0,
+        "tssr": 0.7645,
+        "tssr_std": 0.021266,
+        "ubar_eff": 0.112876,
+        "v_r": 0.2355
+      },
+      "1.0": {
+        "consumed": 48.0,
+        "n": 10,
+        "rbar_eff": 0.741496,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 54.6,
+        "timeout": 0,
+        "tssr": 0.762,
+        "tssr_std": 0.020396,
+        "ubar_eff": 0.09694,
+        "v_r": 0.238
+      },
+      "2.0": {
+        "consumed": 96.0,
+        "n": 10,
+        "rbar_eff": 0.75108,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 104.9,
+        "timeout": 0,
+        "tssr": 0.772,
+        "tssr_std": 0.017635,
+        "ubar_eff": 0.113566,
+        "v_r": 0.228
+      },
+      "4.0": {
+        "consumed": 192.0,
+        "n": 10,
+        "rbar_eff": 0.750701,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 239.2,
+        "timeout": 0,
+        "tssr": 0.7715,
+        "tssr_std": 0.024088,
+        "ubar_eff": 0.119214,
+        "v_r": 0.2285
+      }
+    },
+    "nfa_adapted": {
+      "0.5": {
+        "consumed": 2372.0,
+        "n": 10,
+        "rbar_eff": 0.864709,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 2357.8,
+        "timeout": 0,
+        "tssr": 0.901,
+        "tssr_std": 0.019468,
+        "ubar_eff": 0.134396,
+        "v_r": 0.099
+      },
+      "1.0": {
+        "consumed": 4744.0,
+        "n": 10,
+        "rbar_eff": 0.891003,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 5026.5,
+        "timeout": 0,
+        "tssr": 0.93,
+        "tssr_std": 0.020248,
+        "ubar_eff": 0.147691,
+        "v_r": 0.07
+      },
+      "2.0": {
+        "consumed": 9488.0,
+        "n": 10,
+        "rbar_eff": 0.897966,
+        "status": [
+          "BUDGET_EXHAUSTED"
+        ],
+        "t_alg_ms": 11661.0,
+        "timeout": 0,
+        "tssr": 0.9375,
+        "tssr_std": 0.024005,
+        "ubar_eff": 0.149367,
+        "v_r": 0.0625
+      },
+      "4.0": {
+        "consumed": 18696.1,
+        "n": 10,
+        "rbar_eff": 0.857329,
+        "status": [
+          "BUDGET_EXHAUSTED",
+          "TIMEOUT"
+        ],
+        "t_alg_ms": 29628.1,
+        "timeout": 9,
+        "tssr": 0.89,
+        "tssr_std": 0.0,
+        "ubar_eff": 0.129917,
+        "v_r": 0.11
+      }
+    }
+  }
+}

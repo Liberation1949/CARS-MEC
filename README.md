@@ -6,9 +6,9 @@ CARS（Capacity-Aware Reliability Stabilization Framework）是面向多用户�
 
 CARS (Capacity-Aware Reliability Stabilization Framework) is a reliability-aware online scheduling framework for multi-user mobile edge computing (MU-MEC): the discrete assignment stage senses downstream resource contention, and the continuous resource-allocation stage explicitly enforces task-level reliability resource requirements. The core method chain is **AADA → RCLA**.
 
-本仓库是论文的公开复现实现（Paper Release, v1.0.1），包含正式算法实现、统一模拟器与评价器、六个对比方法、Small-Scale Exact Oracle、V4 Active Schema、正式实验协议与复现脚本、轻量机器可读参考结果摘要。
+本仓库是论文的公开复现实现（Paper Release, v1.0.4），包含正式算法实现、统一模拟器与评价器、六个对比方法、Small-Scale Exact Oracle、V4 Active Schema、正式实验协议与复现脚本、轻量机器可读参考结果摘要。
 
-This repository is the public reproduction implementation of the paper (Paper Release, v1.0.1), including the formal algorithm implementations, a unified simulator and evaluator, six comparison methods, a Small-Scale Exact Oracle, the V4 Active Schema, formal experiment protocols with reproduction scripts, and lightweight machine-readable reference-result summaries.
+This repository is the public reproduction implementation of the paper (Paper Release, v1.0.4), including the formal algorithm implementations, a unified simulator and evaluator, six comparison methods, a Small-Scale Exact Oracle, the V4 Active Schema, formal experiment protocols with reproduction scripts, and lightweight machine-readable reference-result summaries.
 
 ---
 
@@ -122,9 +122,9 @@ Reproducibility is organized into three levels (see [docs/REPRODUCIBILITY.md](do
 
 ## Experiments 实验
 
-正式实验脚本按实验组织于 `scripts/reproduce/<experiment>/`。完整复现说明与范围见 [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md)。
+正式实验脚本按实验组织于 `scripts/reproduce/<experiment>/`。其中 `scripts/reproduce/e1_3_budget/` 提供 E1.3 baseline budget sensitivity 复现入口：BPSO-RATA-LA / NFA-adapted 的 {0.5×, 1×, 2×, 4×} 预算档位扫描 + CARS 固定参考，流程为场景重建 → pilot → formal → aggregation → figure（formal 运行需显式 `--authorize-formal-seeds` 标志，该标志仅为本地防误运行的 opt-in，不是访问控制）。完整复现说明与范围见 [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md)。
 
-Formal experiment scripts are organized by experiment under `scripts/reproduce/<experiment>/`. Full reproduction notes and scope are in [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
+Formal experiment scripts are organized by experiment under `scripts/reproduce/<experiment>/`. In particular, `scripts/reproduce/e1_3_budget/` provides the E1.3 baseline budget-sensitivity reproduction entry: budget-tier scan {0.5×, 1×, 2×, 4×} for BPSO-RATA-LA / NFA-adapted plus a CARS fixed reference, with scenario construction → pilot → formal → aggregation → figure (the formal run requires an explicit `--authorize-formal-seeds` flag, which is a local opt-in against accidental runs, not an access control). Full reproduction notes and scope are in [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
 ## Baselines 基线
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cars"
-version = "1.0.1"
+version = "1.0.4"
 description = "CARS (Capacity-Aware Reliability Stabilization Framework): reliability-aware online scheduling for multi-user MEC (AADA -> RCLA)"
 readme = "README.md"
 requires-python = ">=3.9"

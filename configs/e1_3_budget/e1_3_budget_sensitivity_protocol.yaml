@@ -1,0 +1,355 @@
+# ===========================================================================
+# E1-3 Baseline Computational-Budget Sensitivity —— 实验协议（Stage 1 冻结）
+# ===========================================================================
+# 版本: E1_3_BUDGET_SENSITIVITY_PROTOCOL_V1
+# 日期: 2026-08-09
+# 阶段: E1-3 Stage 1（协议与预算映射冻结；不运行 Pilot / Formal，不生成性能结论）
+# 状态: FREEZE_ONLY（Pilot/Formal 均 NOT_EXECUTED；AUTHORIZED_TO_RUN_PILOT=NO）
+#
+# 唯一目标:
+#   建立可执行、可审计的 E1-3 实验协议，回答:
+#   "当给现有强基线（BPSO-RATA-LA / NFA）更多计算搜索资源时，
+#    当前 CARS（AADA→RCLA）的性能—计算开销优势是否仍然成立？"
+#   即 Baseline Fairness + Performance–Computation Tradeoff 的公平性补强实验，
+#   不是"再证明 CARS 性能更好"。
+#
+# Source of Truth（权威顺序）:
+#   1. experiment_docs/III_VII.md（最新合并正文；III 系统模型/IV 优化/V AADA-RCLA/
+#      VI 复杂度边界/VII E1 设置与 runtime 结果）
+#   2. CARS_EXECUTABLE_THEORY_CONTRACT_V4.md（CARS=AADA→RCLA，无 Repair 层，
+#      无搜索预算参数——grep "budget/预算/搜索/search" 零命中）
+#   3. CARS_ACTIVE_SCHEMA_V4（AADA/RCLA IO；正式 CARS 无预算字段）
+#   4. references/bpso-rata-la.pdf（IEEE TSC 2025，Algorithm 3）
+#   5. references/NFA.pdf（IEEE Access 2019，Algorithm 3）
+#   6. src/cars/methods/bpso_rata_la/ 与 src/cars/methods/nfa_adapted/（当前 adapted 实现）
+#   7. configs/e1_v2/e1_v2_protocol.yaml + results/e1_v2/e1_v2_1_formal/（当前 E1 正式）
+#   8. experiment_docs/III_VII.md 中 VII/E1 正文
+#   9. reports/ 与聊天总结（仅索引，不作事实）
+# 冲突处理: 若仓库正文与上述描述冲突，以仓库当前受保护最新版正文为准，报告冲突，
+#   不得自行修正文。
+# ===========================================================================
+
+experiment_id: e1_3_budget_sensitivity
+stage: "Stage 1：实验协议与预算映射冻结（FREEZE_ONLY）"
+protocol_id: e1_3_budget_sensitivity_protocol_v1
+schema_version: CARS_ACTIVE_SCHEMA_V4
+contract_version: CARS_EXECUTABLE_THEORY_CONTRACT_V4
+status_date: "2026-08-09"
+
+# ---------------------------------------------------------------------------
+# 1. 目的（为什么做这个实验）
+# ---------------------------------------------------------------------------
+purpose: >
+  审稿人建议对 NFA 与 BPSO-RATA-LA 做 (0.5×,1×,2×,4×) 搜索预算扫描，以排除一种
+  潜在攻击："CARS 看起来更快、更好，会不会只是因为给基线的迭代次数、搜索次数或
+  种群规模设置得太小？" 本实验检验：当给现有强基线更多计算搜索资源时，CARS 的
+  服务质量—计算开销优势是否仍然成立。理想趋势：Budget↑ ⇒ 基线质量略有提高，
+  但 T_alg↑↑，且即使到 4×，TSSR_baseline < TSSR_CARS（或即使接近也需明显更大
+  运行时间）。本实验不寻找"让 baseline 最强"的配置，不做参数敏感性调参。
+
+# ---------------------------------------------------------------------------
+# 2. 方法（用户冻结：只比较 3 个方法）
+# ---------------------------------------------------------------------------
+methods:
+  scanned: [bpso_rata_la, nfa_adapted]     # 预算扫描对象
+  reference: [cars]                         # 固定参考，不进行 budget scaling
+  reference_method: cars                    # CARS（AADA→RCLA；Contract V4）
+  not_included: [jtora_adapted, reliability_only, local_only, foa]  # 不重跑
+  cars_config: configs/cars_v4/cars_frozen_v4.yaml
+  baseline_1x_configs:
+    bpso_rata_la: configs/r6/frozen_method_configs/bpso_frozen.yaml
+    nfa_adapted: configs/r6/frozen_method_configs/nfa_frozen.yaml
+  fairness:
+    shared: [scenario, seeds, derived-data rules, hard constraints, Evaluator,
+             timeout policy, hardware budget, failure accounting]
+    note: >
+      1× 必须严格等于当前正式 E1（E1-V2-1）实际使用的 baseline 配置（R6 frozen）。
+      严禁重新定义一个新的、更弱或更强的"1×"。
+
+# ---------------------------------------------------------------------------
+# 3. 场景冻结（小型公平性补强，不重新扫描 E1 网格）
+# ---------------------------------------------------------------------------
+scenario:
+  n: 200
+  m: 8
+  topology: "fully connected"
+  id: "E1-V2-1 formal scenario（N=200；公开仓库通过 scripts/reproduce/e1_3_budget/"
+  #   build_e1_3_budget_scenarios.py 重建同一确定性场景，输出 results/e1_3_budget/scenarios/）
+  #   场景内容与原 E1-V2-1 formal 场景语义一致（同一 build_e1_v2_environment 确定性生成）
+  selection_rationale: >
+    基于既有、先于 E1-3 的正式 E1-V2-1 结果（决策前证据，非 E1-3 新结果）:
+    1) N=200 属 E1 最高压力/近饱和点（NEAR_SATURATION；5-seed mean d/c=1.050，
+       e1_v2_protocol.yaml §4）；
+    2) N=200 处 CARS 与 NFA 服务质量最接近（CARS TSSR 0.9540 vs NFA 0.9300，
+       Δ=0.024），最适合检验"更多 NFA 搜索预算能否追近 CARS"；
+    3) BPSO 在 N=200 处仍明显落后（TSSR 0.7620），可检验增加搜索预算是否改变结论；
+    4) 该选择使用旧 E1 结果确定，不利用 E1-3 新结果选场景。
+  scenario_reuse: >
+    Stage 1 只记录：E1-V2-1 的 N=200 场景文件已存在（10 seeds，见
+    results/e1_v2/e1_v2_1_formal/scenarios/）。Stage 2 决定是否复用（须满足
+    相同硬件/环境/计时口径）；Stage 1 不自行作性能结论。
+
+# ---------------------------------------------------------------------------
+# 4. Seeds（沿用 E1-V2-1 的 10 个 paired formal seeds）
+# ---------------------------------------------------------------------------
+seeds: [1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110]
+seed_note: >
+  与 E1-V2-1 正式 seed 一致；不得重新挑"对 CARS 最有利"的 seeds。
+  与 E0-V2(601-620)/E3-V2(401-410)/E1-V2 pilot(201-203) 互斥（既有已登记事实）。
+  若正式 E1 实际 seed 列表与上述不一致，以正式配置为准并在报告中记录（已核实一致）。
+
+# ---------------------------------------------------------------------------
+# 5. 预算倍率（用户冻结）
+# ---------------------------------------------------------------------------
+budget_multipliers: [0.5, 1.0, 2.0, 4.0]
+
+# ---------------------------------------------------------------------------
+# 6. Budget 核心定义（算法无关 canonical budget + 每算法原生记录）
+# ---------------------------------------------------------------------------
+budget_core_definition: >
+  canonical budget = Consumed Search Evaluations：
+  一次真正参与搜索决策的 candidate/solution fitness/objective evaluation 计为一次
+  search evaluation。对每种算法分别记录 native_budget_parameter、
+  configured_budget、actual_consumed_budget、fitness/objective evaluation count、
+  early-stop status。不得强行把不同算法错误等价化；不简单写"4×iterations=4×budget"，
+  必须由代码检查确认实际搜索评估量。
+
+# ---------------------------------------------------------------------------
+# 7. 预算参数映射（原论文 → adapted 实现 → E1 1× 值 → 缩放规则）
+#    全部基于直接证据：原论文 Algorithm 伪代码 + src 实现 + R6 冻结公式
+#    （scripts/run_r6_calibration_tuning.py build_nfa_grid/build_bpso_grid）
+# ---------------------------------------------------------------------------
+budget_parameter_mapping:
+  bpso_rata_la:
+    source_paper: >
+      "Quality of Experience and Reliability-Aware Task Offloading and Scheduling
+      for Multi-User Mobile-Edge Computing Systems"（IEEE TSC, Vol.18, No.3, 2025,
+      pp.1683-1696）；Algorithm 3: BPSO-Based Task Offloading。
+    decision_variables: "二进制卸载决策 X∈{0,1}^N（每任务本地/卸载）；辅以 Algorithm 1
+      RATA（可靠性感知任务分配）+ Algorithm 2 LA（效用最优资源分配，Lagrangian/KKT）"
+    native_budget_parameter: "K 粒子（swarm）× L 轮迭代；终止条件=预定义迭代数 L
+      （原文：The iteration stops when a pre-defined iteration number L is reached）"
+    per_iteration_search_structure: >
+      每轮：逐粒子更新速度(Eq.34)+位置(Eq.37/38) → 按 X 划分 Γ_loc/Γ_off →
+      RATA(Alg.1)+LA(Alg.2) → 计算 fitness ℧k(Eq.10/11) 与 R_sys(Eq.9) →
+      更新 pbest/gbest。LA 属于搜索循环内部（Algorithm 3 lines 11-13 在迭代内
+      调用 Algorithms 1&2）。一次粒子评价 = RATA+LA+fitness/R_sys 一次。
+    adapted_implementation: "src/cars/methods/bpso_rata_la/bpso.py（Algorithm 3 忠实
+      转写）；K=population_size, L=max_iterations, cap=particle_evaluation_cap"
+    e1_1x_value: {population_size_max: 8, max_iterations_max: 5, particle_evaluation_cap_max: 112}
+    e1_1x_evidence: >
+      configs/r6/frozen_method_configs/bpso_frozen.yaml（E1-V2-1 runner 直接引用）
+      + results/r6/frozen_configuration.json winner=bpso_pop8_iter5
+      + R6 公式 cap = pop*(iter+1)+64 = 8*6+64 = 112（脚本 run_r6_calibration_tuning.py）
+    per_1x_search_evaluations: "48 次粒子评价 = K*(L+1) = 8*6（8 初始 + 5 轮×8）"
+    primary_budget_knob: population_size_max    # 粒子数 K（迭代数 L 冻结）
+    scaling_rule: >
+      K' = multiplier × 8（deterministic；全整数无取整）；L 冻结=5；
+      cap' = K'*(L+1)+64（沿用 R6 冻结公式）。一次粒子评价 = RATA+LA+fitness。
+      K 线性缩放 → 每代工作量 ∝ K，精确形成倍率（L 固定时搜索量 ∝ K）。
+    multiplier_map:
+      "0.5": {population_size_max: 4,  max_iterations_max: 5, particle_evaluation_cap_max: 88,  expected_search_evaluations: 24}
+      "1.0": {population_size_max: 8,  max_iterations_max: 5, particle_evaluation_cap_max: 112, expected_search_evaluations: 48}
+      "2.0": {population_size_max: 16, max_iterations_max: 5, particle_evaluation_cap_max: 160, expected_search_evaluations: 96}
+      "4.0": {population_size_max: 32, max_iterations_max: 5, particle_evaluation_cap_max: 256, expected_search_evaluations: 192}
+
+  nfa_adapted:
+    source_paper: >
+      "A Novel Firefly Algorithm for Scheduling Bag-of-Tasks Applications Under
+      Budget Constraints on Hybrid Clouds"（IEEE Access, 2019, DOI 10.1109/
+      ACCESS.2019.2948468）；Algorithm 3（NFA 主流程）。
+    decision_variables: "BoT 调度序列 π（T 维 firefly 位置经距离型映射算子 Algorithm 1
+      映射到任务序列；预算约束下最小化 makespan——adapted 后为加权多目标
+      [成功数, 有效可靠性, 有效效用]（2026-08-08 用户授权，nfa_frozen.yaml）"
+    native_budget_parameter: "population（|Ψ| fireflies）× generations/iterations；
+      终止条件=预定义代数量（原文：We terminate the NFA procedure if the number of
+      iterations reaches 1000；termination criteria ... set as 1000 generations）"
+    per_iteration_search_structure: >
+      每代：双循环 i,j 成对比较，I_j>I_i 时按 Eq.14 移动 + 重映射 + 重评价 +
+      更新 best-so-far（O(pop^2) 比较/代）。每次 evaluate = mapping(Alg.1,O(T)) +
+      解码（贪心 QoS 列表调度）+ 内部目标。composite heuristic（Algorithm 2:
+      LTF→IRM→SSM）生成初始最优解，其 evaluate 也计入 cap。
+    adapted_implementation: "src/cars/methods/nfa_adapted/core.py + decode.py
+      （Algorithm 3 转写）；pop=population_size, gen=max_generations,
+      cap=objective_evaluation_cap；composite 阶段评估计入 cap"
+    e1_1x_value: {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 4744}
+    e1_1x_evidence: >
+      configs/r6/frozen_method_configs/nfa_frozen.yaml（E1-V2-1 runner 直接引用）
+      + results/r6/frozen_configuration.json winner=nfa_pop8_gen10
+      + R6 公式 cap = pop + pop^2*gen + 4096 = 8+640+4096 = 4744
+      （脚本 run_r6_calibration_tuning.py build_nfa_grid）
+    mechanism_fact_at_n200: >
+      代码算术证据（非运行结论）：N=200 时 composite heuristic IRM 需
+      Σ_{k=0}^{N-1}(k+1) = N(N+1)/2 = 20100 次 evaluate（逐任务逐位置插入），
+      远超 1× cap=4744。cap 检查在每次 evaluate 前（decode.py ObjectiveEvaluator），
+      故 N=200 下 1× cap 在 composite 阶段即触达（约第 96 个任务处），主 firefly
+      搜索循环不执行，返回 BUDGET_EXHAUSTED——与 E1-V2-1 NFA@N=200 观测一致
+      （status=BUDGET_EXHAUSTED, runtime≈3938.9ms）。因此 N=200 下 NFA 的
+      pop/gen 不是实际约束搜索量的参数，objective_evaluation_cap 才是。
+    primary_budget_knob: objective_evaluation_cap_max   # 总目标评价预算（含 composite）
+    scaling_rule: >
+      cap' = multiplier × 4744（deterministic；全整数无取整）；pop/gen 冻结=8/10
+      （保持 1× 算法行为结构：初始化分布/搜索算子不变）。在 N=200 下 cap 是
+      实际控制搜索量的参数；缩放 cap = 精确倍率。各档位预期（精确算术，
+      IRM 插入完成 k 个任务消耗 Σ_{1}^{k}=k(k+1)/2 次评价）：cap 在 composite
+      阶段触达——0.5×：完成第 68 个任务后在插入第 69 个任务期间触达；
+      1×：完成第 96 个任务后在插入第 97 个任务期间触达；2×：完成第 137 个
+      任务后在插入第 138 个任务期间触达；4×：完成第 194 个任务后在插入
+      第 195 个任务期间触达。主循环在各档位均不执行（IRM 总需求 20100 >
+      4× cap 18976）——如实记录为机制事实，不预设结论。pop/gen 冻结的理由：
+      若只增 pop/gen 而 cap 不变，cap 先触达，实际搜索量不变
+      （"配置预算≠实际消耗预算"的典型实例）。
+    multiplier_map:
+      "0.5": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 2372}
+      "1.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 4744}
+      "2.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 9488}
+      "4.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 18976}
+
+  cars:
+    scaling: "固定参考；不进行 budget scaling"
+    evidence: >
+      Contract V4（CARS=AADA→RCLA：AADA 分配感知两阶段确定性指派 + RCLA 固定指派下
+      KKT/active-set 资源分配；无 Repair 层）；Contract V4 全文 grep
+      "budget/预算/搜索/search" 零命中——CARS 无 scaleable search-budget 参数。
+
+# ---------------------------------------------------------------------------
+# 8. 参数白名单（Allowed-to-scale）与冻结参数（Frozen）
+# ---------------------------------------------------------------------------
+parameter_whitelist:
+  bpso_rata_la:
+    allowed_to_scale:
+      - population_size_max          # primary knob（粒子数 K；原论文预算参数）
+      - particle_evaluation_cap_max  # 按 R6 公式随 K 同步（不成为瓶颈的预算保护）
+    frozen: [max_iterations_max, reliability_threshold, inertia_weight,
+             cognitive_coefficient, social_coefficient, method_seed,
+             soft_deadline_margin, hard_timeout_seconds]
+    frozen_rationale: >
+      max_iterations=5 冻结（保持原论文 K×L 结构中 L 不变；K 为唯一主旋钮）。
+      reliability_threshold=0.9 为原文 VIII-A source-faithful；inertia/cognitive/
+      social 为 R6 冻结测试默认（W67 IMPLEMENTATION_SPEC_GAP 已登记，不调）。
+      fitness/objective 定义、RATA/LA 语义、约束处理、初始化（X~Bernoulli(0.5)）、
+      转移函数（Eq.38）、场景/seeds/Evaluator/hardware/timeout 均冻结。
+  nfa_adapted:
+    allowed_to_scale:
+      - objective_evaluation_cap_max # primary knob（总目标评价预算；N=200 下实际控制搜索量）
+    frozen: [population_size_max, max_generations_max, beta_0, gamma,
+             position_bounds, objective_weights, method_seed,
+             soft_deadline_margin, hard_timeout_seconds]
+    frozen_rationale: >
+      pop/gen 冻结为 8/10（1× 结构；见 mechanism_fact_at_n200——N=200 下 cap
+      先触达，pop/gen 不影响实际搜索量，缩放无意义）。beta_0=1/gamma=2/
+      position_bounds=[-2,2] 为 source-faithful（R3-NFA 合同）；objective_weights=
+      [0.5,0.25,0.25]（E1 落实 2026-08-08 用户授权）。mapping/移动算子（Eq.12/14）、
+      composite heuristic（Alg.2）、初始化分布、场景/seeds/Evaluator/hardware/
+      timeout 均冻结。
+  cars:
+    allowed_to_scale: []
+    frozen: "全部参数（固定参考；Contract V4 无预算参数）"
+  general_frozen_scope: >
+    对两扫描基线共同冻结：objective/fitness 定义、reliability model、LA/资源分配
+    语义、constraint handling、初始化分布、mutation/update/search operator、
+    penalty 定义、scenario、seeds、Evaluator、hardware/runtime environment、
+    stopping correctness condition。
+  mixed_parameter_rule: >
+    若某参数同时影响"搜索预算"与"算法行为"，不得直接加入白名单；须在报告中说明
+    并优先寻找更纯粹 budget knob。本协议两 primary knob（BPSO K；NFA cap）均为
+    纯预算参数（改变它们不影响目标/约束/初始化/算子/repair/Evaluator）。
+
+# ---------------------------------------------------------------------------
+# 9. Timeout 与 Early-Stop 策略
+# ---------------------------------------------------------------------------
+timeout_policy:
+  shared_timeout_seconds: 30.0        # R6 冻结 shared timeout；所有档位同一
+  rule: >
+    1) 所有 budget 档位使用同一 timeout policy；2) 不允许 4× 获得特殊无限 timeout；
+    3) timeout 必须进入正式统计；4) early stop 若属原算法正式逻辑则必须保留；
+    5) 发生 early stop 时记录 actual consumed budget；6) 不允许人为关闭原有
+    early stop 只为了"耗满 4×"。
+  no_predictive_modification: >
+    Stage 1 不因预测"4× 可能 timeout"而修改协议；真正可运行性由 Stage 2 Pilot 检验。
+early_stop_policy:
+  bpso_rata_la: "cap 触达（particle_evaluations>=cap）或 soft deadline → 停止并返回
+    incumbent（BUDGET_EXHAUSTED/TIMEOUT）；原算法无其它 early stop"
+  nfa_adapted: "cap 触达（objective_evaluations>=cap）→ 停止（BUDGET_EXHAUSTED，
+    返回 incumbent）；soft deadline → TIMEOUT。composite 阶段同样受 cap 约束"
+  record: "每次运行记录 cap_reached / soft_deadline_triggered / actual consumed count"
+
+# ---------------------------------------------------------------------------
+# 10. 冻结评价指标
+# ---------------------------------------------------------------------------
+metrics:
+  primary_quality: [tssr]
+  secondary_quality: [mean_effective_reliability, mean_effective_utility, reliability_violation_rate]
+  computational:
+    - method_runtime_ms            # T_alg 主口径（算法执行时间；与 E1-V2-1 一致）
+    - total_wall_time_ms           # 端到端补充参考（含实验框架固定开销）
+    - configured_budget_multiplier # 自变量
+    - configured_native_budget     # 各档位配置的原生预算（pop/iter 或 cap）
+    - actual_consumed_search_evaluations  # 实际消耗搜索评估数（见 §11）
+    - executed_iterations_or_generations
+    - early_stop
+    - timeout
+    - result_status
+  role_definition: >
+    budget multiplier 是自变量；TSSR/Rbar_eff/Ubar_eff 是质量结果；T_alg 是计算成本；
+    timeout 不能删除或隐藏。
+  evaluator: "统一 External Evaluator（Runner 唯一调用者）；方法不得自行定义成功/指标"
+
+# ---------------------------------------------------------------------------
+# 11. Consumed-Budget 诊断字段（Stage 1 只定义记录需求；不实现 instrumentation）
+# ---------------------------------------------------------------------------
+consumed_budget_diagnostics:
+  bpso_rata_la:
+    field: "diagnostics.particle_evaluations（实际粒子评价数；排除 cache 命中）"
+    source: "src/cars/methods/bpso_rata_la/bpso.py _common_diag（已存在，只读）"
+    note: "每粒子评价 = RATA+LA+fitness/R_sys 一次；cap=particle_evaluation_cap_max"
+  nfa_adapted:
+    field: "diagnostics.objective_evaluations（目标评价数；含 composite 阶段，排除 cache 命中）"
+    source: "src/cars/methods/nfa_adapted/core.py _stop_proposal / run_nfa（已存在，只读）"
+    note: "cap=objective_evaluation_cap_max；composite heuristic 的 evaluate 也计数"
+  common_record: [configured_budget_multiplier, configured_native_budget,
+                  executed_iterations_or_generations, cap_reached,
+                  soft_deadline_triggered, result_status, method_runtime_ms,
+                  total_wall_time_ms]
+  instrumentation_status: "本阶段不实现算法 instrumentation（只读计数接口设计说明，见报告 §7）"
+
+# ---------------------------------------------------------------------------
+# 12. Runtime 边界
+# ---------------------------------------------------------------------------
+runtime_boundary: >
+  method_runtime_ms = 算法执行时间（主口径，2026-08-09 用户批准；避免子进程隔离/
+  状态构建等实验框架固定开销稀释算法差异）；total_wall_time_ms = 端到端补充参考
+  （含实验框架固定开销，全部方法公平）。与 E1-V2-1 完全一致（同一 runner/计时口径）。
+  CARS 在同一硬件、同一 Python 环境和同一 runtime 计时口径下作为固定参考。
+  Stage 1 不判定"E1 raw result 是否可复用"——只记录该问题，由 Stage 2 决定。
+
+# ---------------------------------------------------------------------------
+# 13. Stage 2 Pilot 门控（Pilot 只允许验证什么）
+# ---------------------------------------------------------------------------
+pilot_gate:
+  authorized: NO                      # AUTHORIZED_TO_RUN_PILOT = NO（本阶段不运行）
+  pilot_may_verify_only:
+    - "各档位配置可被现有 config 验证器接受（无 METHOD_ERROR/配置错误）"
+    - "预算倍率实际产生更多/更少的 consumed search evaluations（配置预算 vs 实际消耗核对）"
+    - "timeout=30s 下各档位可运行性（尤其 4×；不因预测修改协议）"
+    - "决策合法性、ResultStatus 统计完整（SUCCESS/BUDGET_EXHAUSTED/TIMEOUT/ERROR）"
+  pilot_may_not:
+    - "不产生正式性能结论"
+    - "不因 pilot 结果调整预算映射/场景/seeds"
+    - "不重新扫描 E1 网格"
+formal_freeze_rule: >
+  Stage 3 Formal 前须：Pilot 通过 + 用户显式授权（AUTHORIZED_TO_RUN_FORMAL=YES）；
+  formal 使用与 E1-V2-1 相同的场景/seeds/Evaluator/timeout/runtime 口径；
+  严禁在 formal 后按结果调整预算映射或验收终点。
+
+# ---------------------------------------------------------------------------
+# 14. 禁止事项（Stage 1）
+# ---------------------------------------------------------------------------
+forbidden:
+  - "不运行 Pilot / Formal；不生成任何性能结论"
+  - "不修改 experiment_docs/III.md..VII、references/、data/、BPSO/NFA 核心算法、
+     CARS/AADA/RCLA、Evaluator 数学语义、已有正式 E1 raw results"
+  - "不重新定义 1×（1× 必须严格等于 E1-V2-1 实际使用的 frozen 配置）"
+  - "不得为使结果漂亮而事后改变映射"
+  - "不得只调优 CARS / 给 CARS 单独预处理 / 隐藏 timeout/异常/不可行"
+  - "不得把 adaptation 写成原论文方法"

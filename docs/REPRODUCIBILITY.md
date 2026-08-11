@@ -40,6 +40,7 @@ Formal experiment scripts live under `scripts/reproduce/<experiment>/`. Each exp
 |------|---------|-------------------|
 | E0 负载诱导服务退化与机制表征 / load-induced degradation & mechanism | `scripts/reproduce/e0_v2/` | 否 / No |
 | E1 任务规模与异构资源下的性能评估 / performance vs scale & heterogeneity | `scripts/reproduce/e1_v2/`（规模）+ `e2_v2/`（异构） | 否 / No |
+| E1.3 基线预算敏感性 / baseline budget sensitivity | `scripts/reproduce/e1_3_budget/` | 否 / No |
 | E2 组件消融与机制分析 / component ablation | `scripts/reproduce/e3_v2/` | 否 / No |
 | E3 Trace 增强外部有效性评估 / Trace-enhanced external validity | `scripts/reproduce/e4_v2/` | 是 / Yes（见 docs/DATA.md） |
 | E4 小规模精确最优参照（Exact Oracle）/ small-scale exact reference | `scripts/reproduce/e4_exact/` | 否 / No |

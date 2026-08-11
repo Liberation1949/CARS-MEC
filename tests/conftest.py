@@ -147,6 +147,9 @@ def _artifact(rel: str) -> str:
 
 
 EXTERNAL_MODULE_DEPS = {
+    # e1_3_budget: artifacts produced by reproduce scripts (results/e1_3_budget/)
+    "tests/e1_3_budget/test_e1_3_budget_pilot.py": ["results/e1_3_budget/budget_pilot/pilot_raw.jsonl"],
+    "tests/e1_3_budget/test_e1_3_budget_formal.py": ["results/e1_3_budget/budget_formal/formal_manifest.json"],
     "tests/e0_v2/test_e0_v2_2_formal.py": ["results/e0_v2/e0_v2_2_formal/formal_summary.json"],
     "tests/e3_v2/test_e3_v2_2_formal.py": ["results/e3_v2/e3_v2_2_formal/formal_meta.json"],
     "tests/e4_v2/test_e4_v2_2_formal.py": ["results/e4_v2/e4_v2_2_formal/formal_window_manifest.json"],

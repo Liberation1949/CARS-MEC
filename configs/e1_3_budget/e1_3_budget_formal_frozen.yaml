@@ -1,0 +1,162 @@
+# ===========================================================================
+# E1-3 Stage 2 冻结：Stage 3 Formal 最终配置（FROZEN）
+# ===========================================================================
+# 版本: E1_3_BUDGET_FORMAL_FROZEN_V1
+# 日期: 2026-08-09
+# 阶段: E1-3 Stage 2 冻结产物（Stage 3 Formal 唯一执行配置）
+# 状态: FROZEN_ONLY / NOT_EXECUTED（Stage 3 需用户另行授权 AUTHORIZED_TO_RUN_FORMAL）
+# 依据: Stage-1 协议 E1_3_BUDGET_SENSITIVITY_PROTOCOL_V1（预算映射唯一权威）
+#       + Stage-2 Pilot（results/e1_3/budget_pilot/；协议可执行性验证，NOT_FORMAL）
+# 冻结规则: 生成后 Stage 3 不得根据正式结果改配置；不得按结果移动验收终点。
+# ===========================================================================
+
+experiment_id: e1_3_budget_sensitivity
+protocol_version: e1_3_budget_sensitivity_protocol_v1
+formal_config_version: e1_3_budget_formal_frozen_v1
+stage: "Stage 3 Formal 冻结配置（来自 Stage 2 Pilot 校准）"
+status_date: "2026-08-09"
+status: "FROZEN_ONLY / NOT_EXECUTED"
+
+# ---------------------------------------------------------------------------
+# 1. 场景（与 Stage-1 一致；E1-V2-1 formal 场景文件，seeds 1101-1110 的 N=200）
+# ---------------------------------------------------------------------------
+scenario:
+  n: 200
+  m: 8
+  topology: "fully connected"
+  scenario_files: "results/e1_3_budget/scenarios/scenario_seed{seed}_n200.yaml"
+  scenario_id_prefix: "e1_v2_1_formal"
+  selection_basis: "E1-V2-1 正式结果（决策前证据；最高压力/近饱和点，CARS-NFA 最接近、BPSO 落后）"
+
+# ---------------------------------------------------------------------------
+# 2. Formal seeds（与 E1-V2-1 正式一致；不得增加/删除/筛选）
+# ---------------------------------------------------------------------------
+seeds: [1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110]
+seed_isolation:
+  - "与 E1-3 Pilot seeds {201,202,203} 无交集（Pilot 已核实）"
+  - "与 E0-V2(601-620)/E3-V2(401-410)/E1-V2 pilot(201-203) 互斥（既有已登记）"
+
+# ---------------------------------------------------------------------------
+# 3. 方法与预算档位（Stage-1 冻结；Pilot 验证可执行）
+# ---------------------------------------------------------------------------
+methods:
+  scanned: [bpso_rata_la, nfa_adapted]
+  reference: [cars]
+  budget_multipliers: [0.5, 1.0, 2.0, 4.0]
+  reference_method: cars
+  cars_config: configs/cars_v4/cars_frozen_v4.yaml
+  baseline_1x_configs:
+    bpso_rata_la: configs/r6/frozen_method_configs/bpso_frozen.yaml
+    nfa_adapted: configs/r6/frozen_method_configs/nfa_frozen.yaml
+  total_runs: "(2 × 4 + 1) × 10 seeds = 90 runs"
+
+# ---------------------------------------------------------------------------
+# 4. 每档 native 配置（Stage-1 映射唯一权威；Pilot 实测 consumed 见 §9）
+# ---------------------------------------------------------------------------
+budget_configs:
+  bpso_rata_la:
+    "0.5": {population_size_max: 4,  max_iterations_max: 5, particle_evaluation_cap_max: 88}
+    "1.0": {population_size_max: 8,  max_iterations_max: 5, particle_evaluation_cap_max: 112}
+    "2.0": {population_size_max: 16, max_iterations_max: 5, particle_evaluation_cap_max: 160}
+    "4.0": {population_size_max: 32, max_iterations_max: 5, particle_evaluation_cap_max: 256}
+  nfa_adapted:
+    "0.5": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 2372}
+    "1.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 4744}
+    "2.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 9488}
+    "4.0": {population_size_max: 8, max_generations_max: 10, objective_evaluation_cap_max: 18976}
+
+# ---------------------------------------------------------------------------
+# 5. Timeout（保持 Stage-1 30s；Pilot 实测后不调整——见 §9 Warning 记录）
+# ---------------------------------------------------------------------------
+timeout:
+  shared_timeout_seconds: 30.0
+  note: >
+    Stage-2 Pilot 实测：NFA 4× 3 seeds 中 1 个 timeout（seed 201，consumed=18707/18976
+    被截断）、2 个完成（25.8-27.0s，consumed=18976）。属"个别 timeout"而非
+    "几乎全部 timeout"，按合同 §八 不进入 timeout policy review、不调整 timeout。
+    Formal 中 NFA 4× 的 timeout 必须完整记录（不删除、不重跑、不换 seed）。
+  adjustment_history: "无（保持 Stage-1 30s；最多一次 timeout calibration 未被触发）"
+
+# ---------------------------------------------------------------------------
+# 6. Runtime 边界（与 E1-V2-1 完全一致）
+# ---------------------------------------------------------------------------
+runtime_boundary: >
+  method_runtime_ms = 算法执行时间（主口径）；total_wall_time_ms = 端到端补充参考。
+  同一 MethodRunner / Evaluator / 计时口径；CARS 同硬件/环境固定参考。
+
+# ---------------------------------------------------------------------------
+# 7. Consumed-Budget 诊断（Pilot 已验证可准确记录；native unit 不同，不跨算法统一）
+# ---------------------------------------------------------------------------
+consumed_budget_diagnostics:
+  bpso_rata_la:
+    actual_consumed: "diagnostics.particle_evaluations（每次 = RATA+LA+fitness 完整粒子评价）"
+    executed_iterations: "diagnostics.completed_iterations"
+    cap_reached: "particle_evaluations >= particle_evaluation_cap_max"
+  nfa_adapted:
+    actual_consumed: "diagnostics.objective_evaluations（含 composite 阶段；每次 = mapping+decode+目标）"
+    executed_generations: "diagnostics.completed_generations"
+    pairwise_moves: "diagnostics.completed_pairwise_moves"
+    cap_reached: "objective_evaluations >= objective_evaluation_cap_max"
+  cross_algorithm_note: >
+    BPSO 与 NFA 的 search evaluation 单位不同（native unit 不同），
+    actual_consumed_search_evaluations 不可直接跨算法比较——如实记录为
+    IMPLEMENTATION_SPEC_GAP，不猜测不强行统一。
+
+# ---------------------------------------------------------------------------
+# 8. Formal 统计计划（Stage 2 预注册冻结；Stage 3 只执行不修改）
+# ---------------------------------------------------------------------------
+statistical_plan:
+  primary_question: "随 baseline budget 从 0.5× 增长到 4×："
+  questions:
+    q1: "TSSR 是否显著改善（paired：ΔTSSR = TSSR(4×) − TSSR(1×)，同 seed）"
+    q2: "Rbar_eff / Ubar_eff 是否改善（paired 同 seed）"
+    q3: "runtime 增长多少（method_runtime_ms：4× vs 1×；比例 + 绝对差）"
+    q4: "其 quality–runtime tradeoff 是否改变与 CARS 的主要比较结论"
+  primary_metric: TSSR
+  secondary_metrics: [mean_effective_reliability, mean_effective_utility, reliability_violation_rate]
+  cost_metrics: [method_runtime_ms, actual_consumed_search_evaluations]
+  aggregation: "mean ± std over 10 paired seeds；per-seed 值保留"
+  comparison: "paired（同 seed 同场景）；ΔTSSR(4×−1×)、ΔTSSR(2×−1×)、ΔTSSR(1×−0.5×)"
+  outputs:
+    figure: "1 张主图：Performance–Runtime Tradeoff（x=T_alg，y=TSSR；各方法各档位）"
+    table: "1 张紧凑表：Budget × Method 的质量（TSSR/Rbar/Ubar/V_R）与 runtime 汇总"
+  pre_registered: true
+  forbidden: ["Stage 3 看完结果后增加只对 CARS 有利的指标", "按结果移动验收终点",
+              "删除/隐藏 timeout 或 BUDGET_EXHAUSTED", "把 Pilot 当正式证据"]
+
+# ---------------------------------------------------------------------------
+# 9. Pilot 校准结论（NOT_FORMAL；仅协议可执行性；Gate A-D 全过）
+# ---------------------------------------------------------------------------
+pilot_calibration:
+  status: "PASS_WITH_WARNINGS（P0=0；P1=0）"
+  gates:
+    A: "配置预算单调 PASS（BPSO caps [88,112,160,256]；NFA caps [2372,4744,9488,18976]）"
+    B: "消耗预算有效 PASS（BPSO [24,48,96,192]；NFA [2372,4744,9488,18886] 非递减）"
+    C: "runtime 可辨识 PASS（BPSO 32→63→99→229ms；NFA 2193→4864→11245→27588ms 单调）"
+    D: "可运行性 PASS（27 runs：1 timeout / 0 error / 无 crash / 无 invalid）"
+  mechanism_confirmed:
+    - "NFA @N=200：executed_generations=0、pairwise_moves=0、cap_reached=True、
+       consumed==cap——主 firefly 循环未执行，预算全部消耗于 composite heuristic
+       （与 Stage-1 代码算术预测一致）"
+    - "BPSO @N=200：completed_iterations=5、consumed=K×(L+1)（24/48/96/192）、
+       cap 未触达、early_stop=False——搜索完整执行但无可靠性可行解
+       （BUDGET_EXHAUSTED 来自无可行解而非预算耗尽）"
+  warnings:
+    - "NFA 4× 接近 30s timeout（2/3 完成 25.8-27.0s；1/3 截断 18.7s）——Formal 需完整
+       记录 timeout，不删除不重跑"
+    - "BPSO/NFA search evaluation 单位不同，consumed 不可跨算法直接比较"
+    - "本 Pilot 不回答'CARS 是否优于 baseline'（NOT_FORMAL；无正式性能结论）"
+
+# ---------------------------------------------------------------------------
+# 10. 输出与禁止项
+# ---------------------------------------------------------------------------
+output:
+  dir: results/e1_3_budget/budget_formal/
+  raw: "raw_records.jsonl（逐实例；禁止只存 summary）"
+  summary: "summary.json"
+  integrity: "formal_integrity.json"
+forbidden:
+  - "未获用户授权不运行 Stage 3（AUTHORIZED_TO_RUN_FORMAL=NO）"
+  - "不得修改 Stage-1 预算映射 / 场景 / seeds / timeout / 指标"
+  - "不得根据正式结果调参、换 seed、换场景、删除 timeout/不可行"
+  - "不得修改算法 / Evaluator / 正文 / 既有 E1 正式结果"
